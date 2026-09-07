@@ -1,0 +1,354 @@
+import 'dart:io';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hive/hive.dart';
+import 'package:whistly/models/game.dart';
+import 'package:whistly/models/player.dart';
+import 'package:whistly/models/round.dart';
+import 'package:whistly/providers/game_provider.dart';
+import 'package:whistly/scoring_settings.dart';
+
+void main() {
+  late Directory tempDir;
+  late GameProvider provider;
+  late ScoringSettings settings;
+  late List<Player> players;
+
+  setUp(() async {
+    tempDir = await Directory.systemTemp.createTemp('whistly_game_provider_test_');
+    Hive.init(tempDir.path);
+
+    if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(PlayerAdapter());
+    if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(GameAdapter());
+    if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(RoundAdapter());
+
+    provider = GameProvider();
+    settings = ScoringSettings();
+    await settings.init();
+
+    players = [
+      Player(id: 'p1', name: 'Sander'),
+      Player(id: 'p2', name: 'Alice'),
+      Player(id: 'p3', name: 'Bob'),
+      Player(id: 'p4', name: 'Charlie'),
+    ];
+  });
+
+  tearDown(() async {
+    await Hive.close();
+    if (await tempDir.exists()) {
+      await tempDir.delete(recursive: true);
+    }
+  });
+
+  group('GameProvider Initialization & Flow', () {
+    test('should start and end game correctly', () async {
+      await provider.init();
+      expect(provider.activeGame, isNull);
+
+      provider.startGame(players, settings: settings);
+      expect(provider.activeGame, isNotNull);
+      expect(provider.activeGame!.players, players);
+      expect(provider.dealerIndex, 0);
+      expect(provider.currentDealer!.id, 'p1');
+
+      provider.endGame();
+      expect(provider.activeGame, isNull);
+    });
+
+    test('should restore active game on init if activeGameId is saved', () async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+      final gameId = provider.activeGame!.id;
+
+      // Close and re-init a new GameProvider
+      final newProvider = GameProvider();
+      await newProvider.init();
+
+      expect(newProvider.activeGame, isNotNull);
+      expect(newProvider.activeGame!.id, gameId);
+    });
+
+    test('should advance dealer and stack point multiplier on pass round', () async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+
+      expect(provider.pointMultiplier, 1);
+      expect(provider.dealerIndex, 0);
+
+      // Add a pass round
+      provider.addPassRound();
+      expect(provider.pointMultiplier, 2);
+      expect(provider.dealerIndex, 1);
+      expect(provider.activeGame!.rounds.length, 1);
+      expect(provider.activeGame!.rounds.first.contractType, 'Pass');
+
+      // Add another pass round (double again)
+      provider.addPassRound();
+      expect(provider.pointMultiplier, 4);
+      expect(provider.dealerIndex, 2);
+    });
+  });
+
+  group('GameProvider Scoring Calculations', () {
+    setUp(() async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+    });
+
+    test('Ask & Join: success', () {
+      // Declarer: p1, Partner: p2, Defending: p3, p4
+      // Target: 8 tricks, Tricks won: 9. base = 2, overtricks = 1. total = 3.
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 9,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 3);
+      expect(deltas['p2'], 3);
+      expect(deltas['p3'], -3);
+      expect(deltas['p4'], -3);
+
+      expect(provider.activeGame!.totalScores['p1'], 3);
+      expect(provider.activeGame!.totalScores['p3'], -3);
+      expect(provider.dealerIndex, 1); // Dealer rotated
+    });
+
+    test('Ask & Join: failure', () {
+      // Declarer: p1, Partner: p2
+      // Target: 8 tricks, Tricks won: 7. base = 2, total = 2.
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 7,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -2);
+      expect(deltas['p2'], -2);
+      expect(deltas['p3'], 2);
+      expect(deltas['p4'], 2);
+    });
+
+    test('Trull: success', () {
+      // Declarer: p1, Partner: p2. base = 3, overtricks = 1 (tricks: 10 vs target: 9). total = 4.
+      final deltas = provider.addRound(
+        contractType: 'Trull',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 10,
+        agreedTricks: 9,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 4);
+      expect(deltas['p2'], 4);
+      expect(deltas['p3'], -4);
+      expect(deltas['p4'], -4);
+    });
+
+    test('Solo: success', () {
+      // Declarer: p1. Target: 5, Tricks won: 6. base = 2, overtricks = 1. total = 3.
+      // Declarer gets 3 * 3 = 9. Defenders lose 3 each.
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 6,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 9);
+      expect(deltas['p2'], -3);
+      expect(deltas['p3'], -3);
+      expect(deltas['p4'], -3);
+    });
+
+    test('Solo: failure with escalation', () {
+      // Declarer: p1. Target: 7, Tricks won: 6.
+      // Base: aloneBase (2) + (7 - 5) = 4.
+      // Failure: declarer loses 4 * 3 = 12. Defenders gain 4 each.
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 6,
+        agreedTricks: 7,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -12);
+      expect(deltas['p2'], 4);
+      expect(deltas['p3'], 4);
+      expect(deltas['p4'], 4);
+    });
+
+    test('Abondance: success', () {
+      // Declarer: p1. Target: 9, Tricks won: 9. base = 5.
+      // Success: declarer gets 5 * 3 = 15. Defenders lose 5 each.
+      final deltas = provider.addRound(
+        contractType: 'Abondance',
+        declarerId: 'p1',
+        tricksWon: 9,
+        agreedTricks: 9,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 15);
+      expect(deltas['p2'], -5);
+      expect(deltas['p3'], -5);
+      expect(deltas['p4'], -5);
+    });
+
+    test('Miserie: success', () {
+      // Declarer: p1. base = 5.
+      // Success: declarer gets 5 * 3 = 15. Defenders lose 5 each.
+      final deltas = provider.addRound(
+        contractType: 'Miserie',
+        declarerId: 'p1',
+        tricksWon: 0,
+        agreedTricks: 0,
+        miserieSuccess: true,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 15);
+      expect(deltas['p2'], -5);
+      expect(deltas['p3'], -5);
+      expect(deltas['p4'], -5);
+    });
+
+    test('Open Miserie: failure', () {
+      // Declarer: p1. base = 10.
+      // Failure: declarer loses 10 * 3 = 30. Defenders gain 10 each.
+      final deltas = provider.addRound(
+        contractType: 'Open Miserie',
+        declarerId: 'p1',
+        tricksWon: 1,
+        agreedTricks: 0,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -30);
+      expect(deltas['p2'], 10);
+      expect(deltas['p3'], 10);
+      expect(deltas['p4'], 10);
+    });
+
+    test('Double Miserie: both succeed', () {
+      // Declarer: p1, Partner: p2. base = 5. Defenders: p3, p4.
+      // Both succeed: declarers get 5 * 2 = 10 each. Defenders pay 5 * 2 = 10 each.
+      final deltas = provider.addRound(
+        contractType: 'Miserie',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 0,
+        agreedTricks: 0,
+        miserieSuccess: true,
+        partnerMiserieSuccess: true,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 10);
+      expect(deltas['p2'], 10);
+      expect(deltas['p3'], -10);
+      expect(deltas['p4'], -10);
+    });
+
+    test('Double Miserie: both fail', () {
+      // Declarer: p1, Partner: p2. base = 5. Defenders: p3, p4.
+      // Both fail: declarers pay 5 * 2 = 10 each. Defenders get 5 * 2 = 10 each.
+      final deltas = provider.addRound(
+        contractType: 'Miserie',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 0,
+        agreedTricks: 0,
+        miserieSuccess: false,
+        partnerMiserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -10);
+      expect(deltas['p2'], -10);
+      expect(deltas['p3'], 10);
+      expect(deltas['p4'], 10);
+    });
+
+    test('Double Miserie: one succeeds, one fails', () {
+      // Declarer: p1 (succeeds), Partner: p2 (fails). base = 5. Defenders: p3, p4.
+      // p1 gets 10, p2 pays 10. Defenders: net 0 (pay 5 to p1, get 5 from p2).
+      final deltas = provider.addRound(
+        contractType: 'Miserie',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 0,
+        agreedTricks: 0,
+        miserieSuccess: true,
+        partnerMiserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 10);
+      expect(deltas['p2'], -10);
+      expect(deltas['p3'], 0);
+      expect(deltas['p4'], 0);
+    });
+
+    test('Solo Slim: success', () {
+      // Declarer: p1. base = 15.
+      // Success: declarer gets 15 * 3 = 45. Defenders lose 15 each.
+      final deltas = provider.addRound(
+        contractType: 'Solo Slim',
+        declarerId: 'p1',
+        tricksWon: 13,
+        agreedTricks: 13,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 45);
+      expect(deltas['p2'], -15);
+      expect(deltas['p3'], -15);
+      expect(deltas['p4'], -15);
+    });
+
+    test('Should apply Rondpas multipliers and reset them afterwards', () {
+      // Add two pass rounds to get a x4 multiplier
+      provider.addPassRound();
+      provider.addPassRound();
+      expect(provider.pointMultiplier, 4);
+
+      // Play Solo: success. Base = 2.
+      // Delat: p1 gets 2 * 3 = 6. Defenders lose 2.
+      // With x4 multiplier: p1 gets 24. Defenders lose 8.
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 5,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 24);
+      expect(deltas['p2'], -8);
+      expect(deltas['p3'], -8);
+      expect(deltas['p4'], -8);
+
+      // Verify multiplier is reset to 1
+      expect(provider.pointMultiplier, 1);
+    });
+  });
+}

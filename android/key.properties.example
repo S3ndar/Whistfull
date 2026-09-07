@@ -1,0 +1,25 @@
+# Template for android/key.properties — the release signing config read by
+# android/app/build.gradle.kts.
+#
+# 1. Copy this file to android/key.properties (same folder).
+# 2. Fill in the four values below.
+# 3. NEVER commit android/key.properties or your .jks/.keystore file.
+#    Both are already excluded in .gitignore — keep it that way.
+#
+# --- Generating an upload keystore on Windows ---
+# Run this from a "Developer Command Prompt" / PowerShell where `keytool`
+# is on PATH (it ships with the JDK, e.g. under
+# C:\Program Files\Android\Android Studio\jbr\bin):
+#
+#   keytool -genkey -v -keystore upload-keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
+#
+# Store the resulting upload-keystore.jks somewhere safe OUTSIDE the repo
+# (e.g. alongside this file, or in a password manager's attachment vault) —
+# if you lose it, you lose the ability to update your app on Play under the
+# same listing. Google's Play App Signing can help recover from this if
+# enrolled, but don't rely on it.
+
+storePassword=REPLACE_ME
+keyPassword=REPLACE_ME
+keyAlias=upload
+storeFile=../upload-keystore.jks
