@@ -19,28 +19,21 @@ class GameProvider extends ChangeNotifier {
   List<Game> get allGames => _gamesBox?.values.toList() ?? [];
 
   /// Games to show in history/stats: every game that has actually ended,
-  /// i.e. is not the currently active game.
-  ///
-  /// A game is unambiguously "ended" once `dateEnded` is set or
-  /// `isComplete` is true — both `endGame()` and `abandonGame()` set at
-  /// least one of these before clearing the active game.
+  /// i.e. is not the currently active game. This reduces to "not the
+  /// active game" rather than also checking `dateEnded`/`isComplete`
+  /// because of the migration case below — those fields cannot be used
+  /// to *exclude* anything here.
   ///
   /// Migration note: games saved by app versions before `dateEnded` and
   /// `isComplete` existed have NEITHER field set on disk, even if they
   /// were played to a genuine finish — old code never wrote them. If this
   /// getter only trusted the new fields, every one of a user's pre-upgrade
   /// games would silently disappear from their history the moment they
-  /// update the app. To prevent that data loss, a non-active game with
-  /// neither field set (the only case that can still reach the fallback
-  /// below) is also treated as completed. Such legacy games simply can't
-  /// be told apart from "finished" vs "abandoned" — they show in history
-  /// without an Abandoned badge, matching pre-5.2 behaviour exactly.
-  List<Game> get completedGames => _gamesBox?.values.where((g) {
-        if (g.id == _activeGame?.id) return false;
-        if (g.dateEnded != null || g.isComplete) return true;
-        // Legacy game (see migration note above): still counts as completed.
-        return true;
-      }).toList() ?? [];
+  /// update the app. Such legacy games simply can't be told apart from
+  /// "finished" vs "abandoned" — they show in history without an
+  /// Abandoned badge, matching pre-5.2 behaviour exactly.
+  List<Game> get completedGames =>
+      _gamesBox?.values.where((g) => g.id != _activeGame?.id).toList() ?? [];
 
   int get pointMultiplier => _activeGame?.pointMultiplier ?? 1;
 

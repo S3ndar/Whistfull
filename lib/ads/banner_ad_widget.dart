@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -39,7 +37,14 @@ class _AdaptiveBannerAdState extends State<AdaptiveBannerAd> {
   bool _failedToLoad = false;
   bool _requestedLoad = false;
 
-  bool get _supportedPlatform => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  // kIsWeb is still checked explicitly: on Flutter web, defaultTargetPlatform
+  // is derived from the browser's user agent, so it can report android/iOS
+  // for a mobile browser even though google_mobile_ads has no web plugin at
+  // all — kIsWeb rules that case out regardless of the underlying OS.
+  bool get _supportedPlatform =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
 
   @override
   void didChangeDependencies() {
