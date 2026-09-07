@@ -22,9 +22,11 @@ void main() {
   });
 
   group('ThemeProvider Tests', () {
-    test('should initialize with Dark mode by default', () async {
+    test('should initialize with System mode by default', () async {
       await provider.init();
-      expect(provider.themeMode, ThemeMode.dark);
+      expect(provider.themeMode, ThemeMode.system);
+      // isDark is a legacy getter: true for both dark and system, since it
+      // has no BuildContext to resolve system's actual platform brightness.
       expect(provider.isDark, isTrue);
     });
 
@@ -37,8 +39,11 @@ void main() {
 
     test('should toggle theme mode correctly', () async {
       await provider.init();
-      expect(provider.themeMode, ThemeMode.dark);
+      expect(provider.themeMode, ThemeMode.system);
 
+      // toggleTheme() reads the legacy isDark getter, which treats system
+      // as "dark" (see comment above), so the first toggle from the default
+      // goes to light rather than dark.
       provider.toggleTheme();
       expect(provider.themeMode, ThemeMode.light);
 

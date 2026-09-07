@@ -351,4 +351,172 @@ void main() {
       expect(provider.pointMultiplier, 1);
     });
   });
+
+  group('GameProvider Undo/Delete & Recompute', () {
+    setUp(() async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+    });
+
+    test('undoLastRound() restores the exact totals from before that round',
+        () {
+      provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 6,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      ); // p1 +9, others -3 each
+
+      final beforeSecondRound = Map<String, int>.from(
+        provider.activeGame!.totalScores,
+      );
+
+      provider.addRound(
+        contractType: 'Trull',
+        declarerId: 'p2',
+        partnerId: 'p3',
+        tricksWon: 10,
+        agreedTricks: 9,
+        miserieSuccess: false,
+        settings: settings,
+      );
+      expect(provider.activeGame!.totalScores, isNot(beforeSecondRound));
+
+      final undone = provider.undoLastRound();
+
+      expect(undone, isTrue);
+      expect(provider.activeGame!.rounds.length, 1);
+      expect(provider.activeGame!.totalScores, beforeSecondRound);
+    });
+
+    test('undoLastRound() on an empty round list returns false and mutates nothing',
+        () {
+      expect(provider.activeGame!.rounds, isEmpty);
+      final totalsBefore = Map<String, int>.from(
+        provider.activeGame!.totalScores,
+      );
+      final dealerBefore = provider.dealerIndex;
+      final multiplierBefore = provider.pointMultiplier;
+
+      final undone = provider.undoLastRound();
+
+      expect(undone, isFalse);
+      expect(provider.activeGame!.rounds, isEmpty);
+      expect(provider.activeGame!.totalScores, totalsBefore);
+      expect(provider.dealerIndex, dealerBefore);
+      expect(provider.pointMultiplier, multiplierBefore);
+    });
+
+    test('undoing a Rondpas round restores the previous multiplier (2 passes -> x4; undo -> x2)',
+        () {
+      provider.addPassRound();
+      provider.addPassRound();
+      expect(provider.pointMultiplier, 4);
+
+      final undone = provider.undoLastRound();
+
+      expect(undone, isTrue);
+      expect(provider.activeGame!.rounds.length, 1);
+      expect(provider.pointMultiplier, 2);
+    });
+
+    test('deleteRound(index) on a middle round leaves the remaining totals correct',
+        () {
+      provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 6,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      ); // round 0: p1 +9, others -3 each
+
+      provider.addRound(
+        contractType: 'Trull',
+        declarerId: 'p2',
+        partnerId: 'p3',
+        tricksWon: 10,
+        agreedTricks: 9,
+        miserieSuccess: false,
+        settings: settings,
+      ); // round 1 (to be deleted): p2/p3 +4, p1/p4 -4
+
+      provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p4',
+        tricksWon: 5,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      ); // round 2: p4 +6, others -2 each
+
+      final round0Deltas = provider.activeGame!.rounds[0].scoreDeltas;
+      final round2Deltas = provider.activeGame!.rounds[2].scoreDeltas;
+      final expectedTotals = <String, int>{};
+      for (var p in players) {
+        expectedTotals[p.id] =
+            (round0Deltas[p.id] ?? 0) + (round2Deltas[p.id] ?? 0);
+      }
+
+      final deleted = provider.deleteRound(1);
+
+      expect(deleted, isTrue);
+      expect(provider.activeGame!.rounds.length, 2);
+      expect(provider.activeGame!.totalScores, expectedTotals);
+    });
+
+    test('recomputeFromRounds() is idempotent', () {
+      provider.addPassRound();
+      provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 6,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      final totalsAfterFirst = Map<String, int>.from(
+        provider.activeGame!.totalScores,
+      );
+      final dealerAfterFirst = provider.dealerIndex;
+      final multiplierAfterFirst = provider.pointMultiplier;
+
+      provider.recomputeFromRounds();
+      provider.recomputeFromRounds();
+
+      expect(provider.activeGame!.totalScores, totalsAfterFirst);
+      expect(provider.dealerIndex, dealerAfterFirst);
+      expect(provider.pointMultiplier, multiplierAfterFirst);
+    });
+  });
+
+  group('GameProvider legacy save compatibility', () {
+    test('a Game with scoringSnapshot == null (legacy save) still loads and appears in completedGames',
+        () async {
+      await provider.init();
+
+      final legacyGame = Game(
+        id: 'legacy-game-1',
+        dateStarted: DateTime.now(),
+        players: players,
+        // No scoringSnapshot, no dateEnded, isComplete defaults to false:
+        // this is exactly what a pre-5.2 save looks like on disk.
+      );
+      expect(legacyGame.scoringSnapshot, isNull);
+
+      final gamesBox = Hive.box<Game>('games_box');
+      await gamesBox.put(legacyGame.id, legacyGame);
+
+      expect(
+        provider.completedGames.map((g) => g.id),
+        contains('legacy-game-1'),
+      );
+      final loaded =
+          provider.completedGames.firstWhere((g) => g.id == 'legacy-game-1');
+      expect(loaded.scoringSnapshot, isNull);
+    });
+  });
 }
