@@ -354,7 +354,7 @@ class LocalizationProvider extends ChangeNotifier {
     'players_favorite': 'Favoriete Speler',
 
     // Stats
-    'stats_title': "Stats van {}",
+    'stats_title': 'Stats van {}',
     'stats_games': 'Spellen',
     'stats_wins': 'Gewonnen',
     'stats_win_rate': 'Win %',

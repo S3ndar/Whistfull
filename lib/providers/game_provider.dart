@@ -344,7 +344,11 @@ class GameProvider extends ChangeNotifier {
     int points,
     bool success,
   ) {
-    final playingTeam = [declarerId, ?partnerId];
+    // Null-aware element syntax (`?partnerId`) isn't parseable by the `analyzer`
+    // version build_runner/hive_generator bundle (3.4.0, vs SDK 3.13.0); this
+    // `if` form is the version-safe equivalent.
+    // ignore: use_null_aware_elements
+    final playingTeam = [declarerId, if (partnerId != null) partnerId];
     final defendingTeam = _activeGame!.players
         .map((p) => p.id)
         .where((id) => !playingTeam.contains(id))
