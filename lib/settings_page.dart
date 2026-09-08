@@ -411,6 +411,7 @@ class _ScoreAdjustmentRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
+    final loc = context.watch<LocalizationProvider>();
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       child: Row(
@@ -441,6 +442,7 @@ class _ScoreAdjustmentRow extends StatelessWidget {
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   icon: Icon(Icons.remove, size: 18, color: colors.error),
+                  tooltip: loc.translate('settings_decrease').replaceFirst('{}', title),
                   onPressed: value > 0 ? () => onChanged(value - 1) : null,
                 ),
                 SizedBox(
@@ -458,6 +460,7 @@ class _ScoreAdjustmentRow extends StatelessWidget {
                 IconButton(
                   visualDensity: VisualDensity.compact,
                   icon: Icon(Icons.add, size: 18, color: colors.error),
+                  tooltip: loc.translate('settings_increase').replaceFirst('{}', title),
                   onPressed: () => onChanged(value + 1),
                 ),
               ],
