@@ -57,16 +57,17 @@ class HistoryPage extends StatelessWidget {
                       itemBuilder: (context, index) {
                 final game = games[index];
                 
-                // Find winner (highest score)
-                String winnerName = 'Unknown';
-                int maxScore = -999;
-                
-                game.totalScores.forEach((id, score) {
-                  if (score > maxScore) {
-                    maxScore = score;
-                    winnerName = game.players.firstWhere((p) => p.id == id).name;
-                  }
-                });
+                // Find winner(s) — highest score, ties included. Mirrors
+                // active_game_page.dart's _showWinCelebration: that already
+                // computes every tied top-scorer, but this used to keep
+                // only the first player seen at the max, silently dropping
+                // co-winners on a tie.
+                final scores = game.players.map((p) => game.totalScores[p.id] ?? 0);
+                final maxScore = scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
+                final winners = game.players.where((p) => (game.totalScores[p.id] ?? 0) == maxScore);
+                final winnerName = winners.isEmpty
+                    ? 'Unknown'
+                    : winners.map((p) => p.name).join(' & ');
 
                 // Ended via abandonGame() rather than a real finish through
                 // endGame() — see GameProvider.completedGames.

@@ -1,4 +1,4 @@
-import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform;
 
 /// Single source of truth for every AdMob ad unit ID and app ID used by
 /// Whistly, plus the in-app-purchase product ID for "Remove ads".
@@ -43,15 +43,17 @@ class AdConfig {
 
   /// Banner ad unit ID for the current platform.
   ///
-  /// Callers MUST guard with `Platform.isAndroid || Platform.isIOS` (and
-  /// `!kIsWeb`) before touching this — Whistly also targets web/desktop,
-  /// where `dart:io`'s `Platform.isAndroid`/`isIOS` are valid to call but
-  /// AdMob has no plugin support, so this throws on anything else.
+  /// Callers MUST guard with a platform check (see `AdsProvider` /
+  /// `AdaptiveBannerAd`'s `_supportedPlatform`) before touching this —
+  /// AdMob has no plugin support outside Android/iOS, so this throws on
+  /// anything else. Uses `defaultTargetPlatform` rather than `dart:io`'s
+  /// `Platform` so this file (and anything importing it) stays compilable
+  /// on `flutter build web`, which cannot import `dart:io` at all.
   static String get bannerUnitId {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       return useTestAds ? _testBannerAndroid : _prodBannerAndroid;
     }
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return useTestAds ? _testBannerIOS : _prodBannerIOS;
     }
     throw UnsupportedError('AdConfig.bannerUnitId is only available on Android and iOS.');
@@ -60,10 +62,10 @@ class AdConfig {
   /// Interstitial ad unit ID for the current platform. Same guarding
   /// requirement as [bannerUnitId].
   static String get interstitialUnitId {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       return useTestAds ? _testInterstitialAndroid : _prodInterstitialAndroid;
     }
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return useTestAds ? _testInterstitialIOS : _prodInterstitialIOS;
     }
     throw UnsupportedError('AdConfig.interstitialUnitId is only available on Android and iOS.');

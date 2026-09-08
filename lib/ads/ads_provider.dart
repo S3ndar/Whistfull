@@ -1,7 +1,4 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive/hive.dart';
 
@@ -37,8 +34,14 @@ class AdsProvider extends ChangeNotifier {
   DateTime? _lastShownAt;
   final Set<String> _shownForGameIds = {};
 
+  // kIsWeb is still checked explicitly: on Flutter web, defaultTargetPlatform
+  // is derived from the browser's user agent, so it can report android/iOS
+  // for a mobile browser even though google_mobile_ads has no web plugin at
+  // all — kIsWeb rules that case out regardless of the underlying OS.
   bool get _adsSupportedOnThisPlatform =>
-      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS);
 
   /// Reads the persisted entitlement, then — unless ads are already
   /// removed or the platform doesn't support mobile ads — runs the UMP

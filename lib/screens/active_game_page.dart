@@ -184,85 +184,71 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                     );
                   },
           ),
+          // Icon-only (with a tooltip for the label) rather than a labeled
+          // button: with Undo + this + End Game all sharing the AppBar,
+          // labeled buttons left so little room for the title that it
+          // truncated to "Ac..." on a phone-width screen.
+          IconButton(
+            icon: Icon(Icons.table_chart, color: appColors.textPrimary),
+            tooltip: loc.translate('hierarchy_title'),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HierarchyPage()),
+              );
+            },
+          ),
           Padding(
-            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0, right: 8.0),
-            child: TextButton.icon(
-              icon: Icon(Icons.table_chart, color: appColors.textPrimary, size: 18),
-              label: Text(
-                loc.translate('hierarchy_title').split(' ').first, // Keep it short
-                style: TextStyle(fontWeight: FontWeight.bold, color: appColors.textPrimary, fontSize: 13),
-              ),
-              style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-              ),
+            padding: const EdgeInsets.only(right: 4.0),
+            child: IconButton(
+              icon: Icon(Icons.stop_circle, color: appColors.textPrimary),
+              tooltip: loc.translate('end_game'),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const HierarchyPage()),
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    backgroundColor: appColors.surface,
+                    title: Text(loc.translate('active_game_end_title')),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(loc.translate('active_game_end_desc')),
+                        const SizedBox(height: 12),
+                        Text(
+                          loc.translate('active_game_abandon_desc'),
+                          style: TextStyle(fontSize: 12, color: appColors.textFaint),
+                        ),
+                      ],
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text(loc.translate('cancel'), style: TextStyle(color: appColors.textSecondary)),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          // No celebration, no interstitial — just close the
+                          // confirm dialog and return home.
+                          context.read<GameProvider>().abandonGame();
+                          Navigator.pop(context); // close confirm dialog
+                          Navigator.pop(context); // return home
+                        },
+                        child: Text(loc.translate('active_game_abandon'), style: TextStyle(color: appColors.error)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // close confirm dialog
+                          _showWinCelebration(game, loc);
+                        },
+                        child: Text(loc.translate('end_game')),
+                      ),
+                    ],
+                  ),
                 );
               },
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(right: 8.0, top: 8.0, bottom: 8.0),
-            child: TextButton.icon(
-              icon: Icon(Icons.stop_circle, color: appColors.textPrimary),
-              label: Text(loc.translate('end_game'), style: TextStyle(fontWeight: FontWeight.bold, color: appColors.textPrimary)),
-              style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-              ),
-              onPressed: () {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  backgroundColor: appColors.surface,
-                  title: Text(loc.translate('active_game_end_title')),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(loc.translate('active_game_end_desc')),
-                      const SizedBox(height: 12),
-                      Text(
-                        loc.translate('active_game_abandon_desc'),
-                        style: TextStyle(fontSize: 12, color: appColors.textFaint),
-                      ),
-                    ],
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(loc.translate('cancel'), style: TextStyle(color: appColors.textSecondary)),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        // No celebration, no interstitial — just close the
-                        // confirm dialog and return home.
-                        context.read<GameProvider>().abandonGame();
-                        Navigator.pop(context); // close confirm dialog
-                        Navigator.pop(context); // return home
-                      },
-                      child: Text(loc.translate('active_game_abandon'), style: TextStyle(color: appColors.error)),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context); // close confirm dialog
-                        _showWinCelebration(game, loc);
-                      },
-                      child: Text(loc.translate('end_game')),
-                    ),
-                  ],
-                ),
-              ); // end showDialog
-            }, // end onPressed
-            ), // end TextButton
-          ), // end Padding
         ],
       ),
       body: Column(

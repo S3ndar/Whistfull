@@ -59,9 +59,12 @@ class HierarchyPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           child: Table(
             border: TableBorder.all(color: colors.borderFaint, width: 1),
+            // Column 0 was FlexColumnWidth(1.2) — too narrow for the
+            // "Priority" header at this font size, which wrapped mid-word
+            // ("Priori"/"ty" on two lines). Widened at column 1's expense.
             columnWidths: const {
-              0: FlexColumnWidth(1.2),
-              1: FlexColumnWidth(4.5),
+              0: FlexColumnWidth(2),
+              1: FlexColumnWidth(4),
               2: FlexColumnWidth(1.5),
             },
             children: [

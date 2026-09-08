@@ -145,6 +145,8 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_title': 'Scoring Settings',
     'settings_adjust': 'Point System',
     'settings_auto_save': 'Changes are saved automatically after each game.',
+    'settings_decrease': 'Decrease {}',
+    'settings_increase': 'Increase {}',
     'settings_partnership': 'Partnership Contracts',
     'settings_solo': 'Solo Contracts',
     'settings_negative': 'Special & Negative',
@@ -354,7 +356,7 @@ class LocalizationProvider extends ChangeNotifier {
     'players_favorite': 'Favoriete Speler',
 
     // Stats
-    'stats_title': "Stats van {}",
+    'stats_title': 'Stats van {}',
     'stats_games': 'Spellen',
     'stats_wins': 'Gewonnen',
     'stats_win_rate': 'Win %',
@@ -376,6 +378,8 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_title': 'Punteninstellingen',
     'settings_adjust': 'Puntensysteem',
     'settings_auto_save': 'Wijzigingen worden automatisch opgeslagen na elk spel.',
+    'settings_decrease': 'Verlaag {}',
+    'settings_increase': 'Verhoog {}',
     'settings_partnership': 'Duo Contracten',
     'settings_solo': 'Solo Contracten',
     'settings_negative': 'Speciale Contracten',

@@ -163,15 +163,18 @@ class PlayerStatsPage extends StatelessWidget {
                       final game = playerGames[index];
                       final score = game.totalScores[player.id] ?? 0;
                       
-                      // Find winner
-                      String winnerName = 'Unknown';
-                      int maxScore = -999;
-                      for (var entry in game.totalScores.entries) {
-                        if (entry.value > maxScore) {
-                          maxScore = entry.value;
-                          winnerName = game.players.firstWhere((p) => p.id == entry.key).name;
-                        }
-                      }
+                      // Find winner(s) — highest score, ties included. Same
+                      // fix as history_page.dart: a naive "keep the first
+                      // max seen" scan silently drops co-winners on a tie.
+                      final gameScores = game.totalScores.values;
+                      final maxScore = gameScores.isEmpty
+                          ? 0
+                          : gameScores.reduce((a, b) => a > b ? a : b);
+                      final tiedWinners = game.players
+                          .where((p) => (game.totalScores[p.id] ?? 0) == maxScore)
+                          .map((p) => p.name)
+                          .join(' & ');
+                      final winnerName = tiedWinners.isEmpty ? 'Unknown' : tiedWinners;
 
                       return Card(
                         color: colors.surface,
