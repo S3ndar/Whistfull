@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:whistly/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:whistly/providers/game_provider.dart';
@@ -7,6 +6,7 @@ import 'package:whistly/providers/localization_provider.dart';
 
 import 'package:whistly/screens/game_history_detail_page.dart';
 import 'package:whistly/theme/app_theme.dart';
+import 'package:whistly/theme/whistly_components.dart';
 import 'package:whistly/ads/banner_ad_widget.dart';
 
 class HistoryPage extends StatelessWidget {
@@ -42,107 +42,81 @@ class HistoryPage extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.history, size: 64, color: colors.border),
+                          Icon(Icons.history, size: 64, color: colors.line),
                           const SizedBox(height: 16),
-                          Text(
-                            loc.translate('history_empty'),
-                            style: TextStyle(color: colors.textFaint, fontSize: 16),
-                          ),
+                          Text(loc.translate('history_empty'), style: WhistlyText.body(colors.muted, size: 15)),
                         ],
                       ),
                     )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(12),
+                  : ListView.separated(
+                      padding: EdgeInsets.zero,
                       itemCount: games.length,
+                      separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
                       itemBuilder: (context, index) {
-                final game = games[index];
-                
-                // Find winner(s) — highest score, ties included. Mirrors
-                // active_game_page.dart's _showWinCelebration: that already
-                // computes every tied top-scorer, but this used to keep
-                // only the first player seen at the max, silently dropping
-                // co-winners on a tie.
-                final scores = game.players.map((p) => game.totalScores[p.id] ?? 0);
-                final maxScore = scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
-                final winners = game.players.where((p) => (game.totalScores[p.id] ?? 0) == maxScore);
-                final winnerName = winners.isEmpty
-                    ? 'Unknown'
-                    : winners.map((p) => p.name).join(' & ');
+                        final game = games[index];
 
-                // Ended via abandonGame() rather than a real finish through
-                // endGame() — see GameProvider.completedGames.
-                final isAbandoned = game.dateEnded != null && !game.isComplete;
+                        // Find winner(s) — highest score, ties included.
+                        // Mirrors active_game_page.dart's
+                        // _showWinCelebration.
+                        final scores = game.players.map((p) => game.totalScores[p.id] ?? 0);
+                        final maxScore = scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
+                        final winners = game.players.where((p) => (game.totalScores[p.id] ?? 0) == maxScore);
+                        final winnerName = winners.isEmpty ? 'Unknown' : winners.map((p) => p.name).join(' & ');
 
-                return Card(
-                  color: colors.surface,
-                  margin: const EdgeInsets.symmetric(vertical: 6),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: colors.borderFaint),
-                  ),
-                  child: ListTile(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GameHistoryDetailPage(game: game),
-                        ),
-                      );
-                    },
-                    leading: CircleAvatar(
-                      backgroundColor: colors.borderFaint,
-                      child: const Icon(Icons.style, color: AppColors.suitRed, size: 20),
-                    ),
-                    title: Row(
-                      children: [
-                        Text(
-                          formatTitleDate(game.dateStarted),
-                          style: TextStyle(fontSize: 14, color: colors.textSecondary),
-                        ),
-                        if (isAbandoned) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: colors.error.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(4),
-                              border: Border.all(color: colors.error.withValues(alpha: 0.4)),
-                            ),
-                            child: Text(
-                              loc.translate('history_abandoned').toUpperCase(),
-                              style: TextStyle(
-                                color: colors.error,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w900,
-                                letterSpacing: 0.5,
-                              ),
+                        // Ended via abandonGame() rather than a real finish
+                        // through endGame() — see GameProvider.completedGames.
+                        final isAbandoned = game.dateEnded != null && !game.isComplete;
+
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => GameHistoryDetailPage(game: game)));
+                          },
+                          child: Container(
+                            color: colors.bg,
+                            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              loc.translate('history_winner').replaceFirst('{}', winnerName).split('(').first.trim(),
+                                              style: WhistlyText.rowTitle(colors.ink),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                          if (isAbandoned)
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(border: Border.all(color: colors.ink, width: 2)),
+                                              child: Text(
+                                                loc.translate('history_abandoned').toUpperCase(),
+                                                style: WhistlyText.badge(colors.ink),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(formatTitleDate(game.dateStarted), style: WhistlyText.mono(colors.muted)),
+                                      Text(
+                                        loc.translate('history_rounds_played').replaceFirst('{}', game.rounds.length.toString()),
+                                        style: WhistlyText.body(colors.muted, size: 11),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  maxScore >= 0 ? '+$maxScore' : '$maxScore',
+                                  style: WhistlyText.screenNumeral(maxScore >= 0 ? colors.ink : colors.accent, size: 24),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 4),
-                        Text(
-                          loc.translate('history_winner')
-                              .replaceFirst('{}', winnerName)
-                              .replaceFirst('{}', maxScore.toString()),
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: colors.error,
-                            fontSize: 15,
-                          ),
-                        ),
-                        Text(
-                          loc.translate('history_rounds_played').replaceFirst('{}', game.rounds.length.toString()),
-                          style: TextStyle(fontSize: 12, color: colors.textFaint),
-                        ),
-                      ],
-                    ),
-                    trailing: Icon(Icons.chevron_right, color: colors.textFaint),
-                  ),
                         );
                       },
                     ),

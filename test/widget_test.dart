@@ -16,6 +16,7 @@ import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/providers/player_provider.dart';
 import 'package:whistly/providers/theme_provider.dart';
 import 'package:whistly/scoring_settings.dart';
+import 'package:whistly/theme/whistly_components.dart';
 
 void main() {
   late Directory tempDir;
@@ -70,13 +71,12 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    // The home tab (bottom nav index 0) should be showing: its title and
-    // the primary navigation destinations are the smoke-test signal that
-    // the app booted, providers initialised and the widget tree rendered.
-    expect(find.text('WHISTLY'), findsOneWidget);
-    expect(find.byType(BottomNavigationBar), findsOneWidget);
-    // The home tab (index 0) is selected by default, so the bottom nav
-    // shows its *active* icon variant, not the outline one.
-    expect(find.byIcon(Icons.play_circle_filled), findsOneWidget);
+    // The home tab (WhistlyTabBar index 0) should be showing: the brand
+    // wordmark and the primary navigation destinations are the smoke-test
+    // signal that the app booted, providers initialised and the widget
+    // tree rendered.
+    expect(find.text('Whistly'), findsOneWidget);
+    expect(find.byType(WhistlyTabBar), findsOneWidget);
+    expect(find.byIcon(Icons.play_circle_outline), findsOneWidget);
   });
 }

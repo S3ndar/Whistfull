@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whistly/app_colors.dart';
 import 'package:whistly/theme/app_theme.dart';
+import 'package:whistly/theme/whistly_components.dart';
 import 'package:provider/provider.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/round.dart';
@@ -25,9 +25,8 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
   late ConfettiController _confettiController;
 
   // Reserved height of the bottom banner ad (0 when removed/unsupported/
-  // failed to load). The FloatingActionButton is padded by exactly this
-  // much so it always floats above the banner and never overlaps it —
-  // see the `floatingActionButton` below.
+  // failed to load). The action row is padded by exactly this much so it
+  // always floats above the banner and never overlaps it.
   double _bannerHeight = 0;
 
   void _onBannerHeightChanged(double height) {
@@ -48,13 +47,11 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
   }
 
   void _showWinCelebration(Game game, LocalizationProvider loc) {
-    // Find winners (highest score)
     final scores = game.players.map((p) => game.totalScores[p.id] ?? 0);
     final maxScore = scores.isEmpty ? 0 : scores.reduce((a, b) => a > b ? a : b);
-
     final winners = game.players.where((p) => (game.totalScores[p.id] ?? 0) == maxScore).toList();
-    final appColors = AppTheme.of(context);
-    
+    final colors = AppTheme.of(context);
+
     _confettiController.play();
 
     showDialog(
@@ -64,57 +61,49 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
         alignment: Alignment.center,
         children: [
           AlertDialog(
-            backgroundColor: appColors.surface,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
             content: Column(
               mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.emoji_events, color: AppColors.secondary, size: 80),
+                Icon(Icons.emoji_events, color: colors.accent, size: 64),
                 const SizedBox(height: 16),
-                Text(
-                  loc.translate('game_over'),
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
+                Text(loc.translate('game_over'), style: WhistlyText.sectionHead(colors.ink)),
                 const SizedBox(height: 8),
                 Text(
-                  winners.length > 1 ? loc.translate('stats_winners') : loc.translate('stats_winner'),
-                  style: TextStyle(color: appColors.textSecondary),
+                  (winners.length > 1 ? loc.translate('stats_winners') : loc.translate('stats_winner')).toUpperCase(),
+                  style: WhistlyText.eyebrow(colors.muted),
                 ),
-                const SizedBox(height: 16),
-                ...winners.map((w) => Text(
-                  w.name,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.secondary),
-                )),
                 const SizedBox(height: 12),
+                ...winners.map((w) => Text(w.name, style: WhistlyText.sectionHead(colors.ink))),
+                const SizedBox(height: 8),
                 Text(
                   '${loc.translate('score')}: $maxScore',
-                  style: TextStyle(fontSize: 18, color: appColors.textMuted),
+                  style: WhistlyText.mono(colors.muted, size: 15, weight: FontWeight.w800),
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: () {
-                    // Grab the provider reference before popping — after
-                    // both pops below this page's context may no longer
-                    // be mounted, but the ChangeNotifier instance itself
-                    // stays perfectly usable.
-                    final adsProvider = context.read<AdsProvider>();
-                    final gameId = game.id;
-                    context.read<PlayerProvider>().incrementGamesPlayed(game.players);
-                    context.read<GameProvider>().endGame();
-                    Navigator.pop(context); // Close dialog
-                    Navigator.pop(context); // Return home
-                    // Show the interstitial only after leaving the game
-                    // screen — end the game and pop first, so a failed or
-                    // slow ad can never trap the user in this dialog.
-                    // Never shown during round entry, only here.
-                    adsProvider.maybeShowInterstitial(gameId: gameId);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: appColors.success,
-                    minimumSize: const Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: WhistlyPrimaryButton(
+                    label: loc.translate('back_home'),
+                    showChevron: false,
+                    onPressed: () {
+                      // Grab the provider reference before popping — after
+                      // both pops below this page's context may no longer
+                      // be mounted, but the ChangeNotifier instance itself
+                      // stays perfectly usable.
+                      final adsProvider = context.read<AdsProvider>();
+                      final gameId = game.id;
+                      context.read<PlayerProvider>().incrementGamesPlayed(game.players);
+                      context.read<GameProvider>().endGame();
+                      Navigator.pop(context); // Close dialog
+                      Navigator.pop(context); // Return home
+                      // Show the interstitial only after leaving the game
+                      // screen — end the game and pop first, so a failed or
+                      // slow ad can never trap the user in this dialog.
+                      // Never shown during round entry, only here.
+                      adsProvider.maybeShowInterstitial(gameId: gameId);
+                    },
                   ),
-                  child: Text(loc.translate('back_home')),
                 ),
               ],
             ),
@@ -123,7 +112,71 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
             confettiController: _confettiController,
             blastDirectionality: BlastDirectionality.explosive,
             shouldLoop: false,
-            colors: AppColors.confetti,
+            colors: const [Color(0xFFFF2D4F), Color(0xFF0E0E0E), Color(0xFFF5F1EA)],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmUndo(BuildContext context, LocalizationProvider loc, AppSemanticColors colors) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(loc.translate('undo_round_title'), style: WhistlyText.sectionHead(colors.ink)),
+        content: Text(loc.translate('undo_round_desc'), style: WhistlyText.body(colors.muted, size: 13)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(loc.translate('cancel').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<GameProvider>().undoLastRound();
+              Navigator.pop(context);
+            },
+            child: Text(loc.translate('undo').toUpperCase(), style: WhistlyText.eyebrow(colors.ink)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _confirmEndGame(BuildContext context, Game game, LocalizationProvider loc, AppSemanticColors colors) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(loc.translate('active_game_end_title'), style: WhistlyText.sectionHead(colors.ink)),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(loc.translate('active_game_end_desc'), style: WhistlyText.body(colors.muted, size: 13)),
+            const SizedBox(height: 12),
+            Text(loc.translate('active_game_abandon_desc'), style: WhistlyText.body(colors.muted, size: 11)),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(loc.translate('cancel').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+          ),
+          TextButton(
+            onPressed: () {
+              // No celebration, no interstitial — just close the confirm
+              // dialog and return home.
+              context.read<GameProvider>().abandonGame();
+              Navigator.pop(context); // close confirm dialog
+              Navigator.pop(context); // return home
+            },
+            child: Text(loc.translate('active_game_abandon').toUpperCase(), style: WhistlyText.eyebrow(colors.accent)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // close confirm dialog
+              _showWinCelebration(game, loc);
+            },
+            child: Text(loc.translate('end_game').toUpperCase(), style: WhistlyText.eyebrow(colors.ink)),
           ),
         ],
       ),
@@ -140,501 +193,335 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
       return Scaffold(body: Center(child: Text(loc.translate('active_game_no_active'))));
     }
 
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     final players = game.players;
+    final upcomingRound = game.rounds.length + 1;
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.translate('active_game_title'), style: const TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.home),
-          tooltip: loc.translate('back'),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.undo),
-            tooltip: loc.translate('undo'),
-            onPressed: game.rounds.isEmpty
-                ? null
-                : () {
-                    showDialog(
-                      context: context,
-                      builder: (_) => AlertDialog(
-                        backgroundColor: appColors.surface,
-                        title: Text(loc.translate('undo_round_title')),
-                        content: Text(loc.translate('undo_round_desc')),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: Text(loc.translate('cancel'), style: TextStyle(color: appColors.textSecondary)),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<GameProvider>().undoLastRound();
-                              Navigator.pop(context);
-                            },
-                            child: Text(loc.translate('undo')),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-          ),
-          // Icon-only (with a tooltip for the label) rather than a labeled
-          // button: with Undo + this + End Game all sharing the AppBar,
-          // labeled buttons left so little room for the title that it
-          // truncated to "Ac..." on a phone-width screen.
-          IconButton(
-            icon: Icon(Icons.table_chart, color: appColors.textPrimary),
-            tooltip: loc.translate('hierarchy_title'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const HierarchyPage()),
-              );
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(right: 4.0),
-            child: IconButton(
-              icon: Icon(Icons.stop_circle, color: appColors.textPrimary),
-              tooltip: loc.translate('end_game'),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    backgroundColor: appColors.surface,
-                    title: Text(loc.translate('active_game_end_title')),
-                    content: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(loc.translate('active_game_end_desc')),
-                        const SizedBox(height: 12),
-                        Text(
-                          loc.translate('active_game_abandon_desc'),
-                          style: TextStyle(fontSize: 12, color: appColors.textFaint),
-                        ),
-                      ],
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context),
-                        child: Text(loc.translate('cancel'), style: TextStyle(color: appColors.textSecondary)),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          // No celebration, no interstitial — just close the
-                          // confirm dialog and return home.
-                          context.read<GameProvider>().abandonGame();
-                          Navigator.pop(context); // close confirm dialog
-                          Navigator.pop(context); // return home
-                        },
-                        child: Text(loc.translate('active_game_abandon'), style: TextStyle(color: appColors.error)),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context); // close confirm dialog
-                          _showWinCelebration(game, loc);
-                        },
-                        child: Text(loc.translate('end_game')),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        children: [
-          // Scoreboard
-          Container(
-            color: appColors.surface,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                // Player Score Cards
-                Row(
-                  children: players.map((player) {
-                    final score = game.totalScores[player.id] ?? 0;
-                    final isDealer = gameProvider.currentDealer?.id == player.id;
-                    return Expanded(
-                      child: Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                        decoration: BoxDecoration(
-                          color: isDealer
-                              ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5)
-                              : appColors.background,
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(
-                            color: isDealer ? Theme.of(context).colorScheme.secondary : appColors.border,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            CircleAvatar(
-                              radius: 16,
-                              backgroundColor: Theme.of(context).colorScheme.secondary,
-                              child: Text(player.name[0].toUpperCase(),
-                                  style: TextStyle(fontWeight: FontWeight.bold, color: appColors.textPrimary)),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              player.name.split(' ').first,
-                              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              score >= 0 ? '+$score' : '$score',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: score >= 0 ? appColors.success : appColors.error,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-          ),
-          Divider(height: 1, color: appColors.border),
-          // Rondpas multiplier banner
-          if (gameProvider.pointMultiplier > 1)
+      body: SafeArea(
+        child: Column(
+          children: [
+            // ─── Header row ─────────────────────────────────────────────
             Container(
-              color: appColors.panel,
-              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.double_arrow, color: appColors.accentGold, size: 16),
-                  const SizedBox(width: 6),
-                  Text(
-                    '${loc.translate('bid_pass')} — ${loc.translate('active_game_next_round')} ×${gameProvider.pointMultiplier}',
-                    style: TextStyle(
-                      color: appColors.accentGold,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 13,
-                      letterSpacing: 0.4,
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: colors.ink),
+                    tooltip: loc.translate('back'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: Text(
+                      '${loc.translate('round')} ${upcomingRound.toString().padLeft(2, '0')} · ${loc.translate('dealer')} ${gameProvider.currentDealer?.name ?? ''}',
+                      style: WhistlyText.eyebrow(colors.muted),
+                      overflow: TextOverflow.ellipsis,
                     ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.table_chart_outlined, color: colors.ink),
+                    tooltip: loc.translate('hierarchy_title'),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const HierarchyPage()));
+                    },
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.undo, color: game.rounds.isEmpty ? colors.muted : colors.ink),
+                    tooltip: loc.translate('undo'),
+                    onPressed: game.rounds.isEmpty ? null : () => _confirmUndo(context, loc, colors),
                   ),
                 ],
               ),
             ),
 
-          // Round History
-          Expanded(
-            child: game.rounds.isEmpty
-                ? Center(
-                    child: Text(
-                      loc.translate('active_game_no_rounds'),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: appColors.textFaint, fontSize: 16),
+            // ─── Standings list ─────────────────────────────────────────
+            _StandingsList(game: game, loc: loc, colors: colors),
+
+            if (gameProvider.pointMultiplier > 1)
+              Container(
+                width: double.infinity,
+                color: colors.accent,
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+                child: Text(
+                  '${loc.translate('bid_pass')} — ${loc.translate('active_game_next_round')} ×${gameProvider.pointMultiplier}',
+                  textAlign: TextAlign.center,
+                  style: WhistlyText.eyebrow(colors.onAccent),
+                ),
+              ),
+
+            // ─── Round history, newest first ────────────────────────────
+            Expanded(
+              child: game.rounds.isEmpty
+                  ? Center(
+                      child: Text(
+                        loc.translate('active_game_no_rounds'),
+                        textAlign: TextAlign.center,
+                        style: WhistlyText.body(colors.muted, size: 14),
+                      ),
+                    )
+                  : ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemCount: game.rounds.length,
+                      separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
+                      itemBuilder: (context, index) {
+                        final roundNumber = game.rounds.length - index;
+                        final round = game.rounds[game.rounds.length - 1 - index];
+                        return _RoundRow(round: round, roundNumber: roundNumber, players: players);
+                      },
                     ),
-                  )
-                : ListView.builder(
-                    padding: const EdgeInsets.all(8),
-                    itemCount: game.rounds.length,
-                    itemBuilder: (context, index) {
-                      final roundNumber = game.rounds.length - index;
-                      final round = game.rounds[game.rounds.length - 1 - index];
-                      return _RoundHistoryCard(
-                        round: round,
-                        roundNumber: roundNumber,
-                        players: players,
-                      );
-                    },
+            ),
+
+            // ─── Suit strip with trick counts ───────────────────────────
+            _SuitStripWithCounts(game: game),
+
+            SafeArea(
+              top: false,
+              child: AdaptiveBannerAd(onHeightChanged: _onBannerHeightChanged),
+            ),
+
+            // ─── Action row: + Round (flex, accent) and End (bg, 2px left border) ──
+            Padding(
+              padding: EdgeInsets.only(bottom: _bannerHeight),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: WhistlyPrimaryButton(
+                      label: loc.translate('active_game_add_round'),
+                      showChevron: false,
+                      onPressed: () async {
+                        await showModalBottomSheet(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: Colors.transparent,
+                          builder: (_) => RoundSetupDialog(players: game.players),
+                        );
+                      },
+                    ),
                   ),
-          ),
-          // Below the round list, above the FAB area. Full-width, its own
-          // reserved height, and NOT tappable itself in a way that
-          // overlaps the FAB — see the floatingActionButton padding below,
-          // which is pushed up by exactly this banner's height so the two
-          // never sit on top of each other.
-          SafeArea(
-            top: false,
-            child: AdaptiveBannerAd(onHeightChanged: _onBannerHeightChanged),
-          ),
-        ],
-      ),
-      floatingActionButton: Padding(
-        // Reserve the banner's height so the FAB always floats clear of
-        // it — accidental taps on/near an ad are the most common cause of
-        // AdMob invalid-traffic account suspensions for small publishers,
-        // so this offset is a safety measure, not a cosmetic one.
-        padding: EdgeInsets.only(bottom: _bannerHeight),
-        child: FloatingActionButton.extended(
-          onPressed: () async {
-            await showModalBottomSheet(
-              context: context,
-              isScrollControlled: true,
-              backgroundColor: AppColors.transparent,
-              builder: (_) => RoundSetupDialog(players: game.players),
-            );
-          },
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          icon: const Icon(Icons.add),
-          label: Text(loc.translate('active_game_add_round')),
+                  WhistlySecondaryButton(
+                    label: loc.translate('end_game'),
+                    onPressed: () => _confirmEndGame(context, game, loc, colors),
+                    border: Border(left: BorderSide(color: colors.line, width: 2)),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-class _RoundHistoryCard extends StatelessWidget {
+/// Standings row: rank (mono, 16px wide) · name (flex) · optional Lead
+/// badge · score (mono 30px, right-aligned, min 56px). Score is `ink`
+/// when >= 0, `accent` when negative (spec §5). Ranked, 1px `line`
+/// between rows.
+class _StandingsList extends StatelessWidget {
+  final Game game;
+  final LocalizationProvider loc;
+  final AppSemanticColors colors;
+
+  const _StandingsList({required this.game, required this.loc, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    final ranked = [...game.players]
+      ..sort((a, b) => (game.totalScores[b.id] ?? 0).compareTo(game.totalScores[a.id] ?? 0));
+    final topScore = ranked.isEmpty ? 0 : (game.totalScores[ranked.first.id] ?? 0);
+    // Only one player wears the Lead badge (spec: "One per screen") — a
+    // multi-way tie at the top shows none, since none of them are
+    // uniquely leading.
+    final soleLeaderId = ranked.where((p) => (game.totalScores[p.id] ?? 0) == topScore).length == 1
+        ? ranked.first.id
+        : null;
+
+    return Container(
+      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+      child: Column(
+        children: List.generate(ranked.length, (i) {
+          final player = ranked[i];
+          final score = game.totalScores[player.id] ?? 0;
+          return Container(
+            decoration: BoxDecoration(
+              border: i == 0 ? null : Border(top: BorderSide(color: colors.line, width: 1)),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  child: Text('${i + 1}', style: WhistlyText.mono(colors.muted, size: 12)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+                ),
+                if (player.id == soleLeaderId) ...[
+                  WhistlyLeadBadge(label: loc.translate('lead')),
+                  const SizedBox(width: 8),
+                ],
+                SizedBox(
+                  width: 56,
+                  child: Text(
+                    score >= 0 ? '+$score' : '$score',
+                    textAlign: TextAlign.right,
+                    style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/// Suit strip with trick counts (spec §5: "During a game each cell also
+/// carries a mono trick count below the glyph"). This app doesn't track
+/// tricks per suit — the closest real, available number is how many
+/// rounds so far were played with that suit as trump.
+class _SuitStripWithCounts extends StatelessWidget {
+  final Game game;
+  const _SuitStripWithCounts({required this.game});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppTheme.of(context);
+    const suits = [
+      ('♠', 'Spades', false),
+      ('♥', 'Hearts', true),
+      ('♦', 'Diamonds', true),
+      ('♣', 'Clubs', false),
+    ];
+    return Container(
+      color: colors.line,
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        children: List.generate(suits.length, (i) {
+          final (glyph, key, isRed) = suits[i];
+          final count = game.rounds.where((r) => r.trump == key).length;
+          return Expanded(
+            child: Container(
+              margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
+              color: colors.bg,
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(glyph, style: TextStyle(fontSize: 22, color: isRed ? colors.suitRed : colors.suitInk)),
+                  const SizedBox(height: 2),
+                  Text('$count', style: WhistlyText.mono(colors.muted, size: 11)),
+                ],
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/// Round row: index (mono 12px muted) · suit glyph (24px, suit color) ·
+/// bid (15/800) over partners · deltas (mono 11px muted) · result badge
+/// (spec §5).
+class _RoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
   final List<Player> players;
 
-  const _RoundHistoryCard({
-    required this.round,
-    required this.roundNumber,
-    required this.players,
-  });
+  const _RoundRow({required this.round, required this.roundNumber, required this.players});
 
   @override
   Widget build(BuildContext context) {
     final loc = context.watch<LocalizationProvider>();
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
 
-    // Special compact card for Round Pass rounds
     if (round.contractType == 'Pass') {
-      final dealer = players.firstWhere(
-        (p) => p.id == round.dealerId,
-        orElse: () => players.first,
-      );
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        decoration: BoxDecoration(
-          color: appColors.panel,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: appColors.accentGold.withValues(alpha: 0.2)),
-        ),
+      final dealer = players.firstWhere((p) => p.id == round.dealerId, orElse: () => players.first);
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
         child: Row(
           children: [
-            Icon(Icons.skip_next, color: appColors.accentGold, size: 18),
-            const SizedBox(width: 8),
-            Text(
-              loc.translate('bid_pass'),
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: appColors.accentGold),
+            SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(loc.translate('bid_pass'), style: WhistlyText.rowTitle(colors.muted)),
             ),
-            const Spacer(),
             Text(
               '${loc.translate('dealer')}: ${dealer.name}',
-              style: TextStyle(color: appColors.textFaint, fontSize: 10),
+              style: WhistlyText.mono(colors.muted),
             ),
           ],
         ),
       );
     }
 
-    final declarer = players.firstWhere(
-      (p) => p.id == round.declarerId,
-      orElse: () => players.first,
-    );
+    final declarer = players.firstWhere((p) => p.id == round.declarerId, orElse: () => players.first);
     final partner = round.partnerId != null
-        ? players.firstWhere(
-            (p) => p.id == round.partnerId,
-            orElse: () => players.first,
-          )
+        ? players.firstWhere((p) => p.id == round.partnerId, orElse: () => players.first)
         : null;
 
     final isMiserie = round.contractType == 'Miserie' || round.contractType == 'Open Miserie';
-    final declarerWon = (round.scoreDeltas[round.declarerId] ?? 0) > 0;
-    final partnerWon = partner != null && (round.scoreDeltas[round.partnerId] ?? 0) > 0;
+    final overallSuccess = isMiserie && partner != null
+        ? (round.scoreDeltas[round.declarerId] ?? 0) > 0 && (round.scoreDeltas[round.partnerId] ?? 0) > 0
+        : round.success;
 
-    final trumpIcon = round.trump == 'Hearts' ? '♥' 
-                   : round.trump == 'Diamonds' ? '♦'
-                   : round.trump == 'Clubs' ? '♣'
-                   : round.trump == 'Spades' ? '♠' : '';
-    
-    final trumpColor = (round.trump == 'Hearts' || round.trump == 'Diamonds') ? AppColors.suitRed
-                    : (round.trump == 'Clubs' || round.trump == 'Spades') ? AppColors.suitBlack
-                    : appColors.textSecondary;
+    final trumpGlyph = round.trump == 'Hearts'
+        ? '♥'
+        : round.trump == 'Diamonds'
+            ? '♦'
+            : round.trump == 'Clubs'
+                ? '♣'
+                : round.trump == 'Spades'
+                    ? '♠'
+                    : '';
+    final trumpColor = (round.trump == 'Hearts' || round.trump == 'Diamonds')
+        ? colors.suitRed
+        : (round.trump == 'Clubs' || round.trump == 'Spades')
+            ? colors.suitInk
+            : colors.muted;
 
-    final hasMultiplier = (round.multiplier) > 1;
+    final partnerLine = partner != null ? '${declarer.name} & ${partner.name}' : declarer.name;
+    final deltasLine = players.map((p) {
+      final d = round.scoreDeltas[p.id] ?? 0;
+      return '${p.name.split(' ').first} ${d >= 0 ? '+$d' : '$d'}';
+    }).join('  ');
 
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      decoration: BoxDecoration(
-        color: appColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: appColors.scrim),
-      ),
-      child: Column(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Main Info Row
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+          SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 24,
+            child: trumpGlyph.isEmpty ? null : Text(trumpGlyph, style: TextStyle(fontSize: 24, color: trumpColor)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    // Status Badge
-                    if (isMiserie && partner != null) ...[
-                      _miserieStatusBadge(context, loc, declarer.name, declarerWon),
-                      const SizedBox(width: 6),
-                      _miserieStatusBadge(context, loc, partner.name, partnerWon),
-                    ] else ...[
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: (round.success ? appColors.success : Theme.of(context).colorScheme.secondary).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: (round.success ? appColors.success : Theme.of(context).colorScheme.secondary).withValues(alpha: 0.5),
-                          ),
-                        ),
-                        child: Text(
-                          loc.translate(round.success ? 'won' : 'lost').toUpperCase(),
-                          style: TextStyle(
-                            color: round.success ? appColors.success : Theme.of(context).colorScheme.secondary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                            letterSpacing: 1,
-                        ),
-                      ),
-                    ),
-                  ],
-                    const SizedBox(width: 8),
-                    // Names
-                    Expanded(
-                      child: Text(
-                        '${declarer.name}${partner != null ? " & ${partner.name}" : ""}',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: appColors.textPrimary,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    // Multiplier
-                    if (hasMultiplier)
-                      Container(
-                        margin: const EdgeInsets.only(left: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: appColors.accentGold.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: appColors.accentGold.withValues(alpha: 0.4)),
-                        ),
-                        child: Text(
-                          '×${round.multiplier}',
-                          style: TextStyle(
-                            color: appColors.accentGold,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                  ],
+                Text(
+                  getContractName(loc, round.contractType),
+                  style: WhistlyText.rowTitle(colors.ink),
                 ),
-                const SizedBox(height: 10),
-                // Contract Details Row
-                Row(
-                  children: [
-                    Text(
-                      getContractName(loc, round.contractType).toUpperCase(),
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                        color: appColors.textFaint,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    if (trumpIcon.isNotEmpty) ...[
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: Text('•', style: TextStyle(color: appColors.border)),
-                      ),
-                      Text(trumpIcon, style: TextStyle(fontSize: 16, color: trumpColor)),
-                    ],
-                    const Spacer(),
-                    Text(
-                      '#$roundNumber',
-                      style: TextStyle(color: appColors.textFaint, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
+                const SizedBox(height: 2),
+                Text('$partnerLine · $deltasLine', style: WhistlyText.mono(colors.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
               ],
             ),
           ),
-          
-          // Scores Bottom Line
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-            decoration: BoxDecoration(
-              color: appColors.scrim,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
-            ),
-            child: Row(
-              children: players.map((p) {
-                final delta = round.scoreDeltas[p.id] ?? 0;
-                return Expanded(
-                  child: Column(
-                    children: [
-                      Text(
-                        p.name.split(' ').first,
-                        style: TextStyle(fontSize: 10, color: appColors.textFaint),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        delta >= 0 ? '+$delta' : '$delta',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: delta > 0
-                              ? appColors.success
-                              : delta < 0
-                                  ? appColors.error
-                                  : appColors.textDisabled,
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ),
+          const SizedBox(width: 8),
+          WhistlyResultBadge(
+            achieved: overallSuccess,
+            achievedLabel: loc.translate('setup_succeeded'),
+            failedLabel: loc.translate('setup_failed'),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _miserieStatusBadge(BuildContext context, LocalizationProvider loc, String name, bool won) {
-    final color = won ? AppTheme.of(context).success : Theme.of(context).colorScheme.secondary;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        '${name.split(" ").first}: ${loc.translate(won ? 'won' : 'lost').toUpperCase()}',
-        style: TextStyle(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.5,
-        ),
       ),
     );
   }

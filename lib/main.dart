@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
 import 'package:whistly/theme/app_theme.dart';
+import 'package:whistly/theme/whistly_components.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -23,7 +23,7 @@ import 'package:whistly/screens/history_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Hive for local storage
   await Hive.initFlutter();
   Hive.registerAdapter(PlayerAdapter());
@@ -56,79 +56,92 @@ void main() async {
 class WhistlyApp extends StatelessWidget {
   const WhistlyApp({super.key});
 
-  // ─── Dark Theme (original) ───────────────────────────────────────────
-  static ThemeData get _darkTheme => ThemeData(
-    useMaterial3: true,
-    scaffoldBackgroundColor: AppColors.background,
-    colorScheme: const ColorScheme.dark(
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      surface: AppColors.surface,
-      onPrimary: AppColors.white,
-      onSecondary: AppColors.black,
-      onSurface: AppColors.white,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
-      elevation: 0,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+  // Theme spec (iteration 6): radius 0 everywhere, no shadows/gradients/
+  // blur, no surface fills. Archivo throughout; numerals use the platform
+  // monospace (see WhistlyText in theme/whistly_components.dart).
+  static ThemeData _themeFor(AppSemanticColors colors, Brightness brightness) {
+    final base = ThemeData(
+      useMaterial3: true,
+      brightness: brightness,
+      scaffoldBackgroundColor: colors.bg,
+      fontFamily: 'Archivo',
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: colors.accent,
+        brightness: brightness,
+        primary: colors.accent,
+        onPrimary: colors.onAccent,
+        secondary: colors.accent,
+        onSecondary: colors.onAccent,
+        surface: colors.bg,
+        onSurface: colors.ink,
+        error: colors.accent,
+        onError: colors.onAccent,
       ),
-    ),
-    cardTheme: CardThemeData(
-      color: AppColors.surface,
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.white12),
+      appBarTheme: AppBarTheme(
+        backgroundColor: colors.bg,
+        foregroundColor: colors.ink,
+        elevation: 0,
+        centerTitle: false,
+        titleTextStyle: WhistlyText.sectionHead(colors.ink),
+        shape: Border(bottom: BorderSide(color: colors.line, width: 2)),
       ),
-    ),
-    extensions: const <ThemeExtension<dynamic>>[AppSemanticColors.dark],
-  );
-
-  // ─── Light Theme (premium warm parchment) ────────────────────────────
-  static ThemeData get _lightTheme => ThemeData(
-    useMaterial3: true,
-    scaffoldBackgroundColor: AppColors.lightBackground,
-    colorScheme: const ColorScheme.light(
-      primary: AppColors.primary,
-      secondary: AppColors.secondary,
-      surface: AppColors.lightSurface,
-      onPrimary: AppColors.white,
-      onSecondary: AppColors.white,
-      onSurface: AppColors.lightText,
-    ),
-    appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.primary,
-      foregroundColor: AppColors.white,
-      elevation: 0,
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      dividerColor: colors.line,
+      dividerTheme: DividerThemeData(color: colors.line, thickness: 1, space: 1),
+      iconTheme: IconThemeData(color: colors.ink),
+      textTheme: TextTheme(
+        bodyMedium: WhistlyText.body(colors.ink),
+        bodySmall: WhistlyText.body(colors.muted, size: 11),
       ),
-    ),
-    cardTheme: CardThemeData(
-      color: AppColors.lightSurface,
-      elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: const BorderSide(color: AppColors.lightBorder),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: colors.accent,
+          foregroundColor: colors.onAccent,
+          disabledBackgroundColor: colors.line.withValues(alpha: 0.15),
+          disabledForegroundColor: colors.muted,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          textStyle: WhistlyText.buttonLabel(colors.onAccent),
+        ),
       ),
-    ),
-    dividerColor: AppColors.lightBorder,
-    iconTheme: const IconThemeData(color: AppColors.lightIcon),
-    extensions: const <ThemeExtension<dynamic>>[AppSemanticColors.light],
-  );
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: colors.ink,
+          side: BorderSide(color: colors.line, width: 2),
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+          textStyle: WhistlyText.buttonLabel(colors.ink),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          foregroundColor: colors.ink,
+          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+        ),
+      ),
+      cardTheme: CardThemeData(
+        color: colors.bg,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: colors.line, width: 1),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: colors.bg,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.zero,
+          side: BorderSide(color: colors.line, width: 2),
+        ),
+      ),
+      listTileTheme: ListTileThemeData(
+        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+      ),
+      splashFactory: NoSplash.splashFactory,
+      extensions: <ThemeExtension<dynamic>>[colors],
+    );
+    return base;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,8 +150,8 @@ class WhistlyApp extends StatelessWidget {
     return MaterialApp(
       title: loc.translate('app_title'),
       debugShowCheckedModeBanner: false,
-      theme: _lightTheme,
-      darkTheme: _darkTheme,
+      theme: _themeFor(AppSemanticColors.light, Brightness.light),
+      darkTheme: _themeFor(AppSemanticColors.dark, Brightness.dark),
       themeMode: themeProvider.themeMode,
       home: const MainNavigationWrapper(),
     );
@@ -162,8 +175,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
   @override
   Widget build(BuildContext context) {
     final loc = context.watch<LocalizationProvider>();
-    final appColors = AppTheme.of(context);
-    
+
     final List<Widget> tabs = [
       _HomePlayTab(onNavigateToPlayers: () => _setTabIndex(1)),
       const PlayersPage(),
@@ -176,50 +188,28 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
         index: _currentIndex,
         children: tabs,
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: WhistlyTabBar(
         currentIndex: _currentIndex,
         onTap: _setTabIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: appColors.surface,
-        selectedItemColor: Theme.of(context).colorScheme.secondary,
-        unselectedItemColor: appColors.textFaint,
         items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.play_circle_outline),
-            activeIcon: const Icon(Icons.play_circle_filled),
-            label: loc.translate('start_game'),
-          ),
-          BottomNavigationBarItem(
-            icon: Badge(
-              isLabelVisible: context.watch<PlayerProvider>().players.length < 4,
-              label: const Text('!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              child: const Icon(Icons.people_outline),
-            ),
-            activeIcon: Badge(
-              isLabelVisible: context.watch<PlayerProvider>().players.length < 4,
-              label: const Text('!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10)),
-              backgroundColor: Theme.of(context).colorScheme.secondary,
-              child: const Icon(Icons.people),
-            ),
+          WhistlyTabItem(icon: Icons.play_circle_outline, label: loc.translate('start_game')),
+          WhistlyTabItem(
+            icon: Icons.people_outline,
             label: loc.translate('players'),
+            showDot: context.watch<PlayerProvider>().players.length < 4,
           ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.history_toggle_off),
-            activeIcon: const Icon(Icons.history),
-            label: loc.translate('history'),
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.menu_book_outlined),
-            activeIcon: const Icon(Icons.menu_book),
-            label: loc.translate('rules'),
-          ),
+          WhistlyTabItem(icon: Icons.history_toggle_off, label: loc.translate('history')),
+          WhistlyTabItem(icon: Icons.menu_book_outlined, label: loc.translate('rules')),
         ],
       ),
     );
   }
 }
 
+/// Home — per spec §6: brand block (logo mark, wordmark, tagline eyebrow)
+/// with a 2px bottom rule; "At the table" section (eyebrow left, dealer
+/// name right when a game is active; 2x2 player grid; + Add player) with
+/// a 2px bottom rule; flex spacer; suit strip + primary button; tab bar.
 class _HomePlayTab extends StatelessWidget {
   final VoidCallback onNavigateToPlayers;
   const _HomePlayTab({required this.onNavigateToPlayers});
@@ -228,226 +218,226 @@ class _HomePlayTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final playerProvider = context.watch<PlayerProvider>();
     final gameProvider = context.watch<GameProvider>();
-    final hasActiveGame = gameProvider.activeGame != null;
+    final activeGame = gameProvider.activeGame;
+    final hasActiveGame = activeGame != null;
     final loc = context.watch<LocalizationProvider>();
     final hasEnoughPlayers = playerProvider.players.length >= 4;
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
+
+    // The 2x2 grid shows the active game's table when one is in progress,
+    // otherwise the top 4 players by the roster's own favourites-first
+    // sort (PlayerProvider._loadPlayers) — a reasonable "at the table"
+    // default when no game has been started yet.
+    final gridPlayers = hasActiveGame ? activeGame.players : playerProvider.players.take(4).toList();
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(loc.translate('app_title'), style: const TextStyle(fontWeight: FontWeight.bold)),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-            tooltip: loc.translate('settings'),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsPage()),
-              );
-            },
-          ),
-        ],
-      ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const SizedBox(height: 24),
-              Hero(
-                tag: 'logo',
-                child: Image.asset(
-                  'assets/whistly_logo.png',
-                  height: 120,
-                  errorBuilder: (context, error, stackTrace) => 
-                      Icon(Icons.style, size: 80, color: Theme.of(context).colorScheme.secondary),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'WHISTLY',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                  color: appColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                loc.translate('home_hero_subtitle'),
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 12, 
-                  color: appColors.textFaint, 
-                  letterSpacing: 1.5,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
-              const SizedBox(height: 48),
-              
-              if (!hasEnoughPlayers)
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: appColors.surface,
-                    borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: appColors.border),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.black.withValues(alpha: 0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Icon(Icons.group_add, color: Theme.of(context).colorScheme.secondary, size: 32),
-                      const SizedBox(height: 12),
-                      Text(
-                        loc.translate('home_add_players_needed'),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: appColors.textSecondary, fontWeight: FontWeight.w500),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => context.read<PlayerProvider>().populateDefaults(),
-                              style: OutlinedButton.styleFrom(
-                                side: BorderSide(color: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.5)),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: Text(
-                                loc.translate('home_quick_start'),
-                                style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 12),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: ElevatedButton(
-                              onPressed: onNavigateToPlayers,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Theme.of(context).colorScheme.secondary,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                              ),
-                              child: Text(
-                                loc.translate('home_add_players_cta'),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
-              const SizedBox(height: 32),
-              
-              if (hasActiveGame) ...[
-                ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const ActiveGamePage()),
-                    );
-                  },
-                  icon: const Icon(Icons.play_circle_filled),
-                  label: Text(loc.translate('continue_game'),
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.secondary,
-                    minimumSize: const Size(double.infinity, 64),
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(16),
-                        topRight: Radius.circular(16),
-                      ),
+        child: Column(
+          children: [
+            // ─── Brand block ───────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        WhistlyLogoLockup(markSize: 60),
+                        const SizedBox(height: 6),
+                        Text(
+                          loc.translate('home_hero_subtitle').toUpperCase(),
+                          style: WhistlyText.eyebrow(colors.muted),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-                _buildActiveScores(context, gameProvider.activeGame!),
-                const SizedBox(height: 24),
-              ],
+                  IconButton(
+                    icon: Icon(Icons.settings, color: colors.ink),
+                    tooltip: loc.translate('settings'),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const SettingsPage()));
+                    },
+                  ),
+                ],
+              ),
+            ),
 
-              ElevatedButton.icon(
+            // ─── At the table ──────────────────────────────────────────
+            Container(
+              padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(loc.translate('home_at_table').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+                      ),
+                      if (hasActiveGame)
+                        Text(
+                          '${loc.translate('dealer')} · ${gameProvider.currentDealer?.name ?? ''}',
+                          style: WhistlyText.eyebrow(colors.muted),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
+                  if (!hasEnoughPlayers) ...[
+                    Text(
+                      loc.translate('home_add_players_needed'),
+                      style: WhistlyText.body(colors.muted, size: 13),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        WhistlyTextAction(
+                          label: loc.translate('home_quick_start'),
+                          onPressed: () => context.read<PlayerProvider>().populateDefaults(),
+                        ),
+                        const SizedBox(width: 24),
+                        WhistlyTextAction(
+                          icon: Icons.add,
+                          label: loc.translate('home_add_player_action'),
+                          onPressed: onNavigateToPlayers,
+                        ),
+                      ],
+                    ),
+                  ] else ...[
+                    _PlayerGrid(players: gridPlayers, activeGame: activeGame),
+                    const SizedBox(height: 12),
+                    WhistlyTextAction(
+                      icon: Icons.add,
+                      label: loc.translate('home_add_player_action'),
+                      onPressed: onNavigateToPlayers,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            const Spacer(),
+
+            // ─── Suit strip + primary button ───────────────────────────
+            Padding(
+              padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
+              child: const _SuitStrip(),
+            ),
+            const SizedBox(height: 12),
+            if (hasActiveGame)
+              WhistlyPrimaryButton(
+                label: loc.translate('continue_game'),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const ActiveGamePage()));
+                },
+              )
+            else
+              WhistlyPrimaryButton(
+                label: loc.translate('new_game'),
                 onPressed: hasEnoughPlayers
                     ? () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const GameSetupPage()),
-                        );
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => const GameSetupPage()));
                       }
                     : null,
-                icon: const Icon(Icons.add_circle),
-                label: Text(loc.translate('new_game'),
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 64),
-                  disabledBackgroundColor: appColors.border,
-                  disabledForegroundColor: appColors.textDisabled,
-                ),
               ),
-              
-              const Spacer(),
-              FutureBuilder<PackageInfo>(
-                future: PackageInfo.fromPlatform(),
-                builder: (context, snapshot) {
-                  final v = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
-                  return Text(
-                    'Whistly $v',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: appColors.textDisabled, fontSize: 12),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            const SizedBox(height: 8),
+            FutureBuilder<PackageInfo>(
+              future: PackageInfo.fromPlatform(),
+              builder: (context, snapshot) {
+                final v = snapshot.hasData ? 'v${snapshot.data!.version}' : '';
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text('Whistly $v', style: WhistlyText.body(colors.muted, size: 11)),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
   }
+}
 
-  Widget _buildActiveScores(BuildContext context, Game game) {
+/// Suit strip — four equal cells, `line`-colored 2px-gap grid, each `bg`
+/// filled with its suit glyph in suit color (spec §5). Decorative on Home.
+class _SuitStrip extends StatelessWidget {
+  const _SuitStrip();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppTheme.of(context);
+    const suits = [
+      ('♠', false),
+      ('♥', true),
+      ('♦', true),
+      ('♣', false),
+    ];
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-      decoration: BoxDecoration(
-        color: AppTheme.of(context).surface,
-        borderRadius: const BorderRadius.only(
-          bottomLeft: Radius.circular(16),
-          bottomRight: Radius.circular(16),
-        ),
-        border: Border.all(color: AppTheme.of(context).border),
-      ),
+      color: colors.line,
       child: Row(
-        children: game.players.map((p) {
-          final score = game.totalScores[p.id] ?? 0;
+        children: List.generate(suits.length, (i) {
+          final (glyph, isRed) = suits[i];
           return Expanded(
+            child: Container(
+              margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
+              color: colors.bg,
+              height: 56,
+              alignment: Alignment.center,
+              child: Text(
+                glyph,
+                style: TextStyle(fontSize: 24, color: isRed ? colors.suitRed : colors.suitInk),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
+/// Player grid — 2x2 of `bg` cells on a `line` grid, name over record
+/// (spec §5).
+class _PlayerGrid extends StatelessWidget {
+  final List<Player> players;
+  final Game? activeGame;
+  const _PlayerGrid({required this.players, this.activeGame});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppTheme.of(context);
+    final loc = context.watch<LocalizationProvider>();
+    final cells = List.generate(4, (i) => i < players.length ? players[i] : null);
+
+    return Container(
+      color: colors.line,
+      child: GridView.count(
+        crossAxisCount: 2,
+        mainAxisSpacing: 2,
+        crossAxisSpacing: 2,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        childAspectRatio: 2.4,
+        children: cells.map((p) {
+          if (p == null) return Container(color: colors.bg);
+          final record = activeGame != null
+              ? (activeGame!.totalScores[p.id] ?? 0)
+              : p.gamesPlayed;
+          final recordLabel = activeGame != null
+              ? (record >= 0 ? '+$record' : '$record')
+              : '$record ${loc.translate('stats_games').toUpperCase()}';
+          return Container(
+            color: colors.bg,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            alignment: Alignment.centerLeft,
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  p.name.split(' ').first,
-                  style: TextStyle(fontSize: 12, color: AppTheme.of(context).textMuted),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  score >= 0 ? '+$score' : '$score',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: score >= 0 ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.secondary,
-                  ),
-                ),
+                Text(p.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(recordLabel, style: WhistlyText.mono(colors.muted)),
               ],
             ),
           );
@@ -494,8 +484,8 @@ class _GameSetupPageState extends State<GameSetupPage> {
   Widget build(BuildContext context) {
     final players = context.watch<PlayerProvider>().players;
     final loc = context.watch<LocalizationProvider>();
-    final appColors = AppTheme.of(context);
-    
+    final colors = AppTheme.of(context);
+
     final List<String> seatNames = [
       loc.translate('setup_seat_dealer'),
       loc.translate('setup_seat_left'),
@@ -511,48 +501,38 @@ class _GameSetupPageState extends State<GameSetupPage> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(16),
-              color: appColors.surface,
+              padding: const EdgeInsets.all(22),
+              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
                     loc.translate('setup_instruction'),
-                    style: TextStyle(color: appColors.textSecondary),
+                    style: WhistlyText.body(colors.muted, size: 13),
                   ),
                   const SizedBox(height: 16),
                   ...List.generate(4, (index) {
                     final p = _selectedPlayers[index];
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.symmetric(vertical: 6),
                       child: Row(
                         children: [
                           SizedBox(
                             width: 120,
                             child: Text(
-                              seatNames[index],
-                              style: TextStyle(
-                                color: p != null ? Theme.of(context).colorScheme.secondary : appColors.textMuted,
-                                fontWeight: FontWeight.bold,
-                              ),
+                              seatNames[index].toUpperCase(),
+                              style: WhistlyText.eyebrow(p != null ? colors.ink : colors.muted),
                             ),
                           ),
                           Expanded(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                               decoration: BoxDecoration(
-                                color: p != null ? Theme.of(context).colorScheme.secondary.withValues(alpha: 0.1) : appColors.surface,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(
-                                  color: p != null ? Theme.of(context).colorScheme.secondary : appColors.border,
-                                ),
+                                border: Border.all(color: p != null ? colors.ink : colors.line, width: p != null ? 2 : 1),
                               ),
                               child: Text(
                                 p?.name ?? loc.translate('setup_tap_player'),
-                                style: TextStyle(
-                                  color: p != null ? Theme.of(context).colorScheme.secondary : appColors.textMuted,
-                                  fontWeight: p != null ? FontWeight.bold : FontWeight.normal,
-                                ),
+                                style: p != null ? WhistlyText.rowTitle(colors.ink) : WhistlyText.body(colors.muted),
                               ),
                             ),
                           ),
@@ -563,65 +543,62 @@ class _GameSetupPageState extends State<GameSetupPage> {
                 ],
               ),
             ),
-            Divider(height: 1, color: appColors.border),
             Expanded(
-              child: ListView.builder(
-                padding: const EdgeInsets.all(8),
+              child: ListView.separated(
+                padding: EdgeInsets.zero,
                 itemCount: players.length,
+                separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
                 itemBuilder: (context, index) {
                   final player = players[index];
                   final isSelected = _selectedPlayers.contains(player);
                   int seatIndex = _selectedPlayers.indexOf(player);
 
-                  return Card(
-                    color: isSelected ? Theme.of(context).colorScheme.secondary : appColors.surface,
-                    child: ListTile(
-                      onTap: () => _togglePlayerSelection(player),
-                      leading: CircleAvatar(
-                        backgroundColor: isSelected ? appColors.textPrimary : Theme.of(context).colorScheme.secondary,
-                        child: Text(
-                          player.name[0].toUpperCase(),
-                          style: TextStyle(color: isSelected ? Theme.of(context).colorScheme.secondary : appColors.textPrimary),
-                        ),
-                      ),
-                      title: Text(player.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      trailing: isSelected 
-                          ? CircleAvatar(
-                              radius: 12,
-                              backgroundColor: Theme.of(context).colorScheme.secondary,
-                              child: Text('${seatIndex + 1}', style: TextStyle(fontSize: 12, color: appColors.textPrimary)),
+                  return InkWell(
+                    onTap: () => _togglePlayerSelection(player),
+                    child: Container(
+                      color: colors.bg,
+                      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(player.name, style: WhistlyText.rowTitle(colors.ink)),
+                          ),
+                          if (isSelected)
+                            Container(
+                              width: 24,
+                              height: 24,
+                              alignment: Alignment.center,
+                              color: colors.accent,
+                              child: Text(
+                                '${seatIndex + 1}',
+                                style: WhistlyText.mono(colors.onAccent, size: 12, weight: FontWeight.w800),
+                              ),
                             )
-                          : Icon(Icons.add_circle_outline, color: appColors.textMuted),
+                          else
+                            Icon(Icons.add, color: colors.muted),
+                        ],
+                      ),
                     ),
                   );
                 },
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isReadyToStart()
-                      ? () {
-                          final selectedList = _selectedPlayers.whereType<Player>().toList();
-                          context.read<GameProvider>().startGame(
-                                selectedList,
-                                settings: context.read<ScoringSettings>(),
-                              );
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (_) => const ActiveGamePage()),
+            WhistlyPrimaryButton(
+              label: loc.translate('start_game'),
+              showChevron: false,
+              onPressed: _isReadyToStart()
+                  ? () {
+                      final selectedList = _selectedPlayers.whereType<Player>().toList();
+                      context.read<GameProvider>().startGame(
+                            selectedList,
+                            settings: context.read<ScoringSettings>(),
                           );
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    disabledBackgroundColor: appColors.border,
-                    disabledForegroundColor: appColors.textFaint,
-                  ),
-                  child: Text(loc.translate('start_game')),
-                ),
-              ),
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const ActiveGamePage()),
+                      );
+                    }
+                  : null,
             ),
           ],
         ),

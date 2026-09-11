@@ -73,6 +73,14 @@ flutter:
   assets:
     - assets/whistly_logo.png
 
+  fonts:
+    - family: Archivo
+      fonts:
+        - asset: assets/fonts/Archivo-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Archivo-Variable.ttf
+          weight: 800
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 
