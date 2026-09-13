@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 import 'package:provider/provider.dart';
-import 'package:whistly/models/player.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/models/game.dart';
 import 'package:whistly/providers/game_provider.dart';
@@ -93,7 +93,7 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                       // stays perfectly usable.
                       final adsProvider = context.read<AdsProvider>();
                       final gameId = game.id;
-                      context.read<PlayerProvider>().incrementGamesPlayed(game.players);
+                      context.read<PlayerProvider>().incrementGamesPlayed(game.players.map((p) => p.id).toList());
                       context.read<GameProvider>().endGame();
                       Navigator.pop(context); // Close dialog
                       Navigator.pop(context); // Return home
@@ -430,7 +430,7 @@ class _SuitStripWithCounts extends StatelessWidget {
 class _RoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
-  final List<Player> players;
+  final List<GamePlayerRef> players;
 
   const _RoundRow({required this.round, required this.roundNumber, required this.players});
 

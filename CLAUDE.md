@@ -12,13 +12,35 @@ Local-only, no backend, no accounts. Goal: ship to Play Store + App Store with a
 ## Layout
 ```
 lib/
-  models/       Player, Game, Round (+ Hive .g.dart adapters)
+  models/       Player, Game, GamePlayerRef, Round (+ Hive .g.dart adapters)
   providers/    GameProvider, PlayerProvider, ThemeProvider, LocalizationProvider
   screens/      active_game, players, history, game_history_detail, player_stats, hierarchy
   widgets/      round_setup_dialog.dart  (the 4-step round entry flow)
   theme/        app_theme.dart  (AppSemanticColors ThemeExtension)
   app_colors.dart, scoring_settings.dart, settings_page.dart, rules_page.dart
 ```
+
+## `Game.players` is `GamePlayerRef`, not `Player`
+
+A game's roster is an id+name snapshot taken at `GameProvider.startGame()` time —
+`GamePlayerRef({id, name})`, nothing else. **Never add a mutable/live field to it** (a
+favourite flag, `gamesPlayed`, anything from `PlayerProvider`) — that was exactly the bug
+(PLAN.md B4): `Game` used to embed full `Player` objects, which Hive serializes as
+independent copies (not a live reference), so renaming a player never updated their past
+games, and calling `.save()` on one of those embedded copies was fragile (not bound to
+`players_box`). Need something live about a player inside a game context (current
+`gamesPlayed`, whether they're a favourite)? Look it up from `PlayerProvider`/`players_box`
+by `GamePlayerRef.id` — never read it off the ref itself, because it isn't there.
+
+`Game.players` is a *getter*, not a stored field: new games populate `playerRefs`
+(`@HiveField(9)`); games saved before this migration have `playerRefs == null` and the
+getter falls back to deriving id+name from the legacy embedded `Player` list, now renamed
+to `legacyPlayers` (`@HiveField(2)`, nullable, write-only-by-old-code). Don't read
+`legacyPlayers` directly — always go through `players`.
+
+`PlayerProvider.incrementGamesPlayed` takes `List<String> playerIds` (not `Player`s) for
+the same reason: it looks each one up fresh from `players_box` by id and mutates/saves
+*that* instance, rather than trusting whatever was passed in.
 
 ## Scoring engine
 `GameProvider.addRound` is the heart of the app. Contracts: Ask & Join, Trull, Solo,
@@ -48,12 +70,22 @@ hand-rolled styling.
   no separate border colour, and deliberately no surface/card/panel token:
   **radius is 0 everywhere, no shadows, no surface fills.** Separation between
   regions is always a 1-2px `line` rule, never a background tint.
-- **Type**: Archivo (bundled as a variable font at `assets/fonts/Archivo-Variable.ttf`,
-  weights 600/800 both pointing at the same file — see pubspec.yaml `fonts:`).
-  Build text through `WhistlyText.*` (brand/sectionHead/rowTitle/buttonLabel/
-  eyebrow/tabLabel/badge/body), never inline `TextStyle`s with a hardcoded
-  family. Numerals (scores, deltas, round indices, records, trick counts) are
-  monospace — `WhistlyText.screenNumeral`/`.mono`.
+- **Type**: Archivo, bundled as a single true variable font asset
+  (`assets/fonts/Archivo-Variable.ttf`, `wght` axis 100-900, declared once in
+  pubspec.yaml `fonts:`). Build text through `WhistlyText.*`
+  (brand/sectionHead/rowTitle/buttonLabel/eyebrow/tabLabel/badge/body), never
+  inline `TextStyle`s with a hardcoded family. Numerals (scores, deltas,
+  round indices, records, trick counts) are monospace —
+  `WhistlyText.screenNumeral`/`.mono`.
+  **The 600/800 contrast comes from `fontVariations:
+  [FontVariation('wght', ...)]` on each style, not from `fontWeight` alone**
+  (PLAN.md B5) — pubspec used to declare this file twice, once per weight,
+  which cannot work: `weight:` only picks which *file* answers a request
+  when several are declared for one family, it never reaches into a file and
+  sets its variable axis, so both "weights" resolved to the same bytes and
+  rendered identically. If you add a new `WhistlyText` style, give it a
+  `fontVariations` entry or it will silently render at the font's default
+  instance (600) regardless of the `fontWeight` you set.
 - **One accent per screen region.** A screen has one primary button; almost
   everything else is `ink`/`muted`. Don't recolour a whole row/badge with
   `accent` just for emphasis.

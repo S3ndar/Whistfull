@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:whistly/models/game.dart';
-import 'package:whistly/models/player.dart';
+import 'package:whistly/models/game_player_ref.dart';
 
 void main() {
   group('Game Model Tests', () {
     final players = [
-      Player(id: '1', name: 'Sander'),
-      Player(id: '2', name: 'Alice'),
-      Player(id: '3', name: 'Bob'),
-      Player(id: '4', name: 'Charlie'),
+      GamePlayerRef(id: '1', name: 'Sander'),
+      GamePlayerRef(id: '2', name: 'Alice'),
+      GamePlayerRef(id: '3', name: 'Bob'),
+      GamePlayerRef(id: '4', name: 'Charlie'),
     ];
 
     test('should initialize game with correct properties and default scores', () {
@@ -16,7 +16,7 @@ void main() {
       final game = Game(
         id: 'g1',
         dateStarted: date,
-        players: players,
+        playerRefs: players,
       );
 
       expect(game.id, 'g1');
@@ -37,7 +37,7 @@ void main() {
       final game = Game(
         id: 'g2',
         dateStarted: DateTime.now(),
-        players: players,
+        playerRefs: players,
         totalScores: customScores,
         pointMultiplier: 4,
       );

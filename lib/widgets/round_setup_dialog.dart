@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 import 'package:provider/provider.dart';
-import 'package:whistly/models/player.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/providers/game_provider.dart';
 import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/scoring_settings.dart';
@@ -35,7 +35,7 @@ const List<Map<String, dynamic>> kContracts = [
 ];
 
 class RoundSetupDialog extends StatefulWidget {
-  final List<Player> players;
+  final List<GamePlayerRef> players;
   const RoundSetupDialog({super.key, required this.players});
 
   @override
@@ -45,8 +45,8 @@ class RoundSetupDialog extends StatefulWidget {
 class _RoundSetupDialogState extends State<RoundSetupDialog> {
   int _step = 0; // 0: contract type, 1: players, 2: trump, 3: result
   Map<String, dynamic>? _selectedContract;
-  Player? _declarer;
-  Player? _partner;
+  GamePlayerRef? _declarer;
+  GamePlayerRef? _partner;
   String? _selectedTrump;
   int _tricksWon = 0;
   int _agreedTricks = 8;
@@ -310,9 +310,9 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   Widget _playerSelector({
     required LocalizationProvider loc,
     required String label,
-    required Player? selected,
-    required void Function(Player) onSelect,
-    Player? disabledPlayer,
+    required GamePlayerRef? selected,
+    required void Function(GamePlayerRef) onSelect,
+    GamePlayerRef? disabledPlayer,
   }) {
     final colors = AppTheme.of(context);
     return Column(

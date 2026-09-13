@@ -19,26 +19,26 @@ class GameAdapter extends TypeAdapter<Game> {
     return Game(
       id: fields[0] as String,
       dateStarted: fields[1] as DateTime,
-      players: (fields[2] as List).cast<Player>(),
+      playerRefs: (fields[9] as List?)?.cast<GamePlayerRef>(),
       rounds: (fields[3] as List?)?.cast<Round>(),
       totalScores: (fields[4] as Map?)?.cast<String, int>(),
       pointMultiplier: fields[5] as int,
       scoringSnapshot: (fields[6] as Map?)?.cast<String, int>(),
       dateEnded: fields[7] as DateTime?,
       isComplete: fields[8] as bool,
-    );
+    )..legacyPlayers = (fields[2] as List?)?.cast<Player>();
   }
 
   @override
   void write(BinaryWriter writer, Game obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
       ..write(obj.dateStarted)
       ..writeByte(2)
-      ..write(obj.players)
+      ..write(obj.legacyPlayers)
       ..writeByte(3)
       ..write(obj.rounds)
       ..writeByte(4)
@@ -50,7 +50,9 @@ class GameAdapter extends TypeAdapter<Game> {
       ..writeByte(7)
       ..write(obj.dateEnded)
       ..writeByte(8)
-      ..write(obj.isComplete);
+      ..write(obj.isComplete)
+      ..writeByte(9)
+      ..write(obj.playerRefs);
   }
 
   @override

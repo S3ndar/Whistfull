@@ -77,7 +77,7 @@ void main() {
       final alice = provider.players.firstWhere((p) => p.name == 'Alice');
       final bob = provider.players.firstWhere((p) => p.name == 'Bob');
 
-      await provider.incrementGamesPlayed([alice]);
+      await provider.incrementGamesPlayed([alice.id]);
 
       expect(alice.gamesPlayed, 1);
       expect(bob.gamesPlayed, 0);
