@@ -38,6 +38,8 @@ class LocalizationProvider extends ChangeNotifier {
     'add': 'ADD',
     'save': 'SAVE',
     'dealer': 'Dealer',
+    'round': 'Round',
+    'lead': 'Lead',
     'ok': 'OK',
     'back': 'Back',
     'next': 'NEXT',
@@ -70,6 +72,8 @@ class LocalizationProvider extends ChangeNotifier {
     'home_add_players_needed': 'Add at least 4 players to start playing Whist.',
     'home_quick_start': 'Quick Start',
     'home_add_players_cta': 'MANAGE PLAYERS',
+    'home_at_table': 'At the table',
+    'home_add_player_action': 'Add player',
 
     // Game Setup
     'setup_title': 'Setup Table',
@@ -267,6 +271,8 @@ class LocalizationProvider extends ChangeNotifier {
     'add': 'VOEG TOE',
     'save': 'OPSLAAN',
     'dealer': 'Deler',
+    'round': 'Ronde',
+    'lead': 'Leidt',
     'ok': 'OK',
     'back': 'Terug',
     'next': 'VOLGENDE',
@@ -300,6 +306,8 @@ class LocalizationProvider extends ChangeNotifier {
     'home_add_players_needed': 'Voeg minstens 4 spelers toe om te starten.',
     'home_quick_start': 'Snelstart',
     'home_add_players_cta': 'SPELERS BEHEREN',
+    'home_at_table': 'Aan tafel',
+    'home_add_player_action': 'Speler toevoegen',
 
     // Game Setup
     'setup_title': 'Tafel Opstellen',

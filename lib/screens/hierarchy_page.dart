@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/scoring_settings.dart';
 import 'package:whistly/theme/app_theme.dart';
+import 'package:whistly/theme/whistly_components.dart';
 
 class HierarchyPage extends StatelessWidget {
   const HierarchyPage({super.key});
@@ -54,14 +55,15 @@ class HierarchyPage extends StatelessWidget {
     ];
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(12),
+        Container(
+          decoration: BoxDecoration(border: Border.all(color: colors.line, width: 2)),
           child: Table(
-            border: TableBorder.all(color: colors.borderFaint, width: 1),
-            // Column 0 was FlexColumnWidth(1.2) — too narrow for the
-            // "Priority" header at this font size, which wrapped mid-word
-            // ("Priori"/"ty" on two lines). Widened at column 1's expense.
+            border: TableBorder(
+              horizontalInside: BorderSide(color: colors.line, width: 1),
+              verticalInside: BorderSide(color: colors.line, width: 1),
+            ),
             columnWidths: const {
               0: FlexColumnWidth(2),
               1: FlexColumnWidth(4),
@@ -69,24 +71,18 @@ class HierarchyPage extends StatelessWidget {
             },
             children: [
               TableRow(
-                decoration: BoxDecoration(color: colors.surface),
                 children: [
                   _tableHeader(context, loc.translate('rules_table_priority')),
                   _tableHeader(context, loc.translate('rules_table_type')),
                   _tableHeader(context, loc.translate('rules_table_base')),
                 ],
               ),
-              ...tableRows.asMap().entries.map((e) {
-                final isEven = e.key.isEven;
-                final row = e.value;
+              ...tableRows.map((row) {
                 return TableRow(
-                  decoration: BoxDecoration(
-                    color: isEven ? colors.background : colors.surface,
-                  ),
                   children: [
-                    _tableCell(context, row.priority, center: true),
+                    _tableCell(context, row.priority, mono: true, center: true),
                     _tableCell(context, row.name, bold: true),
-                    _tableCell(context, row.basePoints, center: true),
+                    _tableCell(context, row.basePoints, mono: true, center: true),
                   ],
                 );
               }),
@@ -94,10 +90,7 @@ class HierarchyPage extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Text(
-          loc.translate('rules_footer_note'),
-          style: TextStyle(fontSize: 12, color: colors.textFaint, fontStyle: FontStyle.italic),
-        ),
+        Text(loc.translate('rules_footer_note'), style: WhistlyText.body(colors.muted, size: 12)),
       ],
     );
   }
@@ -106,21 +99,19 @@ class HierarchyPage extends StatelessWidget {
     final colors = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-      child: Text(text, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: colors.textPrimary), textAlign: TextAlign.center),
+      child: Text(text.toUpperCase(), style: WhistlyText.eyebrow(colors.ink), textAlign: TextAlign.center),
     );
   }
 
-  static Widget _tableCell(BuildContext context, String text, {bool bold = false, bool center = false}) {
+  static Widget _tableCell(BuildContext context, String text, {bool bold = false, bool center = false, bool mono = false}) {
     final colors = AppTheme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 13,
-          color: colors.textSecondary,
-          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-        ),
+        style: mono
+            ? WhistlyText.mono(colors.ink, size: 13, weight: bold ? FontWeight.w800 : FontWeight.w600)
+            : (bold ? WhistlyText.rowTitle(colors.ink) : WhistlyText.body(colors.muted, size: 13)),
         textAlign: center ? TextAlign.center : TextAlign.start,
       ),
     );

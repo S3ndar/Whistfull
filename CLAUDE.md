@@ -29,26 +29,68 @@ scores ×2, stacking). Do not "simplify" it without reading `test/game_provider_
 pending multiplier are all *derived* from the round list. `undoLastRound()` and
 `deleteRound()` rely on this. Never hand-maintain totals again.
 
+## Theme — spec iteration 6 (neo-brutalist cream/ink/red)
+
+The app was fully re-themed away from the earlier warm gold/navy look. Palette,
+type, and component rules live in `lib/theme/app_theme.dart` (tokens) and
+`lib/theme/whistly_components.dart` (typography + reusable components:
+`WhistlyPrimaryButton`, `WhistlySecondaryButton`, `WhistlyTextAction`,
+`WhistlyLeadBadge`, `WhistlyResultBadge`, `WhistlyTabBar`, `WhistlyToggleRow`,
+`WhistlyLogoMark`/`WhistlyLogoLockup`). Build new screens through those, not
+hand-rolled styling.
+
+- **Seven raw colours, `AppColors`**: `bgLight`/`bgDark`, `mutedLight`/`mutedDark`,
+  `suitRed` (hearts+diamonds, both modes), `suitInkLight`/`suitInkDark`
+  (spades+clubs), `accent` (`#FF2D4F`, interface-only — primary button, active
+  tab, Lead badge, negative scores, text-action underline; never a suit colour).
+- **Resolved tokens, `AppSemanticColors`** via `AppTheme.of(context)`: `bg, ink,
+  muted, line, accent, onAccent, suitRed, suitInk`. `line` *is* `ink` — there is
+  no separate border colour, and deliberately no surface/card/panel token:
+  **radius is 0 everywhere, no shadows, no surface fills.** Separation between
+  regions is always a 1-2px `line` rule, never a background tint.
+- **Type**: Archivo (bundled as a variable font at `assets/fonts/Archivo-Variable.ttf`,
+  weights 600/800 both pointing at the same file — see pubspec.yaml `fonts:`).
+  Build text through `WhistlyText.*` (brand/sectionHead/rowTitle/buttonLabel/
+  eyebrow/tabLabel/badge/body), never inline `TextStyle`s with a hardcoded
+  family. Numerals (scores, deltas, round indices, records, trick counts) are
+  monospace — `WhistlyText.screenNumeral`/`.mono`.
+- **One accent per screen region.** A screen has one primary button; almost
+  everything else is `ink`/`muted`. Don't recolour a whole row/badge with
+  `accent` just for emphasis.
+
+### A real rendering trap, now understood: `Row` + `CrossAxisAlignment.stretch`
+
+`active_game_page.dart`'s bottom action row (`+ Round` / `End`) once used
+`Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [...])` and,
+under headless-Chromium/CanvasKit testing, both buttons silently failed to
+paint — zero analyzer or console error, not even a debug-mode overflow
+warning. Removing `crossAxisAlignment: CrossAxisAlignment.stretch` (the Row's
+default, `center`, is what every other Row in this codebase already uses)
+fixed it completely. `stretch` forces every child to satisfy the Row's own
+cross-axis (here: vertical) extent exactly; when that Row itself has no
+externally-imposed height (this one sits as the last child of a `Column`
+inside `SafeArea`/`Scaffold.body`), the forced-equal-height constraint on
+children built from `Container`/`Padding` (no explicit height of their own)
+can apparently resolve to something that paints nothing, without tripping
+either the debug overflow assertion or a caught `FlutterError`. Before
+adding `CrossAxisAlignment.stretch` to any `Row` in this codebase again,
+verify the fix actually renders — a bespoke tab bar earlier in this same
+redesign was misdiagnosed against SafeArea/Material for the same underlying
+symptom before this cause was found; that fix (rebuilt on Flutter's
+`BottomNavigationBar`) is a fine, more conventional choice regardless and is
+not related to this specific `stretch` cause.
+
 ## Conventions — follow these
-1. **Colours go through the theme.** Use `AppTheme.of(context).<token>` from
-   `lib/theme/app_theme.dart`. Tokens: `background, surface, surfaceAlt, surfaceDim,
-   panel, textPrimary, textSecondary, textMuted, textFaint, textDisabled, border,
-   borderFaint, success, error, accentGold, scrim`.
-   Never add a raw `AppColors.white*` / `.surface` / `.background` / `.darkPanel` to a widget —
-   those are dark-mode-only and broke light mode before. `AppColors.suitRed`, `suitBlack`,
-   `primary`, `secondary`, `selectedBg`, `danger`, `confetti` are intentionally theme-independent
-   and may be used directly.
-2. **`const` and theme lookups don't mix.** `AppTheme.of(context)` is not a compile-time
+1. **`const` and theme lookups don't mix.** `AppTheme.of(context)` is not a compile-time
    constant. If you put it inside a widget, remove `const` from that widget *and every
    enclosing one*. This is the most common way to break this codebase.
-3. **Localisation keys must exist in BOTH maps.** `lib/providers/localization_provider.dart`
-   has `_english` and `_dutch` const maps, currently 173 keys each, in parity.
-   Duplicate keys in a Dart const map are a compile error. Adding a key to only one map
-   silently falls back — always add to both.
-4. **Hive schema changes need codegen.** Adding an `@HiveField` means running
+2. **Localisation keys must exist in BOTH maps.** `lib/providers/localization_provider.dart`
+   has `_english` and `_dutch` const maps, in parity. Duplicate keys in a Dart const map
+   are a compile error. Adding a key to only one map silently falls back — always add to both.
+3. **Hive schema changes need codegen.** Adding an `@HiveField` means running
    `dart run build_runner build --delete-conflicting-outputs`. Bump nothing by hand.
    New fields must be nullable or defaulted so existing users' data still loads.
-5. Never call `Hive.deleteBoxFromDisk` outside `isUnrecoverableHiveError` in
+4. Never call `Hive.deleteBoxFromDisk` outside `isUnrecoverableHiveError` in
    `lib/utils/hive_recovery.dart` — it destroys all of the user's games.
 
 ## Commands

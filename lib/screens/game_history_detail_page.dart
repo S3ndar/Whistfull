@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:whistly/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:whistly/models/game.dart';
@@ -8,6 +7,7 @@ import 'package:whistly/models/round.dart';
 import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/widgets/round_setup_dialog.dart'; // For getContractName
 import 'package:whistly/theme/app_theme.dart';
+import 'package:whistly/theme/whistly_components.dart';
 
 class GameHistoryDetailPage extends StatelessWidget {
   final Game game;
@@ -29,123 +29,70 @@ class GameHistoryDetailPage extends StatelessWidget {
       }
     }
 
+    final ranked = [...players]..sort((a, b) => (game.totalScores[b.id] ?? 0).compareTo(game.totalScores[a.id] ?? 0));
+    final topScore = ranked.isEmpty ? 0 : (game.totalScores[ranked.first.id] ?? 0);
+    final soleLeaderId = ranked.where((p) => (game.totalScores[p.id] ?? 0) == topScore).length == 1 ? ranked.first.id : null;
+
     return Scaffold(
       appBar: AppBar(title: Text(loc.translate('game_recap'))),
       body: Column(
         children: [
-          // Game Date Header
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            color: colors.scrim,
-            child: Text(
-              formatDate(game.dateStarted),
-              style: TextStyle(fontSize: 12, color: colors.textFaint),
-              textAlign: TextAlign.center,
-            ),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+            child: Text(formatDate(game.dateStarted), style: WhistlyText.mono(colors.muted), textAlign: TextAlign.center),
           ),
-          // Final Scoreboard Header
           Container(
-            color: colors.surface,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.emoji_events,
-                      size: 16,
-                      color: AppColors.favoriteGold,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      loc.translate('final_scores'),
-                      style: const TextStyle(
-                        color: AppColors.favoriteGold,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.2,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: (() {
-                    final maxScore = game.totalScores.isNotEmpty
-                        ? game.totalScores.values.reduce((a, b) => a > b ? a : b)
-                        : 0;
-                    return players.map((player) {
-                      final score = game.totalScores[player.id] ?? 0;
-                      final isWinner = score == maxScore;
-
-                      return Expanded(
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: isWinner
-                              ? AppColors.selectedBg.withValues(alpha: 0.2)
-                              : colors.background,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: isWinner
-                                ? AppColors.selectedBg
-                                : colors.border,
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Text(
-                              player.name.split(' ').first,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: isWinner
-                                    ? colors.error
-                                    : colors.textSecondary,
-                                fontWeight: isWinner
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              score >= 0 ? '+$score' : '$score',
-                              style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: score >= 0
-                                    ? colors.success
-                                    : colors.error,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }).toList();
-                })(),
-                ),
-              ],
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+            child: Text(
+              loc.translate('final_scores').toUpperCase(),
+              textAlign: TextAlign.center,
+              style: WhistlyText.eyebrow(colors.muted),
             ),
           ),
-          Divider(height: 1, color: colors.border),
+          Container(
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+            child: Column(
+              children: List.generate(ranked.length, (i) {
+                final player = ranked[i];
+                final score = game.totalScores[player.id] ?? 0;
+                return Container(
+                  decoration: BoxDecoration(border: i == 0 ? null : Border(top: BorderSide(color: colors.line, width: 1))),
+                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+                  child: Row(
+                    children: [
+                      SizedBox(width: 16, child: Text('${i + 1}', style: WhistlyText.mono(colors.muted, size: 12))),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis)),
+                      if (player.id == soleLeaderId) ...[
+                        WhistlyLeadBadge(label: loc.translate('lead')),
+                        const SizedBox(width: 8),
+                      ],
+                      SizedBox(
+                        width: 56,
+                        child: Text(
+                          score >= 0 ? '+$score' : '$score',
+                          textAlign: TextAlign.right,
+                          style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ),
 
-          // Round Recap List
           Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.all(8),
+            child: ListView.separated(
+              padding: EdgeInsets.zero,
               itemCount: game.rounds.length,
+              separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
               itemBuilder: (context, index) {
                 final round = game.rounds[index];
-                final roundNumber = index + 1;
-                return _HistoricalRoundCard(
-                  round: round,
-                  roundNumber: roundNumber,
-                  players: players,
-                );
+                return _HistoricalRoundRow(round: round, roundNumber: index + 1, players: players);
               },
             ),
           ),
@@ -155,170 +102,93 @@ class GameHistoryDetailPage extends StatelessWidget {
   }
 }
 
-class _HistoricalRoundCard extends StatelessWidget {
+class _HistoricalRoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
   final List<Player> players;
 
-  const _HistoricalRoundCard({
-    required this.round,
-    required this.roundNumber,
-    required this.players,
-  });
+  const _HistoricalRoundRow({required this.round, required this.roundNumber, required this.players});
 
   @override
   Widget build(BuildContext context) {
     final loc = context.watch<LocalizationProvider>();
     final colors = AppTheme.of(context);
-    final declarer = players.firstWhere(
-      (p) => p.id == round.declarerId,
-      orElse: () => players.first,
-    );
+
+    if (round.contractType == 'Pass') {
+      final dealer = players.firstWhere((p) => p.id == round.dealerId, orElse: () => players.first);
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+        child: Row(
+          children: [
+            SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
+            const SizedBox(width: 12),
+            Expanded(child: Text(loc.translate('bid_pass'), style: WhistlyText.rowTitle(colors.muted))),
+            Text('${loc.translate('dealer')}: ${dealer.name}', style: WhistlyText.mono(colors.muted)),
+          ],
+        ),
+      );
+    }
+
+    final declarer = players.firstWhere((p) => p.id == round.declarerId, orElse: () => players.first);
     final partner = round.partnerId != null
-        ? players.firstWhere(
-            (p) => p.id == round.partnerId,
-            orElse: () => players.first,
-          )
+        ? players.firstWhere((p) => p.id == round.partnerId, orElse: () => players.first)
         : null;
 
     final isMiserie = round.contractType == 'Miserie' || round.contractType == 'Open Miserie';
-    final declarerWon = (round.scoreDeltas[round.declarerId] ?? 0) > 0;
-    final partnerWon = partner != null && (round.scoreDeltas[round.partnerId] ?? 0) > 0;
+    final overallSuccess = isMiserie && partner != null
+        ? (round.scoreDeltas[round.declarerId] ?? 0) > 0 && (round.scoreDeltas[round.partnerId] ?? 0) > 0
+        : round.success;
 
-    final trumpIcon = round.trump == 'Hearts' ? '♥' 
-                   : round.trump == 'Diamonds' ? '♦'
-                   : round.trump == 'Clubs' ? '♣'
-                   : round.trump == 'Spades' ? '♠' : '';
-    
-    final trumpColor = (round.trump == 'Hearts' || round.trump == 'Diamonds') ? AppColors.suitRed
-                    : (round.trump == 'Clubs' || round.trump == 'Spades') ? AppColors.suitBlack
-                    : colors.textSecondary;
+    final trumpGlyph = round.trump == 'Hearts'
+        ? '♥'
+        : round.trump == 'Diamonds'
+            ? '♦'
+            : round.trump == 'Clubs'
+                ? '♣'
+                : round.trump == 'Spades'
+                    ? '♠'
+                    : '';
+    final trumpColor = (round.trump == 'Hearts' || round.trump == 'Diamonds')
+        ? colors.suitRed
+        : (round.trump == 'Clubs' || round.trump == 'Spades')
+            ? colors.suitInk
+            : colors.muted;
 
-    return Card(
-      color: colors.surface,
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          children: [
-            Row(
+    final partnerLine = partner != null ? '${declarer.name} & ${partner.name}' : declarer.name;
+    final deltasLine = players.map((p) {
+      final d = round.scoreDeltas[p.id] ?? 0;
+      return '${p.name.split(' ').first} ${d >= 0 ? '+$d' : '$d'}';
+    }).join('  ');
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
+          const SizedBox(width: 12),
+          SizedBox(
+            width: 24,
+            child: trumpGlyph.isEmpty ? null : Text(trumpGlyph, style: TextStyle(fontSize: 24, color: trumpColor)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.selectedBg.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: AppColors.selectedBg.withValues(alpha: 0.4),
-                    ),
-                  ),
-                  child: Text(
-                    loc
-                        .translate('active_game_round_n')
-                        .replaceFirst('{}', roundNumber.toString()),
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  getContractName(loc, round.contractType),
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                if (trumpIcon.isNotEmpty) ...[
-                  const SizedBox(width: 6),
-                  Text(trumpIcon, style: TextStyle(fontSize: 18, color: trumpColor)),
-                ],
-                const Spacer(),
-                if (isMiserie && partner != null) ...[
-                  Icon(
-                    declarerWon ? Icons.check : Icons.close,
-                    color: declarerWon ? colors.success : colors.error,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 2),
-                  Text(
-                    '${declarer.name.split(" ").first}: ${loc.translate(declarerWon ? 'won' : 'lost')}',
-                    style: TextStyle(
-                      color: declarerWon ? colors.success : colors.error,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Icon(
-                    partnerWon ? Icons.check : Icons.close,
-                    color: partnerWon ? colors.success : colors.error,
-                    size: 14,
-                  ),
-                  const SizedBox(width: 2),
-                  Text(
-                    '${partner.name.split(" ").first}: ${loc.translate(partnerWon ? 'won' : 'lost')}',
-                    style: TextStyle(
-                      color: partnerWon ? colors.success : colors.error,
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ] else ...[
-                  Icon(
-                    round.success ? Icons.check : Icons.close,
-                    color: round.success
-                        ? colors.success
-                        : colors.error,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    loc.translate(round.success ? 'won' : 'lost'),
-                    style: TextStyle(
-                      color: round.success
-                          ? colors.success
-                          : colors.error,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
+                Text(getContractName(loc, round.contractType), style: WhistlyText.rowTitle(colors.ink)),
+                const SizedBox(height: 2),
+                Text('$partnerLine · $deltasLine', style: WhistlyText.mono(colors.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
               ],
             ),
-            const SizedBox(height: 6),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                '${declarer.name}${partner != null ? " + ${partner.name}" : ""}',
-                style: TextStyle(fontSize: 12, color: colors.textFaint),
-              ),
-            ),
-            Divider(height: 16, color: colors.border),
-            Row(
-              children: players.map((p) {
-                final delta = round.scoreDeltas[p.id] ?? 0;
-                return Expanded(
-                  child: Text(
-                    delta >= 0 ? '+$delta' : '$delta',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: delta > 0
-                          ? colors.success
-                          : delta < 0
-                          ? colors.error
-                          : colors.textFaint,
-                    ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
+          ),
+          const SizedBox(width: 8),
+          WhistlyResultBadge(
+            achieved: overallSuccess,
+            achievedLabel: loc.translate('setup_succeeded'),
+            failedLabel: loc.translate('setup_failed'),
+          ),
+        ],
       ),
     );
   }

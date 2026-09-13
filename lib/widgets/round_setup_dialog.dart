@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:whistly/app_colors.dart';
 import 'package:whistly/theme/app_theme.dart';
+import 'package:whistly/theme/whistly_components.dart';
 import 'package:provider/provider.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/providers/game_provider.dart';
@@ -107,58 +107,51 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = context.watch<LocalizationProvider>();
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: appColors.background,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        color: colors.bg,
+        border: Border(top: BorderSide(color: colors.line, width: 2)),
       ),
       padding: EdgeInsets.only(
-        top: 20,
-        left: 20,
-        right: 20,
+        top: 16,
+        left: 22,
+        right: 22,
         bottom: MediaQuery.of(context).viewInsets.bottom + 20,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header
+          // Header — flush left, per spec (no centered headings).
           Row(
             children: [
               if (_step > 0)
                 IconButton(
-                  icon: const Icon(Icons.arrow_back),
+                  icon: Icon(Icons.arrow_back, color: colors.ink),
                   onPressed: _prevStep,
                 ),
               Expanded(
-                child: Text(
-                  _stepTitle(loc),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
+                child: Text(_stepTitle(loc), style: WhistlyText.sectionHead(colors.ink)),
               ),
-              if (_step > 0) const SizedBox(width: 48),
             ],
           ),
-          // Step indicator
+          // Step indicator — radius 0, per spec §3.
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: List.generate(4, (i) {
-               // Hide step 2 dot if misere
-               if (i == 2 && _selectedContract?['hasTricks'] == false) return const SizedBox();
-               return Container(
-                margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-                width: i == _step ? 20 : 8,
-                height: 8,
-                decoration: BoxDecoration(
-                  color: i == _step ? appColors.error : appColors.border,
-                  borderRadius: BorderRadius.circular(4),
+              // Hide step 2 dot if misere
+              if (i == 2 && _selectedContract?['hasTricks'] == false) return const SizedBox();
+              return Padding(
+                padding: const EdgeInsets.only(right: 4, top: 12, bottom: 12),
+                child: Container(
+                  width: i == _step ? 20 : 8,
+                  height: 4,
+                  color: i == _step ? colors.accent : colors.line,
                 ),
               );
             }),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 4),
           // Step content
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
@@ -171,10 +164,10 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
 
   String _stepTitle(LocalizationProvider loc) {
     switch (_step) {
-      case 0: return loc.translate('setup_contract_step') != 'setup_contract_step' ? loc.translate('setup_contract_step') : 'Select Contract';
-      case 1: return loc.translate('setup_players_step') != 'setup_players_step' ? loc.translate('setup_players_step') : 'Select Players';
-      case 2: return loc.translate('setup_trump_step') != 'setup_trump_step' ? loc.translate('setup_trump_step') : 'Select Trump';
-      case 3: return loc.translate('setup_result_step') != 'setup_result_step' ? loc.translate('setup_result_step') : 'Enter Result';
+      case 0: return loc.translate('setup_contract_step');
+      case 1: return loc.translate('setup_players_step');
+      case 2: return loc.translate('setup_trump_step');
+      case 3: return loc.translate('setup_result_step');
       default: return '';
     }
   }
@@ -190,137 +183,84 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   }
 
   Widget _buildContractStep(LocalizationProvider loc) {
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     return Column(
       key: const ValueKey(0),
-      children: [
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: kContracts.map((contract) {
-            final selected = _selectedContract?['key'] == contract['key'];
-            final displayName = getContractName(loc, contract['key']);
-            final isPass = contract['isPass'] == true;
-            return GestureDetector(
-              onTap: () {
-                if (isPass) {
-                  _submitPass();
-                  return;
-                }
-                setState(() {
-                  _selectedContract = contract;
-                  _partner = null;
-                  _miseriePlayerCount = 1;
-                  final req = (contract['required'] as int);
-                  _agreedTricks = req;
-                  _tricksWon = req;
-                  _declarerMiserieSuccess = true;
-                  _partnerMiserieSuccess = true;
-                });
-                // Auto-advance to next step
-                Future.delayed(const Duration(milliseconds: 150), _nextStep);
-              },
-              child: Container(
-                width: (MediaQuery.of(context).size.width - 50) / 2,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-                decoration: BoxDecoration(
-                  color: isPass
-                      ? appColors.panel
-                      : selected ? AppColors.selectedBg : appColors.surfaceDim,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: isPass
-                        ? appColors.accentGold.withValues(alpha: 0.7)
-                        : selected ? appColors.error : appColors.border,
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Icon(contract['icon'] as IconData,
-                        size: 18,
-                        color: isPass
-                            ? appColors.accentGold
-                            : selected ? appColors.textPrimary : appColors.textMuted),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        displayName,
-                        style: TextStyle(
-                          fontWeight: isPass || selected ? FontWeight.bold : FontWeight.w500,
-                          fontSize: 13,
-                          color: isPass
-                              ? appColors.accentGold
-                              : selected ? appColors.textPrimary : appColors.textSecondary,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (isPass) ...[
-                      const SizedBox(width: 4),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                        decoration: BoxDecoration(
-                          color: appColors.accentGold.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                          border: Border.all(color: appColors.accentGold.withValues(alpha: 0.3)),
-                        ),
-                        child: Text(
-                          'x2',
-                          style: TextStyle(
-                            color: appColors.accentGold,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
+      mainAxisSize: MainAxisSize.min,
+      children: kContracts.map((contract) {
+        final selected = _selectedContract?['key'] == contract['key'];
+        final displayName = getContractName(loc, contract['key']);
+        final isPass = contract['isPass'] == true;
+        return InkWell(
+          onTap: () {
+            if (isPass) {
+              _submitPass();
+              return;
+            }
+            setState(() {
+              _selectedContract = contract;
+              _partner = null;
+              _miseriePlayerCount = 1;
+              final req = (contract['required'] as int);
+              _agreedTricks = req;
+              _tricksWon = req;
+              _declarerMiserieSuccess = true;
+              _partnerMiserieSuccess = true;
+            });
+            // Auto-advance to next step
+            Future.delayed(const Duration(milliseconds: 150), _nextStep);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(color: colors.line, width: 1),
+                left: BorderSide(color: selected ? colors.ink : Colors.transparent, width: 2),
               ),
-            );
-          }).toList(),
-        ),
-        const SizedBox(height: 12),
-      ],
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            child: Row(
+              children: [
+                Icon(contract['icon'] as IconData, size: 18, color: isPass ? colors.accent : colors.ink),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(displayName, style: WhistlyText.rowTitle(colors.ink)),
+                ),
+                if (isPass)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                    color: colors.accent,
+                    child: Text('x2', style: WhistlyText.badge(colors.onAccent)),
+                  ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
   Widget _buildPlayersStep(LocalizationProvider loc) {
-    final appColors = AppTheme.of(context);
     final needsPartner = _needsPartner;
     final isMiserie = _selectedContract?['hasTricks'] == false && _selectedContract?['isPass'] != true;
 
     return Column(
       key: const ValueKey(1),
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (isMiserie) ...[
-          SegmentedButton<int>(
-            segments: [
-              ButtonSegment(
-                value: 1,
-                label: Text(loc.currentLanguage == AppLanguage.nl ? '1 Speler' : '1 Player'),
-                icon: const Icon(Icons.person),
-              ),
-              ButtonSegment(
-                value: 2,
-                label: Text(loc.currentLanguage == AppLanguage.nl ? '2 Spelers' : '2 Players'),
-                icon: const Icon(Icons.people),
-              ),
+          WhistlyToggleRow<int>(
+            options: [
+              (1, loc.currentLanguage == AppLanguage.nl ? '1 Speler' : '1 Player'),
+              (2, loc.currentLanguage == AppLanguage.nl ? '2 Spelers' : '2 Players'),
             ],
-            selected: {_miseriePlayerCount},
-            onSelectionChanged: (val) {
+            selected: _miseriePlayerCount,
+            onChanged: (val) {
               setState(() {
-                _miseriePlayerCount = val.first;
-                // Reset both player selections when switching count
+                _miseriePlayerCount = val;
                 _declarer = null;
                 _partner = null;
               });
             },
-            style: SegmentedButton.styleFrom(
-              selectedBackgroundColor: AppColors.selectedBg,
-              selectedForegroundColor: appColors.textPrimary,
-            ),
           ),
           const SizedBox(height: 16),
         ],
@@ -337,7 +277,6 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
               _declarer = p;
               if (_partner == p) _partner = null;
             });
-            // Auto-advance if complete
             if (!needsPartner || _partner != null) {
               Future.delayed(const Duration(milliseconds: 300), _nextStep);
             }
@@ -345,7 +284,7 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
           disabledPlayer: null,
         ),
         if (needsPartner) ...[
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           _playerSelector(
             loc: loc,
             label: isMiserie
@@ -357,7 +296,6 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
                 _partner = p;
                 if (_declarer == p) _declarer = null;
               });
-              // Auto-advance if complete
               if (_declarer != null) {
                 Future.delayed(const Duration(milliseconds: 300), _nextStep);
               }
@@ -365,7 +303,6 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
             disabledPlayer: _declarer,
           ),
         ],
-        const SizedBox(height: 12),
       ],
     );
   }
@@ -377,72 +314,29 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     required void Function(Player) onSelect,
     Player? disabledPlayer,
   }) {
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.toUpperCase(),
-            style: TextStyle(color: appColors.textFaint, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        Text(label.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+        const SizedBox(height: 8),
+        Column(
           children: widget.players.map((player) {
             final isSelected = selected?.id == player.id;
             final isDisabled = disabledPlayer?.id == player.id;
-            return GestureDetector(
-              onTap: isDisabled ? null : () => onSelect(player),
-              child: Opacity(
-                opacity: isDisabled ? 0.3 : 1.0,
-                child: Column(
-                  children: [
-                    Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          padding: const EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isSelected ? appColors.error : AppColors.transparent,
-                              width: 2.5,
-                            ),
-                          ),
-                          child: CircleAvatar(
-                            radius: 24,
-                            backgroundColor: isSelected ? AppColors.selectedBg : appColors.surfaceDim,
-                            child: Text(
-                              player.name[0].toUpperCase(),
-                              style: TextStyle(
-                                color: isSelected ? appColors.textPrimary : appColors.textFaint,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18,
-                              ),
-                            ),
-                          ),
-                        ),
-                        if (isSelected)
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: Container(
-                              padding: const EdgeInsets.all(2),
-                              decoration: BoxDecoration(color: appColors.error, shape: BoxShape.circle),
-                              child: Icon(Icons.check, size: 10, color: appColors.textPrimary),
-                            ),
-                          ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      player.name.split(' ').first,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                        color: isSelected ? appColors.textPrimary : appColors.textFaint,
-                      ),
-                    ),
-                  ],
+            return Opacity(
+              opacity: isDisabled ? 0.35 : 1.0,
+              child: InkWell(
+                onTap: isDisabled ? null : () => onSelect(player),
+                child: Container(
+                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 1))),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink))),
+                      if (isSelected) Icon(Icons.check, size: 18, color: colors.accent),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -453,56 +347,56 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   }
 
   Widget _buildTrumpStep(LocalizationProvider loc) {
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     final suits = [
-      {'key': 'Hearts', 'icon': '♥', 'color': AppColors.suitRed},
-      {'key': 'Diamonds', 'icon': '♦', 'color': AppColors.suitRed},
-      {'key': 'Clubs', 'icon': '♣', 'color': AppColors.suitBlack},
-      {'key': 'Spades', 'icon': '♠', 'color': AppColors.suitBlack},
+      ('Hearts', '♥', true),
+      ('Diamonds', '♦', true),
+      ('Clubs', '♣', false),
+      ('Spades', '♠', false),
     ];
 
     return Column(
       key: const ValueKey(1.5),
+      mainAxisSize: MainAxisSize.min,
       children: [
-        Text('SELECT THE TRUMP SUIT', style: TextStyle(color: appColors.textFaint, fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.2)),
-        const SizedBox(height: 20),
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          alignment: WrapAlignment.center,
-          children: suits.map((s) {
-            final isSelected = _selectedTrump == s['key'];
-            return GestureDetector(
-              onTap: () {
-                setState(() => _selectedTrump = s['key'] as String);
-                Future.delayed(const Duration(milliseconds: 300), _nextStep);
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: isSelected ? AppColors.selectedBg : appColors.surfaceDim,
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected ? appColors.error : appColors.border,
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    s['icon'] as String,
-                    style: TextStyle(
-                      fontSize: 28,
-                      color: isSelected ? s['color'] as Color : (s['color'] as Color).withValues(alpha: 0.5),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(loc.translate('setup_trump_step').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+        ),
+        const SizedBox(height: 12),
+        Container(
+          color: colors.line,
+          child: Row(
+            children: List.generate(suits.length, (i) {
+              final (key, glyph, isRed) = suits[i];
+              final isSelected = _selectedTrump == key;
+              return Expanded(
+                child: InkWell(
+                  onTap: () {
+                    setState(() => _selectedTrump = key);
+                    Future.delayed(const Duration(milliseconds: 300), _nextStep);
+                  },
+                  child: Container(
+                    margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
+                    height: 72,
+                    color: colors.bg,
+                    alignment: Alignment.center,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: isSelected ? colors.ink : Colors.transparent, width: 2),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      child: Text(
+                        glyph,
+                        style: TextStyle(fontSize: 28, color: isRed ? colors.suitRed : colors.suitInk),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }),
+          ),
         ),
-        const SizedBox(height: 12),
       ],
     );
   }
@@ -525,9 +419,10 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
       success = _tricksWon >= _agreedTricks;
     }
 
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     return Column(
       key: const ValueKey(2),
+      mainAxisSize: MainAxisSize.min,
       children: [
         if (isNegotiable) ...[
           _counterField(
@@ -554,106 +449,63 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
         ],
         if (isMiserie) ...[
           if (_partner != null) ...[
-            Text(
-              _declarer!.name.toUpperCase(),
-              style: TextStyle(color: appColors.textSecondary, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(_declarer!.name.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
             ),
             const SizedBox(height: 6),
-            SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(value: true, label: Text(loc.translate('setup_succeeded')), icon: const Icon(Icons.check)),
-                ButtonSegment(value: false, label: Text(loc.translate('setup_failed')), icon: const Icon(Icons.close)),
+            WhistlyToggleRow<bool>(
+              options: [
+                (true, loc.translate('setup_succeeded')),
+                (false, loc.translate('setup_failed')),
               ],
-              selected: {_declarerMiserieSuccess},
-              onSelectionChanged: (val) => setState(() => _declarerMiserieSuccess = val.first),
-              style: SegmentedButton.styleFrom(
-                selectedBackgroundColor: _declarerMiserieSuccess ? appColors.success : appColors.error,
-                selectedForegroundColor: appColors.textPrimary,
-              ),
+              selected: _declarerMiserieSuccess,
+              onChanged: (val) => setState(() => _declarerMiserieSuccess = val),
             ),
             const SizedBox(height: 16),
-            Text(
-              _partner!.name.toUpperCase(),
-              style: TextStyle(color: appColors.textSecondary, fontSize: 12, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(_partner!.name.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
             ),
             const SizedBox(height: 6),
-            SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(value: true, label: Text(loc.translate('setup_succeeded')), icon: const Icon(Icons.check)),
-                ButtonSegment(value: false, label: Text(loc.translate('setup_failed')), icon: const Icon(Icons.close)),
+            WhistlyToggleRow<bool>(
+              options: [
+                (true, loc.translate('setup_succeeded')),
+                (false, loc.translate('setup_failed')),
               ],
-              selected: {_partnerMiserieSuccess},
-              onSelectionChanged: (val) => setState(() => _partnerMiserieSuccess = val.first),
-              style: SegmentedButton.styleFrom(
-                selectedBackgroundColor: _partnerMiserieSuccess ? appColors.success : appColors.error,
-                selectedForegroundColor: appColors.textPrimary,
-              ),
+              selected: _partnerMiserieSuccess,
+              onChanged: (val) => setState(() => _partnerMiserieSuccess = val),
             ),
             const SizedBox(height: 16),
           ] else ...[
-            Text(loc.translate('setup_result'), style: TextStyle(color: appColors.textFaint, fontSize: 12, fontWeight: FontWeight.bold)),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(loc.translate('setup_result').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+            ),
             const SizedBox(height: 8),
-            SegmentedButton<bool>(
-              segments: [
-                ButtonSegment(value: true, label: Text(loc.translate('setup_succeeded')), icon: const Icon(Icons.check)),
-                ButtonSegment(value: false, label: Text(loc.translate('setup_failed')), icon: const Icon(Icons.close)),
+            WhistlyToggleRow<bool>(
+              options: [
+                (true, loc.translate('setup_succeeded')),
+                (false, loc.translate('setup_failed')),
               ],
-              selected: {_declarerMiserieSuccess},
-              onSelectionChanged: (val) => setState(() => _declarerMiserieSuccess = val.first),
-              style: SegmentedButton.styleFrom(
-                selectedBackgroundColor: _declarerMiserieSuccess ? appColors.success : appColors.error,
-                selectedForegroundColor: appColors.textPrimary,
-              ),
+              selected: _declarerMiserieSuccess,
+              onChanged: (val) => setState(() => _declarerMiserieSuccess = val),
             ),
             const SizedBox(height: 16),
           ],
         ],
-        ElevatedButton(
+        // One accent element per screen region (spec §1.3): this primary
+        // button stays accent-filled regardless of win/lose/mixed outcome
+        // — that feedback belongs to the result badge on the round row
+        // and standings list once submitted, not a second accent color
+        // here.
+        WhistlyPrimaryButton(
+          label: _confirmButtonLabel(loc, success, isMiserie),
+          showChevron: false,
           onPressed: _submit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _confirmButtonColor(success, isMiserie),
-            foregroundColor: appColors.textPrimary,
-            minimumSize: const Size(double.infinity, 56),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            elevation: 8,
-            shadowColor: _confirmButtonColor(success, isMiserie).withValues(alpha: 0.4),
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(_confirmButtonIcon(success, isMiserie)),
-              const SizedBox(width: 12),
-              Text(
-                _confirmButtonLabel(loc, success, isMiserie),
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
-              ),
-            ],
-          ),
         ),
       ],
     );
-  }
-
-  // Helper: pick confirm button color based on context
-  Color _confirmButtonColor(bool success, bool isMiserie) {
-    final appColors = AppTheme.of(context);
-    if (isMiserie && _partner != null) {
-      // Mixed outcome = neutral; both succeed = green; both fail = red
-      if (_declarerMiserieSuccess && _partnerMiserieSuccess) return appColors.success;
-      if (!_declarerMiserieSuccess && !_partnerMiserieSuccess) return appColors.error;
-      return AppColors.selectedBg; // one wins, one loses
-    }
-    return success ? appColors.success : AppColors.selectedBg;
-  }
-
-  // Helper: pick confirm button icon based on context
-  IconData _confirmButtonIcon(bool success, bool isMiserie) {
-    if (isMiserie && _partner != null) {
-      if (_declarerMiserieSuccess && _partnerMiserieSuccess) return Icons.emoji_events;
-      if (!_declarerMiserieSuccess && !_partnerMiserieSuccess) return Icons.error_outline;
-      return Icons.splitscreen; // mixed
-    }
-    return success ? Icons.emoji_events : Icons.error_outline;
   }
 
   // Helper: pick confirm button label based on context
@@ -674,38 +526,40 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     required int max,
     required ValueChanged<int> onChanged,
   }) {
-    final appColors = AppTheme.of(context);
+    final colors = AppTheme.of(context);
     return Column(
       children: [
-        Text(label, style: TextStyle(color: appColors.textFaint, fontSize: 12, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: Text(label.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+        ),
+        const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            IconButton.filled(
-              onPressed: value > min ? () => onChanged(value - 1) : null,
-              icon: const Icon(Icons.remove, size: 20),
-              style: IconButton.styleFrom(
-                backgroundColor: appColors.surface,
-                foregroundColor: appColors.error,
-                minimumSize: const Size(44, 44),
-              ),
-            ),
+            _stepperButton(Icons.remove, value > min ? () => onChanged(value - 1) : null),
             const SizedBox(width: 24),
-            Text('$value', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
+            Text('$value', style: WhistlyText.screenNumeral(colors.ink, size: 32)),
             const SizedBox(width: 24),
-            IconButton.filled(
-              onPressed: value < max ? () => onChanged(value + 1) : null,
-              icon: const Icon(Icons.add, size: 20),
-              style: IconButton.styleFrom(
-                backgroundColor: appColors.surfaceDim,
-                foregroundColor: AppColors.infoBlue,
-                minimumSize: const Size(44, 44),
-              ),
-            ),
+            _stepperButton(Icons.add, value < max ? () => onChanged(value + 1) : null),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _stepperButton(IconData icon, VoidCallback? onPressed) {
+    final colors = AppTheme.of(context);
+    final enabled = onPressed != null;
+    return InkWell(
+      onTap: onPressed,
+      child: Container(
+        width: 44,
+        height: 44,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(border: Border.all(color: enabled ? colors.ink : colors.line, width: 2)),
+        child: Icon(icon, size: 20, color: enabled ? colors.ink : colors.muted),
+      ),
     );
   }
 }
