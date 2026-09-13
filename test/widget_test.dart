@@ -9,6 +9,7 @@ import 'package:whistly/ads/ads_provider.dart';
 import 'package:whistly/billing/purchase_provider.dart';
 import 'package:whistly/main.dart';
 import 'package:whistly/models/game.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/providers/game_provider.dart';
@@ -32,6 +33,7 @@ void main() {
     if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(PlayerAdapter());
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(GameAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(RoundAdapter());
+    if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(GamePlayerRefAdapter());
   });
 
   tearDown(() async {

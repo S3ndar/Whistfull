@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:whistly/models/game.dart';
-import 'package:whistly/models/player.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/widgets/round_setup_dialog.dart'; // For getContractName
@@ -105,7 +105,7 @@ class GameHistoryDetailPage extends StatelessWidget {
 class _HistoricalRoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
-  final List<Player> players;
+  final List<GamePlayerRef> players;
 
   const _HistoricalRoundRow({required this.round, required this.roundNumber, required this.players});
 

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:hive/hive.dart';
 import 'package:whistly/models/game.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/providers/game_provider.dart';
@@ -20,6 +21,7 @@ void main() {
     if (!Hive.isAdapterRegistered(0)) Hive.registerAdapter(PlayerAdapter());
     if (!Hive.isAdapterRegistered(1)) Hive.registerAdapter(GameAdapter());
     if (!Hive.isAdapterRegistered(2)) Hive.registerAdapter(RoundAdapter());
+    if (!Hive.isAdapterRegistered(3)) Hive.registerAdapter(GamePlayerRefAdapter());
 
     provider = GameProvider();
     settings = ScoringSettings();
@@ -47,12 +49,35 @@ void main() {
 
       provider.startGame(players, settings: settings);
       expect(provider.activeGame, isNotNull);
-      expect(provider.activeGame!.players, players);
+      // PLAN.md B4: the game's roster is now an id+name snapshot
+      // (`GamePlayerRef`), not the live `Player` objects passed in.
+      expect(provider.activeGame!.players.map((p) => p.id).toList(), players.map((p) => p.id).toList());
+      expect(provider.activeGame!.players.map((p) => p.name).toList(), players.map((p) => p.name).toList());
       expect(provider.dealerIndex, 0);
       expect(provider.currentDealer!.id, 'p1');
 
       provider.endGame();
       expect(provider.activeGame, isNull);
+    });
+
+    test('PLAN.md B4: renaming a player after the game started leaves the '
+        "game's roster showing the original name", () async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+      final game = provider.activeGame!;
+      expect(game.players.firstWhere((p) => p.id == 'p1').name, 'Sander');
+
+      // Simulate a rename by mutating the live Player object passed to
+      // `startGame` (there's no dedicated "rename player" feature yet —
+      // see PLAN.md; this app doesn't expose renaming through the UI at
+      // all today, so this is the most direct way to exercise the fix).
+      // Pre-B4 this would have changed the name the game shows too, since
+      // `Game.players` embedded these same objects; the fix is that
+      // `startGame` snapshots id+name into an independent `GamePlayerRef`
+      // instead, so mutating the live object afterwards can't reach it.
+      players.firstWhere((p) => p.id == 'p1').name = 'Sander Renamed';
+
+      expect(game.players.firstWhere((p) => p.id == 'p1').name, 'Sander');
     });
 
     test('should restore active game on init if activeGameId is saved', () async {
@@ -501,7 +526,7 @@ void main() {
       final legacyGame = Game(
         id: 'legacy-game-1',
         dateStarted: DateTime.now(),
-        players: players,
+        playerRefs: players.map((p) => GamePlayerRef(id: p.id, name: p.name)).toList(),
         // No scoringSnapshot, no dateEnded, isComplete defaults to false:
         // this is exactly what a pre-5.2 save looks like on disk.
       );
@@ -517,6 +542,48 @@ void main() {
       final loaded =
           provider.completedGames.firstWhere((g) => g.id == 'legacy-game-1');
       expect(loaded.scoringSnapshot, isNull);
+    });
+
+    test('PLAN.md B4: a game with only the pre-migration embedded Player list '
+        '(playerRefs == null) still loads and derives id+name from it', () async {
+      await provider.init();
+
+      // Simulate exactly what a pre-B4 save looks like on disk: `players`
+      // (now `legacyPlayers`) holds full embedded Player copies and the new
+      // `playerRefs` field was never written, so it's null. Bypassing the
+      // `Game(...)` constructor (which always sets `playerRefs`) and setting
+      // the legacy field directly is the only way to reproduce that shape
+      // without hand-crafting Hive's binary format.
+      final legacyGame = Game(
+        id: 'legacy-game-b4',
+        dateStarted: DateTime.now(),
+        playerRefs: const [],
+      )
+        ..playerRefs = null
+        ..legacyPlayers = players
+        ..totalScores = {for (var p in players) p.id: 0};
+
+      final gamesBox = Hive.box<Game>('games_box');
+      await gamesBox.put(legacyGame.id, legacyGame);
+
+      final loaded =
+          provider.completedGames.firstWhere((g) => g.id == 'legacy-game-b4');
+
+      // The `players` getter must derive the same id+name pairs from the
+      // legacy embedded objects, with no live Player object anywhere in
+      // the result (so callers can never accidentally call `.save()` on a
+      // detached copy the way the pre-fix code could).
+      expect(loaded.players.map((p) => p.id).toList(), players.map((p) => p.id).toList());
+      expect(loaded.players.map((p) => p.name).toList(), players.map((p) => p.name).toList());
+      expect(loaded.players, everyElement(isA<GamePlayerRef>()));
+
+      // Round-trip through Hive again (read back what was just read) to
+      // prove the derivation is stable, not a one-time artifact of the
+      // object still being in memory.
+      await gamesBox.put(legacyGame.id, loaded);
+      final reloaded =
+          provider.completedGames.firstWhere((g) => g.id == 'legacy-game-b4');
+      expect(reloaded.players.map((p) => p.id).toList(), players.map((p) => p.id).toList());
     });
   });
 }

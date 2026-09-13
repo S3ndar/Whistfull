@@ -7,6 +7,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/game.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/providers/player_provider.dart';
 import 'package:whistly/providers/game_provider.dart';
@@ -29,6 +30,7 @@ void main() async {
   Hive.registerAdapter(PlayerAdapter());
   Hive.registerAdapter(GameAdapter());
   Hive.registerAdapter(RoundAdapter());
+  Hive.registerAdapter(GamePlayerRefAdapter());
 
   runApp(
     MultiProvider(
@@ -227,8 +229,17 @@ class _HomePlayTab extends StatelessWidget {
     // The 2x2 grid shows the active game's table when one is in progress,
     // otherwise the top 4 players by the roster's own favourites-first
     // sort (PlayerProvider._loadPlayers) — a reasonable "at the table"
-    // default when no game has been started yet.
-    final gridPlayers = hasActiveGame ? activeGame.players : playerProvider.players.take(4).toList();
+    // default when no game has been started yet. The two sources are
+    // different types (a game's roster is `GamePlayerRef` — id+name only,
+    // PLAN.md B4 — while the idle-state roster is a live `Player`), so both
+    // are narrowed to `_PlayerGridEntry` here rather than typing
+    // `_PlayerGrid` around either one specifically.
+    final gridPlayers = hasActiveGame
+        ? activeGame.players.map((p) => _PlayerGridEntry(id: p.id, name: p.name)).toList()
+        : playerProvider.players
+            .take(4)
+            .map((p) => _PlayerGridEntry(id: p.id, name: p.name, gamesPlayed: p.gamesPlayed))
+            .toList();
 
     return Scaffold(
       body: SafeArea(
@@ -397,10 +408,22 @@ class _SuitStrip extends StatelessWidget {
   }
 }
 
+/// Minimal shape `_PlayerGrid` needs from either a live `Player` (idle
+/// state) or a game's `GamePlayerRef` roster (active game) — see the
+/// `gridPlayers` comment in `_HomePlayTab.build` for why these can't just
+/// be typed as one or the other. `gamesPlayed` is only meaningful (and
+/// only read) in the idle-state, no-active-game branch below.
+class _PlayerGridEntry {
+  final String id;
+  final String name;
+  final int gamesPlayed;
+  const _PlayerGridEntry({required this.id, required this.name, this.gamesPlayed = 0});
+}
+
 /// Player grid — 2x2 of `bg` cells on a `line` grid, name over record
 /// (spec §5).
 class _PlayerGrid extends StatelessWidget {
-  final List<Player> players;
+  final List<_PlayerGridEntry> players;
   final Game? activeGame;
   const _PlayerGrid({required this.players, this.activeGame});
 

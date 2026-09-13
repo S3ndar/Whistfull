@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:whistly/models/game.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/scoring_settings.dart';
@@ -37,7 +38,7 @@ class GameProvider extends ChangeNotifier {
 
   int get pointMultiplier => _activeGame?.pointMultiplier ?? 1;
 
-  Player? get currentDealer =>
+  GamePlayerRef? get currentDealer =>
       _activeGame != null ? _activeGame!.players[_dealerIndex] : null;
 
   Future<void> init() async {
@@ -80,7 +81,9 @@ class GameProvider extends ChangeNotifier {
     _activeGame = Game(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       dateStarted: DateTime.now(),
-      players: players,
+      // PLAN.md B4: snapshot id+name only, never the live Player objects —
+      // see GamePlayerRef's doc comment for why.
+      playerRefs: players.map((p) => GamePlayerRef(id: p.id, name: p.name)).toList(),
       // Snapshot the live scoring settings so history keeps reading the
       // values that were actually in force when this game was played,
       // even if the user changes settings afterwards.

@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/round.dart';
 
@@ -12,8 +13,15 @@ class Game extends HiveObject {
   @HiveField(1)
   late DateTime dateStarted;
 
+  // PLAN.md B4: this used to be `late List<Player> players` — full embedded
+  // Player copies. Renamed and made nullable so old on-disk games (which
+  // wrote a real list here) still deserialize; no code writes it anymore.
+  // Never read this directly — use the `players` getter below, which falls
+  // back to deriving id+name from these legacy copies when `playerRefs`
+  // (new games) is null. Kept private-ish by convention, not by the
+  // language: Hive's generated adapter needs a public field to write into.
   @HiveField(2)
-  late List<Player> players;
+  List<Player>? legacyPlayers;
 
   @HiveField(3)
   late List<Round> rounds;
@@ -50,10 +58,21 @@ class Game extends HiveObject {
   @HiveField(8)
   bool isComplete;
 
+  // PLAN.md B4 fix: the game's roster as an id+name snapshot taken at
+  // `startGame()` time — no live `Player` objects. Null only for games
+  // saved before this field existed; see the `players` getter.
+  @HiveField(9)
+  List<GamePlayerRef>? playerRefs;
+
   Game({
     required this.id,
     required this.dateStarted,
-    required this.players,
+    // Required in practice (every call site always has a roster to give
+    // it) even though the field itself is nullable `List<GamePlayerRef>?`
+    // — that nullability exists only so games Hive deserializes straight
+    // from disk (bypassing this constructor entirely) can leave it unset
+    // and fall back to `legacyPlayers` in the `players` getter below.
+    required this.playerRefs,
     List<Round>? rounds,
     Map<String, int>? totalScores,
     this.pointMultiplier = 1,
@@ -63,7 +82,15 @@ class Game extends HiveObject {
   }) {
     this.rounds = rounds ?? [];
     this.totalScores = totalScores ?? {
-      for (var player in players) player.id: 0
+      for (var player in playerRefs!) player.id: 0
     };
   }
+
+  /// The game's roster, as an id+name snapshot. Reads `playerRefs` for
+  /// every game started after the B4 migration; for a game saved before it
+  /// (`playerRefs == null`), derives the same shape from the legacy
+  /// embedded `Player` copies in `legacyPlayers` instead of exposing them
+  /// directly — callers never need to know which one backs a given game.
+  List<GamePlayerRef> get players =>
+      playerRefs ?? legacyPlayers!.map((p) => GamePlayerRef(id: p.id, name: p.name)).toList();
 }

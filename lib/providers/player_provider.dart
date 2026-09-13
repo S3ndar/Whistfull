@@ -61,8 +61,18 @@ class PlayerProvider extends ChangeNotifier {
     _loadPlayers();
   }
 
-  Future<void> incrementGamesPlayed(List<Player> selectedPlayers) async {
-    for (var player in selectedPlayers) {
+  // Takes ids rather than `Player` objects (PLAN.md B4): the caller is
+  // `Game.players`, which are id+name-only `GamePlayerRef`s, not live
+  // `Player`s — looking each one up here by id and mutating/saving *that*
+  // box-bound instance is exactly what avoids the fragile "`.save()` on a
+  // detached embedded copy" failure mode B4 describes. A player deleted
+  // since the game started is simply skipped.
+  Future<void> incrementGamesPlayed(List<String> playerIds) async {
+    final box = _playersBox;
+    if (box == null) return;
+    for (var id in playerIds) {
+      final player = box.get(id);
+      if (player == null) continue;
       player.gamesPlayed++;
       await player.save();
     }

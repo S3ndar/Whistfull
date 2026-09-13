@@ -54,6 +54,14 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   build_runner: ^2.4.13
+  # PLAN.md B6: this pins analyzer 3.4.0, while the SDK this project builds
+  # against is on the 3.13.0 language version — a mismatch `dart run
+  # build_runner build` reports on every run ("Your current `analyzer`
+  # version may not fully support your current SDK version"). It has stayed
+  # workable so far (one real cost so far: `game_provider.dart` carries a
+  # `// ignore: use_null_aware_elements` because that syntax doesn't parse
+  # under 3.4.0's analyzer), but will resurface and may not stay workable at
+  # the next SDK/hive_generator upgrade — check both together.
   hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.14.1
   flutter_native_splash: ^2.4.1
@@ -73,13 +81,20 @@ flutter:
   assets:
     - assets/whistly_logo.png
 
+  # B5 fix: this is a true variable font (wght axis 100-900, default 600).
+  # A single asset entry is correct here — Flutter's per-entry `weight:` only
+  # picks which *file* answers a request when several are declared; it does
+  # not reach into a file and set its variable axis. The two-entry form this
+  # used to have (both entries pointing at this same file, at weight: 600 and
+  # weight: 800) therefore had every "800" request resolve to the identical
+  # bytes as every "600" request, silently collapsing the two weights to one.
+  # The actual 600/800 contrast now comes from `fontVariations:
+  # [FontVariation('wght', ...)]` on each TextStyle in WhistlyText (see
+  # theme/whistly_components.dart) rather than from font-file selection.
   fonts:
     - family: Archivo
       fonts:
         - asset: assets/fonts/Archivo-Variable.ttf
-          weight: 600
-        - asset: assets/fonts/Archivo-Variable.ttf
-          weight: 800
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

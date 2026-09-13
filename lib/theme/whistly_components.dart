@@ -19,11 +19,20 @@ class WhistlyText {
 
   static const String _archivo = 'Archivo';
 
+  // Archivo is bundled as a true variable font (wght axis 100-900, default
+  // 600), declared once in pubspec.yaml. `fontWeight` alone does not select
+  // a variable font's axis value — only `fontVariations` does — so every
+  // style below carries both: `fontWeight` for semantics/fallback fonts,
+  // `fontVariations` for the actual rendered weight (B5).
+  static const _w600 = [FontVariation('wght', 600)];
+  static const _w800 = [FontVariation('wght', 800)];
+
   /// Brand / wordmark — 54px/800/-0.03em, Title case.
   static TextStyle brand(Color color) => TextStyle(
         fontFamily: _archivo,
         fontSize: 54,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: -0.03 * 54,
         color: color,
         height: 1.0,
@@ -43,6 +52,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: 20,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: -0.01 * 20,
         color: color,
       );
@@ -52,6 +62,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: 17,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: -0.01 * 17,
         color: color,
       );
@@ -62,6 +73,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: 19,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: 0.02 * 19,
         color: color,
       );
@@ -71,6 +83,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: 11,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: 0.16 * 11,
         color: color,
       );
@@ -80,6 +93,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: 9,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: 0.10 * 9,
         color: color,
       );
@@ -89,6 +103,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: 9,
         fontWeight: FontWeight.w800,
+        fontVariations: _w800,
         letterSpacing: 0.12 * 9,
         color: color,
       );
@@ -98,6 +113,7 @@ class WhistlyText {
         fontFamily: _archivo,
         fontSize: size,
         fontWeight: FontWeight.w600,
+        fontVariations: _w600,
         color: color,
       );
 
@@ -459,6 +475,7 @@ class WhistlyLogoLockup extends StatelessWidget {
             fontFamily: 'Archivo',
             fontSize: 42,
             fontWeight: FontWeight.w800,
+            fontVariations: WhistlyText._w800,
             letterSpacing: -0.03 * 42,
             color: colors.ink,
           ),
