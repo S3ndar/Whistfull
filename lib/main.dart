@@ -242,8 +242,18 @@ class _HomePlayTab extends StatelessWidget {
             .toList();
 
     return Scaffold(
+      // A fixed-height column with a Spacer pushing the suit strip + primary
+      // button to the bottom. On a short viewport (landscape phone, small
+      // desktop window) that column can exceed the screen, so it scrolls
+      // instead of overflowing. ConstrainedBox + IntrinsicHeight keep the
+      // Spacer behaving normally whenever there IS room.
       body: SafeArea(
-        child: Column(
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Column(
           children: [
             // ─── Brand block ───────────────────────────────────────────
             Container(
@@ -365,6 +375,10 @@ class _HomePlayTab extends StatelessWidget {
               },
             ),
           ],
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -427,44 +441,61 @@ class _PlayerGrid extends StatelessWidget {
   final Game? activeGame;
   const _PlayerGrid({required this.players, this.activeGame});
 
+  /// Fixed row height. Clears the 44px minimum tap target from spec §7 and
+  /// fits a 17px name over an 11px mono record.
+  static const double _cellHeight = 76;
+
   @override
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
     final loc = context.watch<LocalizationProvider>();
     final cells = List.generate(4, (i) => i < players.length ? players[i] : null);
 
+    // A fixed cell height, not an aspect ratio. `childAspectRatio` tied the
+    // cell height to the window width, so on a wide viewport (desktop, tablet,
+    // landscape phone) the 2x2 grid grew tall enough to push the suit strip
+    // and the primary "New game" button off the bottom of the screen — leaving
+    // no way to start a game.
+    Widget cell(_PlayerGridEntry? p) {
+      if (p == null) {
+        return Expanded(
+          child: Container(color: colors.bg, height: _cellHeight),
+        );
+      }
+      final record = activeGame != null
+      ? (activeGame!.totalScores[p.id] ?? 0)
+      : p.gamesPlayed;
+      final recordLabel = activeGame != null
+      ? (record >= 0 ? '+$record' : '$record')
+      : '$record ${loc.translate('stats_games').toUpperCase()}';
+      return Expanded(
+        child: Container(
+          color: colors.bg,
+          height: _cellHeight,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          alignment: Alignment.centerLeft,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(p.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+              const SizedBox(height: 2),
+              Text(recordLabel, style: WhistlyText.mono(colors.muted)),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Container(
       color: colors.line,
-      child: GridView.count(
-        crossAxisCount: 2,
-        mainAxisSpacing: 2,
-        crossAxisSpacing: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        childAspectRatio: 2.4,
-        children: cells.map((p) {
-          if (p == null) return Container(color: colors.bg);
-          final record = activeGame != null
-              ? (activeGame!.totalScores[p.id] ?? 0)
-              : p.gamesPlayed;
-          final recordLabel = activeGame != null
-              ? (record >= 0 ? '+$record' : '$record')
-              : '$record ${loc.translate('stats_games').toUpperCase()}';
-          return Container(
-            color: colors.bg,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            alignment: Alignment.centerLeft,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(p.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 2),
-                Text(recordLabel, style: WhistlyText.mono(colors.muted)),
-              ],
-            ),
-          );
-        }).toList(),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(children: [cell(cells[0]), const SizedBox(width: 2), cell(cells[1])]),
+          const SizedBox(height: 2),
+          Row(children: [cell(cells[2]), const SizedBox(width: 2), cell(cells[3])]),
+        ],
       ),
     );
   }

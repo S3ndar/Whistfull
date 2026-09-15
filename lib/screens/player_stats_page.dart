@@ -108,15 +108,22 @@ class PlayerStatsPage extends StatelessWidget {
             Container(
               color: colors.line,
               padding: const EdgeInsets.only(top: 2),
-              child: GridView.count(
+              // Fixed cell height via mainAxisExtent rather than
+              // childAspectRatio: an aspect ratio ties cell height to the
+              // window width, so on a wide viewport these cells grow absurdly
+              // tall. Same fix as _PlayerGrid in main.dart.
+              child: GridView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisCount: 2,
-                mainAxisSpacing: 2,
-                crossAxisSpacing: 2,
-                childAspectRatio: 2.0,
-                children: statCells.map((cell) {
-                  final (label, value) = cell;
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 2,
+                  crossAxisSpacing: 2,
+                  mainAxisExtent: 84,
+                ),
+                itemCount: statCells.length,
+                itemBuilder: (context, i) {
+                  final (label, value) = statCells[i];
                   return Container(
                     color: colors.bg,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -131,7 +138,7 @@ class PlayerStatsPage extends StatelessWidget {
                       ],
                     ),
                   );
-                }).toList(),
+                },
               ),
             ),
 
