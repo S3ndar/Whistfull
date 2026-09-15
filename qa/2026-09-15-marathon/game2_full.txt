@@ -1,0 +1,260 @@
+nav http://127.0.0.1:8080/
+wait 3000
+click-semantics-toggle
+wait 500
+click-text ADD PLAYER
+wait 800
+click-text ADD NEW PLAYER
+wait 500
+type Anna
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Bram
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Chris
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Dana
+click-xy 298 509
+wait 800
+click-text START GAME Tab 1 of 4
+wait 800
+click-text NEW GAME
+wait 1000
+click-text Anna
+wait 400
+click-text Bram
+wait 400
+click-text Chris
+wait 400
+click-text Dana
+wait 400
+click-text START GAME
+wait 1500
+click-text ADD ROUND
+wait 400
+click-text Ask & Join
+wait 400
+click-text Anna
+wait 300
+click-xy 150 812
+wait 400
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Trull
+wait 400
+click-text Bram
+wait 300
+click-xy 150 856
+wait 400
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Alone
+wait 400
+click-text Chris
+wait 400
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Abundance
+wait 400
+click-text Dana
+wait 400
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Solo Slim
+wait 400
+click-text Anna
+wait 400
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+screenshot g2_01_game1_before_end
+dump-tree g2_01_game1_tree
+click-xy 344 866
+wait 600
+click-xy 307 556
+wait 1200
+screenshot g2_02_celebration
+dump-tree g2_02_celebration_tree
+click-xy 210 557
+wait 1200
+click-text ADD PLAYER
+wait 800
+click-xy 400 27
+wait 600
+type Eve
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Frank
+click-xy 298 509
+wait 800
+screenshot g2_03_players_after_adding_new
+dump-tree g2_03_players_tree
+click-text START GAME Tab 1 of 4
+wait 800
+click-text NEW GAME
+wait 1000
+click-text Anna
+wait 400
+click-text Bram
+wait 400
+click-text Eve
+wait 400
+click-text Frank
+wait 400
+click-text START GAME
+wait 1500
+click-text ADD ROUND
+wait 400
+click-text Ask & Join
+wait 400
+click-text Anna
+wait 300
+click-xy 150 812
+wait 400
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Trull
+wait 400
+click-text Bram
+wait 300
+click-xy 150 856
+wait 400
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Alone
+wait 400
+click-text Eve
+wait 400
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Abundance
+wait 400
+click-text Frank
+wait 400
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Ask & Join
+wait 400
+click-text Anna
+wait 300
+click-xy 150 856
+wait 400
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Trull
+wait 400
+click-text Bram
+wait 300
+click-xy 150 812
+wait 400
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Solo Slim
+wait 400
+click-text Frank
+wait 400
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 400
+click-text Round Pass
+wait 700
+click-text ADD ROUND
+wait 400
+click-text Ask & Join
+wait 400
+click-text Eve
+wait 300
+click-xy 150 722
+wait 400
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+screenshot g2_04_game2_before_end
+dump-tree g2_04_game2_tree
+click-xy 344 866
+wait 600
+click-xy 307 556
+wait 1200
+screenshot g2_05_celebration2
+click-xy 210 557
+wait 1200
+click-text HISTORY Tab 3 of 4
+wait 800
+screenshot g2_06_history
+dump-tree g2_06_history_tree
+click-xy 210 130
+wait 800
+screenshot g2_07_game2_detail
+dump-tree g2_07_game2_detail_tree
+click-xy 32 27
+wait 500
+click-xy 210 280
+wait 800
+screenshot g2_08_game1_detail
+dump-tree g2_08_game1_detail_tree
+click-xy 32 27
+wait 500
+click-text PLAYERS Tab 2 of 4
+wait 800
+screenshot g2_09_players_final
+dump-tree g2_09_players_final_tree
+click-xy 100 129
+wait 800
+screenshot g2_10_anna_stats
+dump-tree g2_10_anna_stats_tree
+dump-console g2_console

@@ -1,0 +1,161 @@
+{
+ "role": "WebArea",
+ "name": "Whistly",
+ "children": [
+  {
+   "role": "generic",
+   "name": "",
+   "children": [
+    {
+     "role": "button",
+     "name": "Back",
+     "focused": true
+    },
+    {
+     "role": "text",
+     "name": "Round 101 · Dealer Anna"
+    },
+    {
+     "role": "button",
+     "name": "Bidding Hierarchy"
+    },
+    {
+     "role": "button",
+     "name": "UNDO"
+    },
+    {
+     "role": "text",
+     "name": "1"
+    },
+    {
+     "role": "text",
+     "name": "Anna"
+    },
+    {
+     "role": "text",
+     "name": "LEAD"
+    },
+    {
+     "role": "text",
+     "name": "+322"
+    },
+    {
+     "role": "text",
+     "name": "2"
+    },
+    {
+     "role": "text",
+     "name": "Dana"
+    },
+    {
+     "role": "text",
+     "name": "+252"
+    },
+    {
+     "role": "text",
+     "name": "3"
+    },
+    {
+     "role": "text",
+     "name": "Chris"
+    },
+    {
+     "role": "text",
+     "name": "-190"
+    },
+    {
+     "role": "text",
+     "name": "4"
+    },
+    {
+     "role": "text",
+     "name": "Bram"
+    },
+    {
+     "role": "text",
+     "name": "-384"
+    },
+    {
+     "role": "button",
+     "name": "100 ♦ Abundance Anna · Anna +15 Bram -5 Chris -5 Dana -5 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "99 ♥ Alone Dana · Anna -2 Bram -2 Chris -2 Dana +6 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "98 ♠ Trull Chris & Anna · Anna +9 Bram -9 Chris +9 Dana -9 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "97 ♣ Ask & Join Bram & Dana · Anna -2 Bram +2 Chris -2 Dana +2 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "96 Open Misery Anna · Anna +30 Bram -10 Chris -10 Dana -10 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "95 ♦ Solo Slim Dana · Anna -15 Bram -15 Chris -15 Dana +45 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "94 Misery Anna · Anna +15 Bram -5 Chris -5 Dana -5 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "93 Misery Bram · Anna -5 Bram +15 Chris -5 Dana -5 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "92 ♥ Abundance Anna · Anna +15 Bram -5 Chris -5 Dana -5 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "91 ♠ Alone Dana · Anna -2 Bram -2 Chris -2 Dana +6 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "♠"
+    },
+    {
+     "role": "text",
+     "name": "♥"
+    },
+    {
+     "role": "text",
+     "name": "♦"
+    },
+    {
+     "role": "text",
+     "name": "♣"
+    },
+    {
+     "role": "text",
+     "name": "14"
+    },
+    {
+     "role": "text",
+     "name": "15"
+    },
+    {
+     "role": "text",
+     "name": "17"
+    },
+    {
+     "role": "text",
+     "name": "16"
+    },
+    {
+     "role": "button",
+     "name": "ADD ROUND"
+    },
+    {
+     "role": "button",
+     "name": "END GAME"
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,1090 @@
+nav http://127.0.0.1:8080/
+wait 3000
+click-semantics-toggle
+wait 500
+click-text ADD PLAYER
+wait 800
+click-text ADD NEW PLAYER
+wait 500
+type Anna
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Bram
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Chris
+click-xy 298 509
+wait 800
+click-xy 400 27
+wait 600
+type Dana
+click-xy 298 509
+wait 800
+click-text START GAME Tab 1 of 4
+wait 800
+click-text NEW GAME
+wait 1000
+click-text Anna
+wait 400
+click-text Bram
+wait 400
+click-text Chris
+wait 400
+click-text Dana
+wait 400
+click-text START GAME
+wait 1500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Anna
+wait 300
+click-xy 150 812
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Chris
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Dana
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Chris
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Dana
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Anna
+wait 300
+click-xy 150 812
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+screenshot marathon_r10
+dump-tree marathon_r10_tree
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Chris
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Dana
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Chris
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Dana
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Anna
+wait 300
+click-xy 150 812
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Chris
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Dana
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+screenshot marathon_r20
+dump-tree marathon_r20_tree
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Chris
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Dana
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Anna
+wait 300
+click-xy 150 812
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Chris
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Dana
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text CONFIRM
+wait 500
+screenshot marathon_r30
+dump-tree marathon_r30_tree
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Chris
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Dana
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Anna
+wait 300
+click-xy 150 812
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Chris
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Dana
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Chris
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Dana
+wait 350
+click-text CONFIRM
+wait 500
+screenshot marathon_r40
+dump-tree marathon_r40_tree
+click-text ADD ROUND
+wait 350
+click-text Round Pass
+wait 700
+click-text ADD ROUND
+wait 350
+click-text Round Pass
+wait 700
+click-text ADD ROUND
+wait 350
+click-text Round Pass
+wait 700
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+screenshot marathon_r50
+dump-tree marathon_r50_tree
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Anna
+wait 300
+click-xy 150 812
+wait 350
+click-text ♥
+wait 300
+click-xy 155 778
+wait 150
+click-xy 155 778
+wait 150
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+screenshot marathon_r60
+dump-tree marathon_r60_tree
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Chris
+wait 350
+click-text ♠
+wait 300
+click-xy 265 778
+wait 150
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+screenshot marathon_r70
+dump-tree marathon_r70_tree
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+screenshot marathon_r80
+dump-tree marathon_r80_tree
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+screenshot marathon_r90
+dump-tree marathon_r90_tree
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-text Bram
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Misery
+wait 350
+click-xy 303 638
+wait 300
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Solo Slim
+wait 350
+click-text Dana
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Open Misery
+wait 350
+click-text Anna
+wait 350
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Ask & Join
+wait 350
+click-text Bram
+wait 300
+click-xy 150 856
+wait 350
+click-text ♣
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Trull
+wait 350
+click-text Chris
+wait 300
+click-xy 150 722
+wait 350
+click-text ♠
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Alone
+wait 350
+click-text Dana
+wait 350
+click-text ♥
+wait 300
+click-text CONFIRM
+wait 500
+click-text ADD ROUND
+wait 350
+click-text Abundance
+wait 350
+click-text Anna
+wait 350
+click-text ♦
+wait 300
+click-text CONFIRM
+wait 500
+screenshot marathon_r100
+dump-tree marathon_r100_tree
+screenshot marathon_final
+dump-tree marathon_final_tree
+dump-console marathon_console
+click-xy 344 866
+wait 600
+click-xy 307 556
+wait 1200
+screenshot marathon_celebration
+log-tree
+click-xy 210 557
+wait 1500
+screenshot marathon_home_after
+click-text HISTORY Tab 3 of 4
+wait 800
+screenshot marathon_history_after_game1
+log-tree

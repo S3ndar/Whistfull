@@ -1,0 +1,2610 @@
+{
+  "finalTotals": {
+    "Anna": 186,
+    "Bram": -360,
+    "Chris": -102,
+    "Dana": 276
+  },
+  "finalMultiplier": 1,
+  "finalDealerIndex": 0,
+  "roundsRecorded": 100,
+  "rounds": [
+    {
+      "n": 1,
+      "contractType": "Ask & Join",
+      "declarer": "Anna",
+      "partner": "Chris",
+      "trump": "Hearts",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": 2,
+        "Bram": -2,
+        "Chris": 2,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 2,
+        "Bram": -2,
+        "Chris": 2,
+        "Dana": -2
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 2,
+      "contractType": "Trull",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -9,
+        "Bram": 9,
+        "Chris": -9,
+        "Dana": 9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -7,
+        "Bram": 7,
+        "Chris": -7,
+        "Dana": 7
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 3,
+      "contractType": "Solo",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": 6,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -9,
+        "Bram": 5,
+        "Chris": -1,
+        "Dana": 5
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 4,
+      "contractType": "Abondance",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": 15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -14,
+        "Bram": 0,
+        "Chris": -6,
+        "Dana": 20
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 5,
+      "contractType": "Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 1,
+        "Bram": -5,
+        "Chris": -11,
+        "Dana": 15
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 6,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": 10,
+        "Chris": -10,
+        "Dana": 10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -9,
+        "Bram": 5,
+        "Chris": -21,
+        "Dana": 25
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 7,
+      "contractType": "Solo Slim",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": 45,
+        "Dana": -15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -24,
+        "Bram": -10,
+        "Chris": 24,
+        "Dana": 10
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 8,
+      "contractType": "Open Miserie",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": 30
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -34,
+        "Bram": -20,
+        "Chris": 14,
+        "Dana": 40
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 9,
+      "contractType": "Ask & Join",
+      "declarer": "Anna",
+      "partner": "Chris",
+      "trump": "Diamonds",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": 2,
+        "Bram": -2,
+        "Chris": 2,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -32,
+        "Bram": -22,
+        "Chris": 16,
+        "Dana": 38
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 10,
+      "contractType": "Trull",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Clubs",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -9,
+        "Bram": 9,
+        "Chris": -9,
+        "Dana": 9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -41,
+        "Bram": -13,
+        "Chris": 7,
+        "Dana": 47
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 11,
+      "contractType": "Solo",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": 6,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -43,
+        "Bram": -15,
+        "Chris": 13,
+        "Dana": 45
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 12,
+      "contractType": "Abondance",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": 15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -48,
+        "Bram": -20,
+        "Chris": 8,
+        "Dana": 60
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 13,
+      "contractType": "Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -33,
+        "Bram": -25,
+        "Chris": 3,
+        "Dana": 55
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 14,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": 10,
+        "Chris": -10,
+        "Dana": 10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -43,
+        "Bram": -15,
+        "Chris": -7,
+        "Dana": 65
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 15,
+      "contractType": "Solo Slim",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": 45,
+        "Dana": -15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -58,
+        "Bram": -30,
+        "Chris": 38,
+        "Dana": 50
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 16,
+      "contractType": "Open Miserie",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": 30
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -68,
+        "Bram": -40,
+        "Chris": 28,
+        "Dana": 80
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 17,
+      "contractType": "Ask & Join",
+      "declarer": "Anna",
+      "partner": "Chris",
+      "trump": "Clubs",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": 2,
+        "Bram": -2,
+        "Chris": 2,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -66,
+        "Bram": -42,
+        "Chris": 30,
+        "Dana": 78
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 18,
+      "contractType": "Trull",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Spades",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -9,
+        "Bram": 9,
+        "Chris": -9,
+        "Dana": 9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -75,
+        "Bram": -33,
+        "Chris": 21,
+        "Dana": 87
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 19,
+      "contractType": "Solo",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": 6,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -77,
+        "Bram": -35,
+        "Chris": 27,
+        "Dana": 85
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 20,
+      "contractType": "Abondance",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": 15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -82,
+        "Bram": -40,
+        "Chris": 22,
+        "Dana": 100
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 21,
+      "contractType": "Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -67,
+        "Bram": -45,
+        "Chris": 17,
+        "Dana": 95
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 22,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": 10,
+        "Chris": -10,
+        "Dana": 10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -77,
+        "Bram": -35,
+        "Chris": 7,
+        "Dana": 105
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 23,
+      "contractType": "Solo Slim",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": 45,
+        "Dana": -15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -92,
+        "Bram": -50,
+        "Chris": 52,
+        "Dana": 90
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 24,
+      "contractType": "Open Miserie",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": 30
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -102,
+        "Bram": -60,
+        "Chris": 42,
+        "Dana": 120
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 25,
+      "contractType": "Ask & Join",
+      "declarer": "Anna",
+      "partner": "Chris",
+      "trump": "Spades",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": 2,
+        "Bram": -2,
+        "Chris": 2,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -100,
+        "Bram": -62,
+        "Chris": 44,
+        "Dana": 118
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 26,
+      "contractType": "Trull",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Hearts",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -9,
+        "Bram": 9,
+        "Chris": -9,
+        "Dana": 9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -109,
+        "Bram": -53,
+        "Chris": 35,
+        "Dana": 127
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 27,
+      "contractType": "Solo",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": 6,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -111,
+        "Bram": -55,
+        "Chris": 41,
+        "Dana": 125
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 28,
+      "contractType": "Abondance",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": 15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -116,
+        "Bram": -60,
+        "Chris": 36,
+        "Dana": 140
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 29,
+      "contractType": "Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -101,
+        "Bram": -65,
+        "Chris": 31,
+        "Dana": 135
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 30,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": 10,
+        "Chris": -10,
+        "Dana": 10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -111,
+        "Bram": -55,
+        "Chris": 21,
+        "Dana": 145
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 31,
+      "contractType": "Solo Slim",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": 45,
+        "Dana": -15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -126,
+        "Bram": -70,
+        "Chris": 66,
+        "Dana": 130
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 32,
+      "contractType": "Open Miserie",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": 30
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -136,
+        "Bram": -80,
+        "Chris": 56,
+        "Dana": 160
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 33,
+      "contractType": "Ask & Join",
+      "declarer": "Anna",
+      "partner": "Chris",
+      "trump": "Hearts",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": 2,
+        "Bram": -2,
+        "Chris": 2,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -134,
+        "Bram": -82,
+        "Chris": 58,
+        "Dana": 158
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 34,
+      "contractType": "Trull",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -9,
+        "Bram": 9,
+        "Chris": -9,
+        "Dana": 9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -143,
+        "Bram": -73,
+        "Chris": 49,
+        "Dana": 167
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 35,
+      "contractType": "Solo",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": 6,
+        "Dana": -2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -145,
+        "Bram": -75,
+        "Chris": 55,
+        "Dana": 165
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 36,
+      "contractType": "Abondance",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": 15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -150,
+        "Bram": -80,
+        "Chris": 50,
+        "Dana": 180
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 37,
+      "contractType": "Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -135,
+        "Bram": -85,
+        "Chris": 45,
+        "Dana": 175
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 38,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": 10,
+        "Chris": -10,
+        "Dana": 10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -145,
+        "Bram": -75,
+        "Chris": 35,
+        "Dana": 185
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 39,
+      "contractType": "Solo Slim",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": 45,
+        "Dana": -15
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -160,
+        "Bram": -90,
+        "Chris": 80,
+        "Dana": 170
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 40,
+      "contractType": "Open Miserie",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -10,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": 30
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -170,
+        "Bram": -100,
+        "Chris": 70,
+        "Dana": 200
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 41,
+      "contractType": "Pass",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 0,
+        "Bram": 0,
+        "Chris": 0,
+        "Dana": 0
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -170,
+        "Bram": -100,
+        "Chris": 70,
+        "Dana": 200
+      },
+      "pointMultiplierAfter": 2,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 42,
+      "contractType": "Pass",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 0,
+        "Bram": 0,
+        "Chris": 0,
+        "Dana": 0
+      },
+      "multiplierApplied": 2,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -170,
+        "Bram": -100,
+        "Chris": 70,
+        "Dana": 200
+      },
+      "pointMultiplierAfter": 4,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 43,
+      "contractType": "Pass",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 0,
+        "Bram": 0,
+        "Chris": 0,
+        "Dana": 0
+      },
+      "multiplierApplied": 4,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -170,
+        "Bram": -100,
+        "Chris": 70,
+        "Dana": 200
+      },
+      "pointMultiplierAfter": 8,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 44,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 120,
+        "Bram": -40,
+        "Chris": -40,
+        "Dana": -40
+      },
+      "multiplierApplied": 8,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -50,
+        "Bram": -140,
+        "Chris": 30,
+        "Dana": 160
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 45,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -55,
+        "Bram": -125,
+        "Chris": 25,
+        "Dana": 155
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 46,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -45,
+        "Bram": -135,
+        "Chris": 35,
+        "Dana": 145
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 47,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -60,
+        "Bram": -150,
+        "Chris": 20,
+        "Dana": 190
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 48,
+      "contractType": "Open Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 30,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -30,
+        "Bram": -160,
+        "Chris": 10,
+        "Dana": 180
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 49,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Spades",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -32,
+        "Bram": -158,
+        "Chris": 8,
+        "Dana": 182
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 50,
+      "contractType": "Trull",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": "Hearts",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 9,
+        "Bram": -9,
+        "Chris": 9,
+        "Dana": -9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -23,
+        "Bram": -167,
+        "Chris": 17,
+        "Dana": 173
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 51,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -25,
+        "Bram": -169,
+        "Chris": 15,
+        "Dana": 179
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 52,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -10,
+        "Bram": -174,
+        "Chris": 10,
+        "Dana": 174
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 53,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -15,
+        "Bram": -159,
+        "Chris": 5,
+        "Dana": 169
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 54,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -5,
+        "Bram": -169,
+        "Chris": 15,
+        "Dana": 159
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 55,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -20,
+        "Bram": -184,
+        "Chris": 0,
+        "Dana": 204
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 56,
+      "contractType": "Ask & Join",
+      "declarer": "Anna",
+      "partner": "Chris",
+      "trump": "Hearts",
+      "tricksWon": 6,
+      "agreedTricks": 8,
+      "success": false,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -22,
+        "Bram": -182,
+        "Chris": -2,
+        "Dana": 206
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 57,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Diamonds",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -24,
+        "Bram": -180,
+        "Chris": -4,
+        "Dana": 208
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 58,
+      "contractType": "Trull",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": "Clubs",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 9,
+        "Bram": -9,
+        "Chris": 9,
+        "Dana": -9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": -15,
+        "Bram": -189,
+        "Chris": 5,
+        "Dana": 199
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 59,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -17,
+        "Bram": -191,
+        "Chris": 3,
+        "Dana": 205
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 60,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": -2,
+        "Bram": -196,
+        "Chris": -2,
+        "Dana": 200
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 61,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": -7,
+        "Bram": -181,
+        "Chris": -7,
+        "Dana": 195
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 62,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 3,
+        "Bram": -191,
+        "Chris": 3,
+        "Dana": 185
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 63,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": -12,
+        "Bram": -206,
+        "Chris": -12,
+        "Dana": 230
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 64,
+      "contractType": "Open Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 30,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 18,
+        "Bram": -216,
+        "Chris": -22,
+        "Dana": 220
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 65,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Clubs",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 16,
+        "Bram": -214,
+        "Chris": -24,
+        "Dana": 222
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 66,
+      "contractType": "Solo",
+      "declarer": "Chris",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 6,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -3,
+        "Bram": -3,
+        "Chris": 9,
+        "Dana": -3
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 13,
+        "Bram": -217,
+        "Chris": -15,
+        "Dana": 219
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 67,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 11,
+        "Bram": -219,
+        "Chris": -17,
+        "Dana": 225
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 68,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 26,
+        "Bram": -224,
+        "Chris": -22,
+        "Dana": 220
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 69,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 21,
+        "Bram": -209,
+        "Chris": -27,
+        "Dana": 215
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 70,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 31,
+        "Bram": -219,
+        "Chris": -17,
+        "Dana": 205
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 71,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 16,
+        "Bram": -234,
+        "Chris": -32,
+        "Dana": 250
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 72,
+      "contractType": "Open Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 30,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 46,
+        "Bram": -244,
+        "Chris": -42,
+        "Dana": 240
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 73,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Spades",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 44,
+        "Bram": -242,
+        "Chris": -44,
+        "Dana": 242
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 74,
+      "contractType": "Trull",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": "Hearts",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 9,
+        "Bram": -9,
+        "Chris": 9,
+        "Dana": -9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 53,
+        "Bram": -251,
+        "Chris": -35,
+        "Dana": 233
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 75,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 51,
+        "Bram": -253,
+        "Chris": -37,
+        "Dana": 239
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 76,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 66,
+        "Bram": -258,
+        "Chris": -42,
+        "Dana": 234
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 77,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 61,
+        "Bram": -243,
+        "Chris": -47,
+        "Dana": 229
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 78,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 71,
+        "Bram": -253,
+        "Chris": -37,
+        "Dana": 219
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 79,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 56,
+        "Bram": -268,
+        "Chris": -52,
+        "Dana": 264
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 80,
+      "contractType": "Open Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 30,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 86,
+        "Bram": -278,
+        "Chris": -62,
+        "Dana": 254
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 81,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Hearts",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 84,
+        "Bram": -276,
+        "Chris": -64,
+        "Dana": 256
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 82,
+      "contractType": "Trull",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 9,
+        "Bram": -9,
+        "Chris": 9,
+        "Dana": -9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 93,
+        "Bram": -285,
+        "Chris": -55,
+        "Dana": 247
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 83,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Clubs",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 91,
+        "Bram": -287,
+        "Chris": -57,
+        "Dana": 253
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 84,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 106,
+        "Bram": -292,
+        "Chris": -62,
+        "Dana": 248
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 85,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 101,
+        "Bram": -277,
+        "Chris": -67,
+        "Dana": 243
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 86,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 111,
+        "Bram": -287,
+        "Chris": -57,
+        "Dana": 233
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 87,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 96,
+        "Bram": -302,
+        "Chris": -72,
+        "Dana": 278
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 88,
+      "contractType": "Open Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 30,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 126,
+        "Bram": -312,
+        "Chris": -82,
+        "Dana": 268
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 89,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Diamonds",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 124,
+        "Bram": -310,
+        "Chris": -84,
+        "Dana": 270
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 90,
+      "contractType": "Trull",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": "Clubs",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 9,
+        "Bram": -9,
+        "Chris": 9,
+        "Dana": -9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 133,
+        "Bram": -319,
+        "Chris": -75,
+        "Dana": 261
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 91,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Spades",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 131,
+        "Bram": -321,
+        "Chris": -77,
+        "Dana": 267
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 92,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 146,
+        "Bram": -326,
+        "Chris": -82,
+        "Dana": 262
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 93,
+      "contractType": "Miserie",
+      "declarer": "Bram",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": -5,
+        "Bram": 15,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 141,
+        "Bram": -311,
+        "Chris": -87,
+        "Dana": 257
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 94,
+      "contractType": "Miserie",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 10,
+        "Bram": -10,
+        "Chris": 10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 151,
+        "Bram": -321,
+        "Chris": -77,
+        "Dana": 247
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 95,
+      "contractType": "Solo Slim",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 13,
+      "agreedTricks": 13,
+      "success": true,
+      "deltas": {
+        "Anna": -15,
+        "Bram": -15,
+        "Chris": -15,
+        "Dana": 45
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 136,
+        "Bram": -336,
+        "Chris": -92,
+        "Dana": 292
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 96,
+      "contractType": "Open Miserie",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": null,
+      "tricksWon": null,
+      "agreedTricks": null,
+      "success": true,
+      "deltas": {
+        "Anna": 30,
+        "Bram": -10,
+        "Chris": -10,
+        "Dana": -10
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 166,
+        "Bram": -346,
+        "Chris": -102,
+        "Dana": 282
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    },
+    {
+      "n": 97,
+      "contractType": "Ask & Join",
+      "declarer": "Bram",
+      "partner": "Dana",
+      "trump": "Clubs",
+      "tricksWon": 8,
+      "agreedTricks": 8,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": 2,
+        "Chris": -2,
+        "Dana": 2
+      },
+      "multiplierApplied": 1,
+      "dealer": "Anna",
+      "totalsAfter": {
+        "Anna": 164,
+        "Bram": -344,
+        "Chris": -104,
+        "Dana": 284
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 1
+    },
+    {
+      "n": 98,
+      "contractType": "Trull",
+      "declarer": "Chris",
+      "partner": "Anna",
+      "trump": "Spades",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 9,
+        "Bram": -9,
+        "Chris": 9,
+        "Dana": -9
+      },
+      "multiplierApplied": 1,
+      "dealer": "Bram",
+      "totalsAfter": {
+        "Anna": 173,
+        "Bram": -353,
+        "Chris": -95,
+        "Dana": 275
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 2
+    },
+    {
+      "n": 99,
+      "contractType": "Solo",
+      "declarer": "Dana",
+      "partner": null,
+      "trump": "Hearts",
+      "tricksWon": 5,
+      "agreedTricks": 5,
+      "success": true,
+      "deltas": {
+        "Anna": -2,
+        "Bram": -2,
+        "Chris": -2,
+        "Dana": 6
+      },
+      "multiplierApplied": 1,
+      "dealer": "Chris",
+      "totalsAfter": {
+        "Anna": 171,
+        "Bram": -355,
+        "Chris": -97,
+        "Dana": 281
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 3
+    },
+    {
+      "n": 100,
+      "contractType": "Abondance",
+      "declarer": "Anna",
+      "partner": null,
+      "trump": "Diamonds",
+      "tricksWon": 9,
+      "agreedTricks": 9,
+      "success": true,
+      "deltas": {
+        "Anna": 15,
+        "Bram": -5,
+        "Chris": -5,
+        "Dana": -5
+      },
+      "multiplierApplied": 1,
+      "dealer": "Dana",
+      "totalsAfter": {
+        "Anna": 186,
+        "Bram": -360,
+        "Chris": -102,
+        "Dana": 276
+      },
+      "pointMultiplierAfter": 1,
+      "dealerIndexAfter": 0
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+ "role": "WebArea",
+ "name": "Whistly",
+ "children": [
+  {
+   "role": "generic",
+   "name": "",
+   "children": [
+    {
+     "role": "button",
+     "name": "Back",
+     "focused": true
+    },
+    {
+     "role": "heading",
+     "name": "Anna's Stats",
+     "level": 2
+    },
+    {
+     "role": "button",
+     "name": ""
+    },
+    {
+     "role": "text",
+     "name": "Anna"
+    },
+    {
+     "role": "text",
+     "name": "PLAYER"
+    },
+    {
+     "role": "text",
+     "name": "2 GAMES"
+    },
+    {
+     "role": "text",
+     "name": "1 WINS"
+    },
+    {
+     "role": "text",
+     "name": "50.0% WIN RATE"
+    },
+    {
+     "role": "text",
+     "name": "31 BEST GAME"
+    },
+    {
+     "role": "text",
+     "name": "-0.5 AVG POINTS"
+    },
+    {
+     "role": "text",
+     "name": "PAST GAMES"
+    },
+    {
+     "role": "button",
+     "name": "Winner: Frank Sep 15, 2026 • 17:26 -32"
+    },
+    {
+     "role": "button",
+     "name": "Winner: Anna Sep 15, 2026 • 17:26 +31"
+    }
+   ]
+  }
+ ]
+}

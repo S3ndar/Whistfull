@@ -1,0 +1,118 @@
+{
+ "role": "WebArea",
+ "name": "Whistly",
+ "children": [
+  {
+   "role": "generic",
+   "name": "",
+   "children": [
+    {
+     "role": "button",
+     "name": "Back",
+     "focused": true
+    },
+    {
+     "role": "heading",
+     "name": "Game Recap",
+     "level": 2
+    },
+    {
+     "role": "text",
+     "name": "Tuesday, Sep 15, 2026 • 17:26"
+    },
+    {
+     "role": "text",
+     "name": "FINAL SCORES"
+    },
+    {
+     "role": "text",
+     "name": "1"
+    },
+    {
+     "role": "text",
+     "name": "Frank"
+    },
+    {
+     "role": "text",
+     "name": "LEAD"
+    },
+    {
+     "role": "text",
+     "name": "+54"
+    },
+    {
+     "role": "text",
+     "name": "2"
+    },
+    {
+     "role": "text",
+     "name": "Eve"
+    },
+    {
+     "role": "text",
+     "name": "-10"
+    },
+    {
+     "role": "text",
+     "name": "3"
+    },
+    {
+     "role": "text",
+     "name": "Bram"
+    },
+    {
+     "role": "text",
+     "name": "-12"
+    },
+    {
+     "role": "text",
+     "name": "4"
+    },
+    {
+     "role": "text",
+     "name": "Anna"
+    },
+    {
+     "role": "text",
+     "name": "-32"
+    },
+    {
+     "role": "text",
+     "name": "1 ♥ Ask & Join Anna & Eve · Anna +2 Bram -2 Eve +2 Frank -2 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "2 ♣ Trull Bram & Frank · Anna -9 Bram +9 Eve -9 Frank +9 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "3 ♦ Alone Eve · Anna -2 Bram -2 Eve +6 Frank -2 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "4 ♠ Abundance Frank · Anna -5 Bram -5 Eve -5 Frank +15 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "5 ♦ Ask & Join Anna & Frank · Anna +2 Bram -2 Eve -2 Frank +2 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "6 ♥ Trull Bram & Eve · Anna -9 Bram +9 Eve +9 Frank -9 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "7 ♣ Solo Slim Frank · Anna -15 Bram -15 Eve -15 Frank +45 SUCCEEDED"
+    },
+    {
+     "role": "text",
+     "name": "8 Round Pass Dealer: Frank"
+    },
+    {
+     "role": "text",
+     "name": "9 ♠ Ask & Join Eve & Anna · Anna +4 Bram -4 Eve +4 Frank -4 SUCCEEDED"
+    }
+   ]
+  }
+ ]
+}
