@@ -102,6 +102,8 @@ class LocalizationProvider extends ChangeNotifier {
     'undo_round_title': 'Undo last round?',
     'undo_round_desc': 'The most recent round will be removed and all scores recalculated.',
     'undo': 'UNDO',
+    'delete_round_title': 'Delete this round?',
+    'delete_round_desc': 'This round will be removed and all scores recalculated. Only the last round can be deleted — delete it first to reach an earlier one.',
 
     // Round Dialog
     'setup_contract_step': 'Select Contract',
@@ -337,6 +339,8 @@ class LocalizationProvider extends ChangeNotifier {
     'undo_round_title': 'Laatste ronde ongedaan maken?',
     'undo_round_desc': 'De laatste ronde wordt verwijderd en alle scores worden herberekend.',
     'undo': 'ONGEDAAN',
+    'delete_round_title': 'Deze ronde verwijderen?',
+    'delete_round_desc': 'Deze ronde wordt verwijderd en alle scores worden herberekend. Alleen de laatste ronde kan verwijderd worden — verwijder die eerst om een vorige te bereiken.',
 
     // Round Dialog
     'setup_contract_step': 'Kies Bod',

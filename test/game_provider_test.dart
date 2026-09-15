@@ -163,7 +163,7 @@ void main() {
     });
 
     test('Trull: success', () {
-      // Declarer: p1, Partner: p2. base = 3, overtricks = 1 (tricks: 10 vs target: 9). total = 4.
+      // Declarer: p1, Partner: p2. base = 9, overtricks = 1 (tricks: 10 vs target: 9). total = 10.
       final deltas = provider.addRound(
         contractType: 'Trull',
         declarerId: 'p1',
@@ -174,10 +174,10 @@ void main() {
         settings: settings,
       );
 
-      expect(deltas['p1'], 4);
-      expect(deltas['p2'], 4);
-      expect(deltas['p3'], -4);
-      expect(deltas['p4'], -4);
+      expect(deltas['p1'], 10);
+      expect(deltas['p2'], 10);
+      expect(deltas['p3'], -10);
+      expect(deltas['p4'], -10);
     });
 
     test('Solo: success', () {
@@ -466,7 +466,7 @@ void main() {
         agreedTricks: 9,
         miserieSuccess: false,
         settings: settings,
-      ); // round 1 (to be deleted): p2/p3 +4, p1/p4 -4
+      ); // round 1 (to be deleted): p2/p3 +10, p1/p4 -10
 
       provider.addRound(
         contractType: 'Solo',
