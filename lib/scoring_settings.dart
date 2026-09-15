@@ -7,7 +7,7 @@ class ScoringSettings extends ChangeNotifier {
 
   // Base points (won/lost from each opponent)
   int askAndJoinBase = 2;
-  int trull = 3;
+  int trull = 9;
   int aloneBase = 2;
   int misere = 5;
   int abundanceBase = 5; // Base for 9 tricks, others are tiered
@@ -35,7 +35,7 @@ class ScoringSettings extends ChangeNotifier {
 
     if (box != null) {
       askAndJoinBase = box.get('askAndJoinBase', defaultValue: 2);
-      trull = box.get('trull', defaultValue: 3);
+      trull = box.get('trull', defaultValue: 9);
       aloneBase = box.get('aloneBase', defaultValue: 2);
       misere = box.get('misere', defaultValue: 5);
       abundanceBase = box.get('abundanceBase', defaultValue: 5);

@@ -142,6 +142,35 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
     );
   }
 
+  // Per-row delete, reachable only from the LAST round row (see the
+  // `isLast` check where _RoundRow is built) — deliberately not a general
+  // "delete any round" action. [index] is always `game.rounds.length - 1`
+  // at the point this is wired up. Deleting repeatedly walks backward one
+  // round at a time, same as the header's undo icon; this just gives the
+  // same action a second, in-context entry point directly on the row.
+  void _confirmDeleteRound(BuildContext context, int index, LocalizationProvider loc, AppSemanticColors colors) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: Text(loc.translate('delete_round_title'), style: WhistlyText.sectionHead(colors.ink)),
+        content: Text(loc.translate('delete_round_desc'), style: WhistlyText.body(colors.muted, size: 13)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(loc.translate('cancel').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+          ),
+          TextButton(
+            onPressed: () {
+              context.read<GameProvider>().deleteRound(index);
+              Navigator.pop(context);
+            },
+            child: Text(loc.translate('delete').toUpperCase(), style: WhistlyText.eyebrow(colors.accent)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _confirmEndGame(BuildContext context, Game game, LocalizationProvider loc, AppSemanticColors colors) {
     showDialog(
       context: context,
@@ -267,7 +296,17 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                       itemBuilder: (context, index) {
                         final roundNumber = game.rounds.length - index;
                         final round = game.rounds[game.rounds.length - 1 - index];
-                        return _RoundRow(round: round, roundNumber: roundNumber, players: players);
+                        // index 0 is the most recent round (see the
+                        // reversed indexing above) — only it may be
+                        // deleted, so the previous round becomes the last
+                        // (and itself deletable) one delete at a time.
+                        final isLast = index == 0;
+                        return _RoundRow(
+                          round: round,
+                          roundNumber: roundNumber,
+                          players: players,
+                          onDelete: isLast ? () => _confirmDeleteRound(context, game.rounds.length - 1, loc, colors) : null,
+                        );
                       },
                     ),
             ),
@@ -362,11 +401,20 @@ class _StandingsList extends StatelessWidget {
                   WhistlyLeadBadge(label: loc.translate('lead')),
                   const SizedBox(width: 8),
                 ],
-                SizedBox(
-                  width: 56,
+                ConstrainedBox(
+                  // Spec's "56px" is a minimum, not a cap (§6) — a fixed
+                  // `width: 56` here let a 3-digit total (e.g. "+13") wrap
+                  // onto two lines instead of overflowing, since the
+                  // 30px-mono glyphs for 3 characters don't fit 56px and
+                  // `Text` wraps by default. `minWidth` keeps every row's
+                  // number right-aligned to the same column for the common
+                  // case, `softWrap: false` lets a wider number grow past
+                  // it on one line instead of wrapping.
+                  constraints: const BoxConstraints(minWidth: 56),
                   child: Text(
                     score >= 0 ? '+$score' : '$score',
                     textAlign: TextAlign.right,
+                    softWrap: false,
                     style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
                   ),
                 ),
@@ -431,8 +479,12 @@ class _RoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
   final List<GamePlayerRef> players;
+  // Non-null only for the most recent round — see the `isLast` check
+  // where this is built. Renders a small delete affordance on this row
+  // only; every earlier round's is null and shows nothing.
+  final VoidCallback? onDelete;
 
-  const _RoundRow({required this.round, required this.roundNumber, required this.players});
+  const _RoundRow({required this.round, required this.roundNumber, required this.players, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -454,6 +506,7 @@ class _RoundRow extends StatelessWidget {
               '${loc.translate('dealer')}: ${dealer.name}',
               style: WhistlyText.mono(colors.muted),
             ),
+            if (onDelete != null) _deleteButton(colors),
           ],
         ),
       );
@@ -521,8 +574,17 @@ class _RoundRow extends StatelessWidget {
             achievedLabel: loc.translate('setup_succeeded'),
             failedLabel: loc.translate('setup_failed'),
           ),
+          if (onDelete != null) _deleteButton(colors),
         ],
       ),
     );
   }
+
+  Widget _deleteButton(AppSemanticColors colors) => Padding(
+        padding: const EdgeInsets.only(left: 8),
+        child: InkWell(
+          onTap: onDelete,
+          child: Icon(Icons.delete_outline, size: 20, color: colors.muted),
+        ),
+      );
 }

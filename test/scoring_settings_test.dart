@@ -25,7 +25,7 @@ void main() {
       await settings.init();
 
       expect(settings.askAndJoinBase, 2);
-      expect(settings.trull, 3);
+      expect(settings.trull, 9);
       expect(settings.aloneBase, 2);
       expect(settings.misere, 5);
       expect(settings.abundanceBase, 5);
@@ -101,7 +101,7 @@ void main() {
       );
 
       expect(settings.askAndJoinBase, 5);
-      expect(settings.trull, 3); // Unchanged default
+      expect(settings.trull, 9); // Unchanged default
 
       // Flush async Hive write before tearDown closes the box
       await Future.delayed(const Duration(milliseconds: 50));
