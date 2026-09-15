@@ -362,11 +362,20 @@ class _StandingsList extends StatelessWidget {
                   WhistlyLeadBadge(label: loc.translate('lead')),
                   const SizedBox(width: 8),
                 ],
-                SizedBox(
-                  width: 56,
+                ConstrainedBox(
+                  // Spec's "56px" is a minimum, not a cap (§6) — a fixed
+                  // `width: 56` here let a 3-digit total (e.g. "+13") wrap
+                  // onto two lines instead of overflowing, since the
+                  // 30px-mono glyphs for 3 characters don't fit 56px and
+                  // `Text` wraps by default. `minWidth` keeps every row's
+                  // number right-aligned to the same column for the common
+                  // case, `softWrap: false` lets a wider number grow past
+                  // it on one line instead of wrapping.
+                  constraints: const BoxConstraints(minWidth: 56),
                   child: Text(
                     score >= 0 ? '+$score' : '$score',
                     textAlign: TextAlign.right,
+                    softWrap: false,
                     style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
                   ),
                 ),

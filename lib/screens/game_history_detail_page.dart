@@ -70,11 +70,16 @@ class GameHistoryDetailPage extends StatelessWidget {
                         WhistlyLeadBadge(label: loc.translate('lead')),
                         const SizedBox(width: 8),
                       ],
-                      SizedBox(
-                        width: 56,
+                      ConstrainedBox(
+                        // See the matching column in active_game_page.dart's
+                        // _StandingsList: 56px is a minimum, not a cap — a
+                        // fixed `width: 56` let a 3-digit total wrap onto
+                        // two lines instead of staying on one.
+                        constraints: const BoxConstraints(minWidth: 56),
                         child: Text(
                           score >= 0 ? '+$score' : '$score',
                           textAlign: TextAlign.right,
+                          softWrap: false,
                           style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
                         ),
                       ),
