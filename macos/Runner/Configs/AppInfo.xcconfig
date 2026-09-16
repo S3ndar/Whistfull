@@ -8,7 +8,7 @@
 PRODUCT_NAME = Whistly
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.example.Whistly
+PRODUCT_BUNDLE_IDENTIFIER = be.quest.whistly
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.example. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 Quest. All rights reserved.

@@ -20,27 +20,28 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     // ============================================================================
-    // !!! MUST CHANGE BEFORE THE FIRST PLAY STORE UPLOAD !!!
+    // Application ID: be.quest.whistly — FINAL, chosen 2026-09-15.
     //
-    // `namespace` and `applicationId` below are still the Flutter template
-    // default (com.example.whistfull). Google Play REJECTS uploads whose
-    // applicationId starts with "com.example". You must pick a real, final
-    // package ID (e.g. com.yourcompany.whistly) and set it in BOTH places
-    // below before you ever upload a build to the Play Console.
+    // Play never allows changing a published app's applicationId. This value
+    // must stay in sync with four other places:
+    //   - `applicationId` in defaultConfig below
+    //   - the Kotlin package + folder: android/app/src/main/kotlin/be/quest/whistly/
+    //   - PRODUCT_BUNDLE_IDENTIFIER in ios/Runner.xcodeproj/project.pbxproj
+    //   - PRODUCT_BUNDLE_IDENTIFIER in macos/Runner.xcodeproj/project.pbxproj
     //
-    // This ID becomes permanent the moment it's uploaded: Play does not allow
-    // changing the applicationId of an already-published app, ever. Decide
-    // it deliberately, then change it here.
+    // NOTE: `flutter build` rewrites this file ("Upgrading build.gradle.kts").
+    // It has already reverted this edit twice. Commit the file before building
+    // so `git diff` shows what the tool changed.
     // ============================================================================
-    namespace = "com.example.whistfull"
-    // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-    // TODO: Play Store REJECTS "com.example.*" applicationIds. Change this before first upload.
-    // TODO: The applicationId can NEVER be changed after your first Play Store upload. Choose carefully.
+    namespace = "be.quest.whistly"
 
-    // SDK versions are pinned explicitly rather than inherited from the
-    // Flutter tool, so CI and every developer machine build against the
-    // same target regardless of installed Flutter version.
-    compileSdk = 35
+    // compileSdk pinned so CI and every machine build against the same SDK.
+    // 36 is what five bundled plugins (google_mobile_ads, in_app_purchase_android,
+    // package_info_plus, path_provider_android, webview_flutter_android) compile
+    // against. Building on 35 only warns rather than failing, but compileSdk is
+    // backward compatible — raising it changes no runtime behaviour and drops
+    // no devices, so there is no reason to stay behind.
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
@@ -53,12 +54,17 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.whistfull"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23 // Google Mobile Ads requires minSdk 23+.
-        targetSdk = 35 // Play Store's current requirement for new app submissions.
+        applicationId = "be.quest.whistly"
+        // NOTE: `flutter build` reverted a previously pinned `minSdk = 23` to this
+        // inherited value. Inherited is safe today (Flutter's floor clears Google
+        // Mobile Ads' minSdk 23), but it means the minimum Android version — and
+        // your device reach on Play — moves with the Flutter version. Pin it
+        // deliberately before the first release.
+        minSdk = flutter.minSdkVersion
+        // TODO: confirm Play's current targetSdk requirement for NEW apps before
+        // the first upload — it rises roughly annually. Unlike compileSdk,
+        // raising targetSdk changes runtime behaviour, so test after bumping.
+        targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
     }

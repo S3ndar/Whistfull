@@ -37,10 +37,19 @@ dependencies:
   hive: ^2.2.3
   hive_flutter: ^1.1.0
   provider: ^6.1.5+1
-  intl: ^0.19.0
+  # 0.20.x: DateFormat (the only intl API used here) is unchanged; the
+  # breaking changes were removals of deprecated locale helpers.
+  intl: ^0.20.3
   confetti: ^0.8.0
-  package_info_plus: ^8.0.0
-  google_mobile_ads: ^5.2.0
+  # 10.x requires Flutter >=3.41.6 / Dart >=3.11.0, and (from 9.0.0) Android
+  # Gradle Plugin >=8.12.1 — see android/settings.gradle.kts, bumped to match.
+  # PackageInfo.fromPlatform() and .version are unchanged.
+  package_info_plus: ^10.2.1
+  # 9.x needs Flutter >=3.38.1 / Dart >=3.10.0. The only break touching this
+  # codebase is that AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize()
+  # is deprecated (not removed) in favour of the *Large* variants — those are a
+  # taller ad slot, so switching is a layout/revenue decision, not a rename.
+  google_mobile_ads: ^9.1.0
   in_app_purchase: ^3.2.0
 
 dev_dependencies:
@@ -62,6 +71,12 @@ dev_dependencies:
   # `// ignore: use_null_aware_elements` because that syntax doesn't parse
   # under 3.4.0's analyzer), but will resurface and may not stay workable at
   # the next SDK/hive_generator upgrade — check both together.
+  # PINNED AND STUCK: hive_generator 2.0.1 (last published Aug 2023) requires
+  # analyzer <7.0.0, which holds analyzer, build_runner, source_gen and
+  # dart_style at old versions for the whole project. It only affects codegen,
+  # never the shipped app. Escaping it means migrating to the community fork
+  # (hive_ce + hive_ce_generator) and regenerating the adapters — worth doing,
+  # but not before release.
   hive_generator: ^2.0.1
   flutter_launcher_icons: ^0.14.1
   flutter_native_splash: ^2.4.1
