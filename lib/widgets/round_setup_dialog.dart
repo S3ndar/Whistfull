@@ -43,7 +43,17 @@ class RoundSetupDialog extends StatefulWidget {
 }
 
 class _RoundSetupDialogState extends State<RoundSetupDialog> {
-  int _step = 0; // 0: contract type, 1: players, 2: trump, 3: result
+  // The wizard's steps used to be a fixed 0-3 sequence (contract, players,
+  // trump, result), with the "players" step showing the declarer AND
+  // partner selectors together — for a 4+ player table that made the
+  // sheet very tall. Steps are now a dynamic, named sequence built fresh
+  // from `_phases` on every navigation: declarer and partner are always
+  // separate screens, tricks are negotiated before trump is chosen (real
+  // Whist settles the bid before the declarer names trump), and any step
+  // that isn't relevant to the selected contract (partner for a solo
+  // contract, negotiation for a fixed-tricks one, trump for Miserie) is
+  // simply absent from the list rather than specially skipped.
+  String _phase = 'contract';
   Map<String, dynamic>? _selectedContract;
   GamePlayerRef? _declarer;
   GamePlayerRef? _partner;
@@ -62,22 +72,36 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     return _selectedContract?['needsPartner'] == true;
   }
 
+  bool get _isNegotiable {
+    final key = _selectedContract?['key'];
+    return key == 'Ask & Join' || key == 'Solo' || key == 'Abondance';
+  }
+
+  List<String> get _phases {
+    if (_selectedContract == null) return const ['contract'];
+    final hasTricks = _selectedContract!['hasTricks'] == true;
+    return [
+      'contract',
+      'declarer',
+      if (_needsPartner) 'partner',
+      if (_isNegotiable) 'negotiated',
+      if (hasTricks) 'trump',
+      'result',
+    ];
+  }
+
   void _nextStep() {
-    // Skip trump selection for Misery
-    if (_step == 1 && _selectedContract?['hasTricks'] == false) {
-      _selectedTrump = null;
-      setState(() => _step = 3);
-    } else {
-      setState(() => _step++);
-    }
+    final phases = _phases;
+    final i = phases.indexOf(_phase);
+    if (i == -1 || i + 1 >= phases.length) return;
+    setState(() => _phase = phases[i + 1]);
   }
 
   void _prevStep() {
-    if (_step == 3 && _selectedContract?['hasTricks'] == false) {
-      setState(() => _step = 1);
-    } else {
-      setState(() => _step--);
-    }
+    final phases = _phases;
+    final i = phases.indexOf(_phase);
+    if (i <= 0) return;
+    setState(() => _phase = phases[i - 1]);
   }
 
   void _submit() {
@@ -126,7 +150,7 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
           // Header — flush left, per spec (no centered headings).
           Row(
             children: [
-              if (_step > 0)
+              if (_phase != 'contract')
                 IconButton(
                   icon: Icon(Icons.arrow_back, color: colors.ink),
                   onPressed: _prevStep,
@@ -136,20 +160,24 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
               ),
             ],
           ),
-          // Step indicator — radius 0, per spec §3.
+          // Step indicator — radius 0, per spec §3. Dot count/position
+          // track `_phases`, which already omits whatever isn't relevant
+          // to the selected contract — nothing to specially hide here.
           Row(
-            children: List.generate(4, (i) {
-              // Hide step 2 dot if misere
-              if (i == 2 && _selectedContract?['hasTricks'] == false) return const SizedBox();
-              return Padding(
-                padding: const EdgeInsets.only(right: 4, top: 12, bottom: 12),
-                child: Container(
-                  width: i == _step ? 20 : 8,
-                  height: 4,
-                  color: i == _step ? colors.accent : colors.line,
-                ),
-              );
-            }),
+            children: () {
+              final phases = _phases;
+              final current = phases.indexOf(_phase);
+              return List.generate(phases.length, (i) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 4, top: 12, bottom: 12),
+                  child: Container(
+                    width: i == current ? 20 : 8,
+                    height: 4,
+                    color: i == current ? colors.accent : colors.line,
+                  ),
+                );
+              });
+            }(),
           ),
           const SizedBox(height: 4),
           // Step content
@@ -163,21 +191,25 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   }
 
   String _stepTitle(LocalizationProvider loc) {
-    switch (_step) {
-      case 0: return loc.translate('setup_contract_step');
-      case 1: return loc.translate('setup_players_step');
-      case 2: return loc.translate('setup_trump_step');
-      case 3: return loc.translate('setup_result_step');
+    switch (_phase) {
+      case 'contract': return loc.translate('setup_contract_step');
+      case 'declarer': return loc.translate('setup_players_step');
+      case 'partner': return loc.translate('setup_players_step');
+      case 'negotiated': return loc.translate('setup_negotiated');
+      case 'trump': return loc.translate('setup_trump_step');
+      case 'result': return loc.translate('setup_result_step');
       default: return '';
     }
   }
 
   Widget _buildStep(LocalizationProvider loc) {
-    switch (_step) {
-      case 0: return _buildContractStep(loc);
-      case 1: return _buildPlayersStep(loc);
-      case 2: return _buildTrumpStep(loc);
-      case 3: return _buildResultStep(loc);
+    switch (_phase) {
+      case 'contract': return _buildContractStep(loc);
+      case 'declarer': return _buildDeclarerStep(loc);
+      case 'partner': return _buildPartnerStep(loc);
+      case 'negotiated': return _buildNegotiatedStep(loc);
+      case 'trump': return _buildTrumpStep(loc);
+      case 'result': return _buildResultStep(loc);
       default: return const SizedBox();
     }
   }
@@ -185,7 +217,7 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   Widget _buildContractStep(LocalizationProvider loc) {
     final colors = AppTheme.of(context);
     return Column(
-      key: const ValueKey(0),
+      key: const ValueKey('contract'),
       mainAxisSize: MainAxisSize.min,
       children: kContracts.map((contract) {
         final selected = _selectedContract?['key'] == contract['key'];
@@ -200,6 +232,7 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
             setState(() {
               _selectedContract = contract;
               _partner = null;
+              _selectedTrump = null;
               _miseriePlayerCount = 1;
               final req = (contract['required'] as int);
               _agreedTricks = req;
@@ -239,12 +272,15 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     );
   }
 
-  Widget _buildPlayersStep(LocalizationProvider loc) {
+  // Declarer and partner are deliberately two separate steps (not shown
+  // together as before) — with a 4+ player table, both full lists at
+  // once made the sheet very tall.
+  Widget _buildDeclarerStep(LocalizationProvider loc) {
     final needsPartner = _needsPartner;
     final isMiserie = _selectedContract?['hasTricks'] == false && _selectedContract?['isPass'] != true;
 
     return Column(
-      key: const ValueKey(1),
+      key: const ValueKey('declarer'),
       mainAxisSize: MainAxisSize.min,
       children: [
         if (isMiserie) ...[
@@ -277,32 +313,65 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
               _declarer = p;
               if (_partner == p) _partner = null;
             });
-            if (!needsPartner || _partner != null) {
-              Future.delayed(const Duration(milliseconds: 300), _nextStep);
-            }
+            Future.delayed(const Duration(milliseconds: 300), _nextStep);
           },
           disabledPlayer: null,
         ),
-        if (needsPartner) ...[
-          const SizedBox(height: 8),
-          _playerSelector(
-            loc: loc,
-            label: isMiserie
-                ? (loc.currentLanguage == AppLanguage.nl ? 'Speler 2' : 'Player 2')
-                : loc.translate('partner'),
-            selected: _partner,
-            onSelect: (p) {
-              setState(() {
-                _partner = p;
-                if (_declarer == p) _declarer = null;
-              });
-              if (_declarer != null) {
-                Future.delayed(const Duration(milliseconds: 300), _nextStep);
-              }
-            },
-            disabledPlayer: _declarer,
-          ),
-        ],
+      ],
+    );
+  }
+
+  // Only ever built when `_needsPartner` is true (it isn't in `_phases`
+  // otherwise) — declarer is already fixed by the time we get here.
+  Widget _buildPartnerStep(LocalizationProvider loc) {
+    final isMiserie = _selectedContract?['hasTricks'] == false && _selectedContract?['isPass'] != true;
+
+    return Column(
+      key: const ValueKey('partner'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _playerSelector(
+          loc: loc,
+          label: isMiserie
+              ? (loc.currentLanguage == AppLanguage.nl ? 'Speler 2' : 'Player 2')
+              : loc.translate('partner'),
+          selected: _partner,
+          onSelect: (p) {
+            setState(() {
+              _partner = p;
+              if (_declarer == p) _declarer = null;
+            });
+            Future.delayed(const Duration(milliseconds: 300), _nextStep);
+          },
+          disabledPlayer: _declarer,
+        ),
+      ],
+    );
+  }
+
+  // Negotiated tricks are settled before trump is chosen (real Whist
+  // settles the bid first) — only built for the negotiable contracts
+  // (Ask & Join, Solo, Abondance); Trull/Solo Slim have a fixed required
+  // count and skip this step entirely (not in `_phases`).
+  Widget _buildNegotiatedStep(LocalizationProvider loc) {
+    final contract = _selectedContract!;
+    return Column(
+      key: const ValueKey('negotiated'),
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _counterField(
+          label: loc.translate('setup_negotiated'),
+          showLabel: false, // already this step's own title bar
+          value: _agreedTricks,
+          min: contract['required'] as int,
+          max: 13,
+          onChanged: (val) => setState(() {
+            _agreedTricks = val;
+            if (_tricksWon < _agreedTricks) _tricksWon = _agreedTricks;
+          }),
+        ),
+        const SizedBox(height: 20),
+        WhistlyPrimaryButton(label: loc.translate('next'), onPressed: _nextStep),
       ],
     );
   }
@@ -356,7 +425,7 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     ];
 
     return Column(
-      key: const ValueKey(1.5),
+      key: const ValueKey('trump'),
       mainAxisSize: MainAxisSize.min,
       children: [
         Align(
@@ -403,9 +472,7 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
 
   Widget _buildResultStep(LocalizationProvider loc) {
     final contract = _selectedContract!;
-    final name = contract['key'] as String;
     final hasTricks = contract['hasTricks'] == true;
-    final isNegotiable = name == 'Ask & Join' || name == 'Solo' || name == 'Abondance';
     final isMiserie = !hasTricks;
 
     bool success;
@@ -421,22 +488,12 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
 
     final colors = AppTheme.of(context);
     return Column(
-      key: const ValueKey(2),
+      key: const ValueKey('result'),
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (isNegotiable) ...[
-          _counterField(
-            label: loc.translate('setup_negotiated'),
-            value: _agreedTricks,
-            min: contract['required'],
-            max: 13,
-            onChanged: (val) => setState(() {
-              _agreedTricks = val;
-              if (_tricksWon < _agreedTricks) _tricksWon = _agreedTricks;
-            }),
-          ),
-          const SizedBox(height: 16),
-        ],
+        // Negotiated tricks are settled in their own earlier step (see
+        // `_buildNegotiatedStep`) — this step only asks what actually
+        // happened at the table.
         if (hasTricks) ...[
           _counterField(
             label: loc.translate('setup_tricks_won'),
@@ -525,15 +582,18 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     required int min,
     required int max,
     required ValueChanged<int> onChanged,
+    bool showLabel = true,
   }) {
     final colors = AppTheme.of(context);
     return Column(
       children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(label.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
-        ),
-        const SizedBox(height: 8),
+        if (showLabel) ...[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Text(label.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+          ),
+          const SizedBox(height: 8),
+        ],
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

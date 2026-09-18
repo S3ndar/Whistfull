@@ -78,8 +78,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/whistly_logo.png
+  # assets:
+  #   - assets/some_asset.png
 
   # B5 fix: this is a true variable font (wght axis 100-900, default 600).
   # A single asset entry is correct here — Flutter's per-entry `weight:` only
@@ -124,22 +124,36 @@ flutter:
 
 # Config for flutter_launcher_icons (dev dependency). Regenerate with:
 #   dart run flutter_launcher_icons
+# `app_icon.png`/`app_icon_foreground.png` reproduce WhistlyLogoMark (the
+# 2x2 suit-card mark shown on the Home screen — lib/theme/whistly_components.dart)
+# as static exports, since a launcher icon can't be a live Flutter widget.
+# The foreground is the same mark at 70% scale on a transparent canvas, so
+# it sits inside Android's adaptive-icon safe zone under every mask shape;
+# its own ink fill matches `adaptive_icon_background` exactly so the seam
+# between the two layers is invisible. Regenerate both from
+# WhistlyLogoMark's own source if that widget's design ever changes —
+# they were rendered by hand to match it, not derived automatically.
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/whistly_logo.png"
+  image_path: "assets/app_icon.png"
   min_sdk_android: 23
   remove_alpha_ios: true
-  adaptive_icon_background: "#080E1A"
-  adaptive_icon_foreground: "assets/whistly_logo.png"
+  adaptive_icon_background: "#0E0E0E"
+  adaptive_icon_foreground: "assets/app_icon_foreground.png"
 
 # Config for flutter_native_splash (dev dependency). Regenerate with:
 #   dart run flutter_native_splash:create
+# Colours/images match the current theme (app_theme.dart) and the real
+# WhistlyLogoMark, same as the app_icon.png/app_icon_foreground.png pair
+# used by flutter_launcher_icons above — not the old navy/JPEG logo.
 flutter_native_splash:
-  color: "#080E1A"
-  image: "assets/whistly_logo.png"
-  color_dark: "#080E1A"
-  image_dark: "assets/whistly_logo.png"
+  color: "#F5F1EA"
+  image: "assets/app_icon.png"
+  color_dark: "#0E0E0E"
+  image_dark: "assets/app_icon.png"
   android_12:
-    color: "#080E1A"
-    image: "assets/whistly_logo.png"
+    color: "#F5F1EA"
+    color_dark: "#0E0E0E"
+    image: "assets/app_icon_foreground.png"
+    image_dark: "assets/app_icon_foreground.png"
