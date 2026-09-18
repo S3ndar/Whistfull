@@ -24,16 +24,6 @@ class ActiveGamePage extends StatefulWidget {
 class _ActiveGamePageState extends State<ActiveGamePage> {
   late ConfettiController _confettiController;
 
-  // Reserved height of the bottom banner ad (0 when removed/unsupported/
-  // failed to load). The action row is padded by exactly this much so it
-  // always floats above the banner and never overlaps it.
-  double _bannerHeight = 0;
-
-  void _onBannerHeightChanged(double height) {
-    if (!mounted) return;
-    setState(() => _bannerHeight = height);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -228,6 +218,10 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
 
     return Scaffold(
       body: SafeArea(
+        // The banner ad (last child below) handles its own bottom-safe-area
+        // inset — see its own SafeArea wrapper — so the outer one doesn't
+        // need to add it again after the ad.
+        bottom: false,
         child: Column(
           children: [
             // ─── Header row ─────────────────────────────────────────────
@@ -314,38 +308,34 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
             // ─── Suit strip with trick counts ───────────────────────────
             _SuitStripWithCounts(game: game),
 
-            SafeArea(
-              top: false,
-              child: AdaptiveBannerAd(onHeightChanged: _onBannerHeightChanged),
+            // ─── Action row: + Round (flex, accent) and End (bg, 2px left border) ──
+            Row(
+              children: [
+                Expanded(
+                  child: WhistlyPrimaryButton(
+                    label: loc.translate('active_game_add_round'),
+                    showChevron: false,
+                    onPressed: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => RoundSetupDialog(players: game.players),
+                      );
+                    },
+                  ),
+                ),
+                WhistlySecondaryButton(
+                  label: loc.translate('end_game'),
+                  onPressed: () => _confirmEndGame(context, game, loc, colors),
+                  border: Border(left: BorderSide(color: colors.line, width: 2)),
+                ),
+              ],
             ),
 
-            // ─── Action row: + Round (flex, accent) and End (bg, 2px left border) ──
-            Padding(
-              padding: EdgeInsets.only(bottom: _bannerHeight),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: WhistlyPrimaryButton(
-                      label: loc.translate('active_game_add_round'),
-                      showChevron: false,
-                      onPressed: () async {
-                        await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => RoundSetupDialog(players: game.players),
-                        );
-                      },
-                    ),
-                  ),
-                  WhistlySecondaryButton(
-                    label: loc.translate('end_game'),
-                    onPressed: () => _confirmEndGame(context, game, loc, colors),
-                    border: Border(left: BorderSide(color: colors.line, width: 2)),
-                  ),
-                ],
-              ),
-            ),
+            // ─── Banner ad — the very bottom of the screen, below the
+            // action row, not sandwiched in the middle of the layout. ───
+            SafeArea(top: false, child: const AdaptiveBannerAd()),
           ],
         ),
       ),

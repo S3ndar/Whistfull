@@ -20,9 +20,11 @@ import 'package:whistly/ads/ads_provider.dart';
 class AdaptiveBannerAd extends StatefulWidget {
   /// Optional: fired whenever the height this widget reserves changes
   /// (a resolved adaptive size, or back to 0 when removed/unsupported/
-  /// failed). Useful for callers that must keep another control (e.g. a
-  /// FloatingActionButton) from ever overlapping the banner — see
-  /// `lib/screens/active_game_page.dart`.
+  /// failed). Useful for a caller that needs to know the ad's height for
+  /// some reason other than plain layout flow — e.g. a floating control
+  /// positioned relative to it. Every current screen just places this
+  /// widget as a normal, last-in-column child instead, so none of them
+  /// pass this.
   final ValueChanged<double>? onHeightChanged;
 
   const AdaptiveBannerAd({super.key, this.onHeightChanged});
