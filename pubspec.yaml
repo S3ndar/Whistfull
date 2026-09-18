@@ -78,8 +78,8 @@ flutter:
   uses-material-design: true
 
   # To add assets to your application, add an assets section, like this:
-  assets:
-    - assets/whistly_logo.png
+  # assets:
+  #   - assets/some_asset.png
 
   # B5 fix: this is a true variable font (wght axis 100-900, default 600).
   # A single asset entry is correct here — Flutter's per-entry `weight:` only
@@ -144,11 +144,16 @@ flutter_launcher_icons:
 
 # Config for flutter_native_splash (dev dependency). Regenerate with:
 #   dart run flutter_native_splash:create
+# Colours/images match the current theme (app_theme.dart) and the real
+# WhistlyLogoMark, same as the app_icon.png/app_icon_foreground.png pair
+# used by flutter_launcher_icons above — not the old navy/JPEG logo.
 flutter_native_splash:
-  color: "#080E1A"
-  image: "assets/whistly_logo.png"
-  color_dark: "#080E1A"
-  image_dark: "assets/whistly_logo.png"
+  color: "#F5F1EA"
+  image: "assets/app_icon.png"
+  color_dark: "#0E0E0E"
+  image_dark: "assets/app_icon.png"
   android_12:
-    color: "#080E1A"
-    image: "assets/whistly_logo.png"
+    color: "#F5F1EA"
+    color_dark: "#0E0E0E"
+    image: "assets/app_icon_foreground.png"
+    image_dark: "assets/app_icon_foreground.png"
