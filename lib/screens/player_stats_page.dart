@@ -63,7 +63,7 @@ class PlayerStatsPage extends StatelessWidget {
     final statCells = [
       (loc.translate('stats_games'), '${playerGames.length}'),
       (loc.translate('stats_wins'), '$wins'),
-      (loc.translate('stats_win_rate'), '${winRate.toStringAsFixed(1)}%'),
+      (loc.translate('stats_win_rate'), '${winRate.toStringAsFixed(1)} %'),
       (loc.translate('stats_best_game'), '${bestScore ?? 0}'),
       (loc.translate('stats_avg_points'), playerGames.isEmpty ? '0.0' : (totalPoints / playerGames.length).toStringAsFixed(1)),
     ];
