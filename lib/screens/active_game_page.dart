@@ -24,16 +24,6 @@ class ActiveGamePage extends StatefulWidget {
 class _ActiveGamePageState extends State<ActiveGamePage> {
   late ConfettiController _confettiController;
 
-  // Reserved height of the bottom banner ad (0 when removed/unsupported/
-  // failed to load). The action row is padded by exactly this much so it
-  // always floats above the banner and never overlaps it.
-  double _bannerHeight = 0;
-
-  void _onBannerHeightChanged(double height) {
-    if (!mounted) return;
-    setState(() => _bannerHeight = height);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -57,64 +47,29 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
     showDialog(
       context: context,
       barrierDismissible: false, // Must use the button to exit
-      builder: (_) => Stack(
-        alignment: Alignment.center,
-        children: [
-          AlertDialog(
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(Icons.emoji_events, color: colors.accent, size: 64),
-                const SizedBox(height: 16),
-                Text(loc.translate('game_over'), style: WhistlyText.sectionHead(colors.ink)),
-                const SizedBox(height: 8),
-                Text(
-                  (winners.length > 1 ? loc.translate('stats_winners') : loc.translate('stats_winner')).toUpperCase(),
-                  style: WhistlyText.eyebrow(colors.muted),
-                ),
-                const SizedBox(height: 12),
-                ...winners.map((w) => Text(w.name, style: WhistlyText.sectionHead(colors.ink))),
-                const SizedBox(height: 8),
-                Text(
-                  '${loc.translate('score')}: $maxScore',
-                  style: WhistlyText.mono(colors.muted, size: 15, weight: FontWeight.w800),
-                ),
-                const SizedBox(height: 20),
-                SizedBox(
-                  width: double.infinity,
-                  child: WhistlyPrimaryButton(
-                    label: loc.translate('back_home'),
-                    showChevron: false,
-                    onPressed: () {
-                      // Grab the provider reference before popping — after
-                      // both pops below this page's context may no longer
-                      // be mounted, but the ChangeNotifier instance itself
-                      // stays perfectly usable.
-                      final adsProvider = context.read<AdsProvider>();
-                      final gameId = game.id;
-                      context.read<PlayerProvider>().incrementGamesPlayed(game.players.map((p) => p.id).toList());
-                      context.read<GameProvider>().endGame();
-                      Navigator.pop(context); // Close dialog
-                      Navigator.pop(context); // Return home
-                      // Show the interstitial only after leaving the game
-                      // screen — end the game and pop first, so a failed or
-                      // slow ad can never trap the user in this dialog.
-                      // Never shown during round entry, only here.
-                      adsProvider.maybeShowInterstitial(gameId: gameId);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-          ConfettiWidget(
-            confettiController: _confettiController,
-            blastDirectionality: BlastDirectionality.explosive,
-            shouldLoop: false,
-            colors: const [Color(0xFFFF2D4F), Color(0xFF0E0E0E), Color(0xFFF5F1EA)],
-          ),
-        ],
+      builder: (_) => _WinCelebrationDialog(
+        winners: winners,
+        maxScore: maxScore,
+        loc: loc,
+        colors: colors,
+        mainConfettiController: _confettiController,
+        onBackHome: () {
+          // Grab the provider reference before popping — after
+          // both pops below this page's context may no longer
+          // be mounted, but the ChangeNotifier instance itself
+          // stays perfectly usable.
+          final adsProvider = context.read<AdsProvider>();
+          final gameId = game.id;
+          context.read<PlayerProvider>().incrementGamesPlayed(game.players.map((p) => p.id).toList());
+          context.read<GameProvider>().endGame();
+          Navigator.pop(context); // Close dialog
+          Navigator.pop(context); // Return home
+          // Show the interstitial only after leaving the game
+          // screen — end the game and pop first, so a failed or
+          // slow ad can never trap the user in this dialog.
+          // Never shown during round entry, only here.
+          adsProvider.maybeShowInterstitial(gameId: gameId);
+        },
       ),
     );
   }
@@ -228,6 +183,10 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
 
     return Scaffold(
       body: SafeArea(
+        // The banner ad (last child below) handles its own bottom-safe-area
+        // inset — see its own SafeArea wrapper — so the outer one doesn't
+        // need to add it again after the ad.
+        bottom: false,
         child: Column(
           children: [
             // ─── Header row ─────────────────────────────────────────────
@@ -314,38 +273,34 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
             // ─── Suit strip with trick counts ───────────────────────────
             _SuitStripWithCounts(game: game),
 
-            SafeArea(
-              top: false,
-              child: AdaptiveBannerAd(onHeightChanged: _onBannerHeightChanged),
+            // ─── Action row: + Round (flex, accent) and End (bg, 2px left border) ──
+            Row(
+              children: [
+                Expanded(
+                  child: WhistlyPrimaryButton(
+                    label: loc.translate('active_game_add_round'),
+                    showChevron: false,
+                    onPressed: () async {
+                      await showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (_) => RoundSetupDialog(players: game.players),
+                      );
+                    },
+                  ),
+                ),
+                WhistlySecondaryButton(
+                  label: loc.translate('end_game'),
+                  onPressed: () => _confirmEndGame(context, game, loc, colors),
+                  border: Border(left: BorderSide(color: colors.line, width: 2)),
+                ),
+              ],
             ),
 
-            // ─── Action row: + Round (flex, accent) and End (bg, 2px left border) ──
-            Padding(
-              padding: EdgeInsets.only(bottom: _bannerHeight),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: WhistlyPrimaryButton(
-                      label: loc.translate('active_game_add_round'),
-                      showChevron: false,
-                      onPressed: () async {
-                        await showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          builder: (_) => RoundSetupDialog(players: game.players),
-                        );
-                      },
-                    ),
-                  ),
-                  WhistlySecondaryButton(
-                    label: loc.translate('end_game'),
-                    onPressed: () => _confirmEndGame(context, game, loc, colors),
-                    border: Border(left: BorderSide(color: colors.line, width: 2)),
-                  ),
-                ],
-              ),
-            ),
+            // ─── Banner ad — the very bottom of the screen, below the
+            // action row, not sandwiched in the middle of the layout. ───
+            SafeArea(top: false, child: const AdaptiveBannerAd()),
           ],
         ),
       ),
@@ -587,4 +542,131 @@ class _RoundRow extends StatelessWidget {
           child: Icon(Icons.delete_outline, size: 20, color: colors.muted),
         ),
       );
+}
+
+// One extra confetti burst at a tapped screen point — its own short-lived
+// controller, disposed once its burst finishes, so tapping repeatedly
+// doesn't leak controllers.
+class _ConfettiBurst {
+  _ConfettiBurst(this.position, this.controller);
+  final Offset position;
+  final ConfettiController controller;
+}
+
+class _WinCelebrationDialog extends StatefulWidget {
+  const _WinCelebrationDialog({
+    required this.winners,
+    required this.maxScore,
+    required this.loc,
+    required this.colors,
+    required this.mainConfettiController,
+    required this.onBackHome,
+  });
+
+  final List<GamePlayerRef> winners;
+  final int maxScore;
+  final LocalizationProvider loc;
+  final AppSemanticColors colors;
+  final ConfettiController mainConfettiController;
+  final VoidCallback onBackHome;
+
+  @override
+  State<_WinCelebrationDialog> createState() => _WinCelebrationDialogState();
+}
+
+class _WinCelebrationDialogState extends State<_WinCelebrationDialog> {
+  final List<_ConfettiBurst> _extraBursts = [];
+
+  void _addBurst(Offset position) {
+    final controller = ConfettiController(duration: const Duration(milliseconds: 700));
+    final burst = _ConfettiBurst(position, controller);
+    setState(() => _extraBursts.add(burst));
+    controller.play();
+    Future.delayed(const Duration(milliseconds: 900), () {
+      if (!mounted) return;
+      setState(() => _extraBursts.remove(burst));
+      controller.dispose();
+    });
+  }
+
+  @override
+  void dispose() {
+    for (final burst in _extraBursts) {
+      burst.controller.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = widget.loc;
+    final colors = widget.colors;
+    final winners = widget.winners;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.translucent,
+      onTapDown: (details) => _addBurst(details.localPosition),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AlertDialog(
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(Icons.emoji_events, color: colors.accent, size: 64),
+                const SizedBox(height: 16),
+                Text(loc.translate('game_over'), style: WhistlyText.sectionHead(colors.ink)),
+                const SizedBox(height: 8),
+                Text(
+                  (winners.length > 1 ? loc.translate('stats_winners') : loc.translate('stats_winner')).toUpperCase(),
+                  style: WhistlyText.eyebrow(colors.muted),
+                ),
+                const SizedBox(height: 12),
+                ...winners.map((w) => Text(w.name, style: WhistlyText.sectionHead(colors.ink))),
+                const SizedBox(height: 8),
+                Text(
+                  '${loc.translate('score')}: ${widget.maxScore}',
+                  style: WhistlyText.mono(colors.muted, size: 15, weight: FontWeight.w800),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: WhistlyPrimaryButton(
+                    label: loc.translate('back_home'),
+                    showChevron: false,
+                    onPressed: widget.onBackHome,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          ConfettiWidget(
+            confettiController: widget.mainConfettiController,
+            blastDirectionality: BlastDirectionality.explosive,
+            shouldLoop: false,
+            colors: const [Color(0xFFFF2D4F), Color(0xFF0E0E0E), Color(0xFFF5F1EA)],
+          ),
+          for (final burst in _extraBursts)
+            Positioned(
+              left: burst.position.dx - 60,
+              top: burst.position.dy - 60,
+              child: IgnorePointer(
+                child: SizedBox(
+                  width: 120,
+                  height: 120,
+                  child: ConfettiWidget(
+                    confettiController: burst.controller,
+                    blastDirectionality: BlastDirectionality.explosive,
+                    shouldLoop: false,
+                    numberOfParticles: 12,
+                    colors: const [Color(0xFFFF2D4F), Color(0xFF0E0E0E), Color(0xFFF5F1EA)],
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
 }
