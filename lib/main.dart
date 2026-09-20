@@ -21,6 +21,7 @@ import 'package:whistly/rules_page.dart';
 import 'package:whistly/screens/active_game_page.dart';
 import 'package:whistly/screens/players_page.dart';
 import 'package:whistly/screens/history_page.dart';
+import 'package:whistly/widgets/player_grid_picker.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -226,20 +227,14 @@ class _HomePlayTab extends StatelessWidget {
     final hasEnoughPlayers = playerProvider.players.length >= 4;
     final colors = AppTheme.of(context);
 
-    // The 2x2 grid shows the active game's table when one is in progress,
-    // otherwise the top 4 players by the roster's own favourites-first
-    // sort (PlayerProvider._loadPlayers) — a reasonable "at the table"
-    // default when no game has been started yet. The two sources are
-    // different types (a game's roster is `GamePlayerRef` — id+name only,
-    // PLAN.md B4 — while the idle-state roster is a live `Player`), so both
-    // are narrowed to `_PlayerGridEntry` here rather than typing
-    // `_PlayerGrid` around either one specifically.
+    // ALTERATIONS.md B4: the grid only ever renders the CURRENT game's
+    // table now — showing the roster's first four players here (the old
+    // behaviour, when no game was active) implied a table that doesn't
+    // exist. See the "At the table" section below for the no-active-game
+    // replacement.
     final gridPlayers = hasActiveGame
-        ? activeGame.players.map((p) => _PlayerGridEntry(id: p.id, name: p.name)).toList()
-        : playerProvider.players
-            .take(4)
-            .map((p) => _PlayerGridEntry(id: p.id, name: p.name, gamesPlayed: p.gamesPlayed))
-            .toList();
+        ? activeGame.players.map((p) => PlayerGridEntry(id: p.id, name: p.name)).toList()
+        : const <PlayerGridEntry>[];
 
     return Scaffold(
       // A fixed-height column with a Spacer pushing the suit strip + primary
@@ -287,47 +282,33 @@ class _HomePlayTab extends StatelessWidget {
             ),
 
             // ─── At the table ──────────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
-              decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: Text(loc.translate('home_at_table').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
-                      ),
-                      if (hasActiveGame)
+            // ALTERATIONS.md B4: this whole section — eyebrow, grid, dealer
+            // text, bottom rule — only exists while a game is actually in
+            // progress. With no active game there is no table to show, so
+            // the section disappears entirely rather than falling back to
+            // a preview of the roster's first four players (which looked
+            // like a table that didn't exist). "+ Add player" stays
+            // reachable via the empty-state replacement below.
+            if (hasActiveGame)
+              Container(
+                padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+                decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(loc.translate('home_at_table').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+                        ),
                         Text(
                           '${loc.translate('dealer')} · ${gameProvider.currentDealer?.name ?? ''}',
                           style: WhistlyText.eyebrow(colors.muted),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 14),
-                  if (!hasEnoughPlayers) ...[
-                    Text(
-                      loc.translate('home_add_players_needed'),
-                      style: WhistlyText.body(colors.muted, size: 13),
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        WhistlyTextAction(
-                          label: loc.translate('home_quick_start'),
-                          onPressed: () => context.read<PlayerProvider>().populateDefaults(),
-                        ),
-                        const SizedBox(width: 24),
-                        WhistlyTextAction(
-                          icon: Icons.add,
-                          label: loc.translate('home_add_player_action'),
-                          onPressed: onNavigateToPlayers,
-                        ),
                       ],
                     ),
-                  ] else ...[
-                    _PlayerGrid(players: gridPlayers, activeGame: activeGame),
+                    const SizedBox(height: 14),
+                    PlayerGridPicker(players: gridPlayers, activeGame: activeGame),
                     const SizedBox(height: 12),
                     WhistlyTextAction(
                       icon: Icons.add,
@@ -335,9 +316,40 @@ class _HomePlayTab extends StatelessWidget {
                       onPressed: onNavigateToPlayers,
                     ),
                   ],
-                ],
+                ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (!hasEnoughPlayers) ...[
+                      Text(
+                        loc.translate('home_add_players_needed'),
+                        style: WhistlyText.body(colors.muted, size: 13),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+                    Row(
+                      children: [
+                        if (!hasEnoughPlayers) ...[
+                          WhistlyTextAction(
+                            label: loc.translate('home_quick_start'),
+                            onPressed: () => context.read<PlayerProvider>().populateDefaults(),
+                          ),
+                          const SizedBox(width: 24),
+                        ],
+                        WhistlyTextAction(
+                          icon: Icons.add,
+                          label: loc.translate('home_add_player_action'),
+                          onPressed: onNavigateToPlayers,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
 
             const Spacer(),
 
@@ -422,84 +434,10 @@ class _SuitStrip extends StatelessWidget {
   }
 }
 
-/// Minimal shape `_PlayerGrid` needs from either a live `Player` (idle
-/// state) or a game's `GamePlayerRef` roster (active game) — see the
-/// `gridPlayers` comment in `_HomePlayTab.build` for why these can't just
-/// be typed as one or the other. `gamesPlayed` is only meaningful (and
-/// only read) in the idle-state, no-active-game branch below.
-class _PlayerGridEntry {
-  final String id;
-  final String name;
-  final int gamesPlayed;
-  const _PlayerGridEntry({required this.id, required this.name, this.gamesPlayed = 0});
-}
-
-/// Player grid — 2x2 of `bg` cells on a `line` grid, name over record
-/// (spec §5).
-class _PlayerGrid extends StatelessWidget {
-  final List<_PlayerGridEntry> players;
-  final Game? activeGame;
-  const _PlayerGrid({required this.players, this.activeGame});
-
-  /// Fixed row height. Clears the 44px minimum tap target from spec §7 and
-  /// fits a 17px name over an 11px mono record.
-  static const double _cellHeight = 76;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppTheme.of(context);
-    final loc = context.watch<LocalizationProvider>();
-    final cells = List.generate(4, (i) => i < players.length ? players[i] : null);
-
-    // A fixed cell height, not an aspect ratio. `childAspectRatio` tied the
-    // cell height to the window width, so on a wide viewport (desktop, tablet,
-    // landscape phone) the 2x2 grid grew tall enough to push the suit strip
-    // and the primary "New game" button off the bottom of the screen — leaving
-    // no way to start a game.
-    Widget cell(_PlayerGridEntry? p) {
-      if (p == null) {
-        return Expanded(
-          child: Container(color: colors.bg, height: _cellHeight),
-        );
-      }
-      final record = activeGame != null
-      ? (activeGame!.totalScores[p.id] ?? 0)
-      : p.gamesPlayed;
-      final recordLabel = activeGame != null
-      ? (record >= 0 ? '+$record' : '$record')
-      : '$record ${loc.translate('stats_games').toUpperCase()}';
-      return Expanded(
-        child: Container(
-          color: colors.bg,
-          height: _cellHeight,
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          alignment: Alignment.centerLeft,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(p.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
-              const SizedBox(height: 2),
-              Text(recordLabel, style: WhistlyText.mono(colors.muted)),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Container(
-      color: colors.line,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(children: [cell(cells[0]), const SizedBox(width: 2), cell(cells[1])]),
-          const SizedBox(height: 2),
-          Row(children: [cell(cells[2]), const SizedBox(width: 2), cell(cells[3])]),
-        ],
-      ),
-    );
-  }
-}
+// ALTERATIONS.md B3: the player grid used to live here as a private
+// `_PlayerGrid`/`_PlayerGridEntry` pair. It's now `PlayerGridPicker`/
+// `PlayerGridEntry` in `lib/widgets/player_grid_picker.dart`, shared with
+// `RoundSetupDialog`'s declarer/partner picker.
 
 class GameSetupPage extends StatefulWidget {
   const GameSetupPage({super.key});
