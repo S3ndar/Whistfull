@@ -50,23 +50,25 @@ void main() {
     final playerProvider = PlayerProvider()..init();
     final gameProvider = GameProvider();
     final settings = ScoringSettings();
-    await gameProvider.init();
-    await settings.init();
 
-    if (startGame) {
-      final players = [
-        Player(id: 'p1', name: 'Anke'),
-        Player(id: 'p2', name: 'Bram'),
-        Player(id: 'p3', name: 'Cato'),
-        Player(id: 'p4', name: 'Dries'),
-      ];
-      // startGame writes to the real Hive box — run it outside the fake
-      // test zone, or it hangs (see test/standings_test.dart's runAsync
-      // note for the same underlying cause).
-      await tester.runAsync(() async {
+    // Real Hive I/O (init and, when starting a game, the box write) hangs
+    // if awaited directly inside the fake testWidgets zone — see
+    // test/standings_test.dart's runAsync note for the same underlying
+    // cause. Everything that touches Hive here runs inside one runAsync.
+    await tester.runAsync(() async {
+      await gameProvider.init();
+      await settings.init();
+
+      if (startGame) {
+        final players = [
+          Player(id: 'p1', name: 'Anke'),
+          Player(id: 'p2', name: 'Bram'),
+          Player(id: 'p3', name: 'Cato'),
+          Player(id: 'p4', name: 'Dries'),
+        ];
         gameProvider.startGame(players, settings: settings);
-      });
-    }
+      }
+    });
 
     await tester.pumpWidget(
       MultiProvider(
