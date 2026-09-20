@@ -74,6 +74,7 @@ class LocalizationProvider extends ChangeNotifier {
     'home_add_players_cta': 'MANAGE PLAYERS',
     'home_at_table': 'At the table',
     'home_add_player_action': 'Add player',
+    'score_progression': 'Score progression',
 
     // Game Setup
     'setup_title': 'Setup Table',
@@ -314,6 +315,7 @@ class LocalizationProvider extends ChangeNotifier {
     'home_add_players_cta': 'SPELERS BEHEREN',
     'home_at_table': 'Aan tafel',
     'home_add_player_action': 'Speler toevoegen',
+    'score_progression': 'Scoreverloop',
 
     // Game Setup
     'setup_title': 'Tafel Opstellen',

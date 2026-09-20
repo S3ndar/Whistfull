@@ -14,6 +14,7 @@ import 'package:whistly/screens/hierarchy_page.dart';
 import 'package:confetti/confetti.dart';
 import 'package:whistly/ads/ads_provider.dart';
 import 'package:whistly/ads/banner_ad_widget.dart';
+import 'package:whistly/widgets/score_chart.dart';
 
 class ActiveGamePage extends StatefulWidget {
   const ActiveGamePage({super.key});
@@ -238,6 +239,9 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                   style: WhistlyText.eyebrow(colors.onAccent),
                 ),
               ),
+
+            // ─── Score progression chart ────────────────────────────────
+            ScoreProgressionSection(game: game),
 
             // ─── Round history, newest first ────────────────────────────
             Expanded(
