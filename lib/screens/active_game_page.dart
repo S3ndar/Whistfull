@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
@@ -224,7 +225,7 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
             ),
 
             // ─── Standings list ─────────────────────────────────────────
-            _StandingsList(game: game, loc: loc, colors: colors),
+            _StandingsList(game: game, loc: loc, colors: colors, dealerId: gameProvider.currentDealer?.id),
 
             if (gameProvider.pointMultiplier > 1)
               Container(
@@ -316,27 +317,30 @@ class _StandingsList extends StatelessWidget {
   final Game game;
   final LocalizationProvider loc;
   final AppSemanticColors colors;
+  final String? dealerId;
 
-  const _StandingsList({required this.game, required this.loc, required this.colors});
+  const _StandingsList({required this.game, required this.loc, required this.colors, this.dealerId});
 
   @override
   Widget build(BuildContext context) {
-    final ranked = [...game.players]
-      ..sort((a, b) => (game.totalScores[b.id] ?? 0).compareTo(game.totalScores[a.id] ?? 0));
-    final topScore = ranked.isEmpty ? 0 : (game.totalScores[ranked.first.id] ?? 0);
+    // ALTERATIONS.md B2: fixed seating order (`game.players`, set once at
+    // startGame()) — no more re-sorting by score every rebuild, which made
+    // rows jump around as the game progressed. The leader is still found
+    // by score, just without reordering anything to do it.
+    final topScore = game.totalScores.values.isEmpty ? -1 << 31 : game.totalScores.values.reduce(max);
     // Only one player wears the Lead badge (spec: "One per screen") — a
     // multi-way tie at the top shows none, since none of them are
     // uniquely leading.
-    final soleLeaderId = ranked.where((p) => (game.totalScores[p.id] ?? 0) == topScore).length == 1
-        ? ranked.first.id
-        : null;
+    final leaders = game.players.where((p) => (game.totalScores[p.id] ?? 0) == topScore);
+    final soleLeaderId = leaders.length == 1 ? leaders.first.id : null;
 
     return Container(
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
       child: Column(
-        children: List.generate(ranked.length, (i) {
-          final player = ranked[i];
+        children: List.generate(game.players.length, (i) {
+          final player = game.players[i];
           final score = game.totalScores[player.id] ?? 0;
+          final isDealer = dealerId != null && player.id == dealerId;
           return Container(
             decoration: BoxDecoration(
               border: i == 0 ? null : Border(top: BorderSide(color: colors.line, width: 1)),
@@ -344,14 +348,16 @@ class _StandingsList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
             child: Row(
               children: [
-                SizedBox(
-                  width: 16,
-                  child: Text('${i + 1}', style: WhistlyText.mono(colors.muted, size: 12)),
-                ),
-                const SizedBox(width: 12),
                 Expanded(
                   child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
                 ),
+                // B1: Dealer marker first, then Lead — one player can hold
+                // both. The header text naming the dealer stays too; this
+                // is additional, not a replacement.
+                if (isDealer) ...[
+                  WhistlyDealerBadge(label: loc.translate('dealer')),
+                  const SizedBox(width: 6),
+                ],
                 if (player.id == soleLeaderId) ...[
                   WhistlyLeadBadge(label: loc.translate('lead')),
                   const SizedBox(width: 8),

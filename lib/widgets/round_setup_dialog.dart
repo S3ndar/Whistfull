@@ -6,6 +6,7 @@ import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/providers/game_provider.dart';
 import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/scoring_settings.dart';
+import 'package:whistly/widgets/player_grid_picker.dart';
 
 // Helper to get localized contract name
 String getContractName(LocalizationProvider loc, String key) {
@@ -376,6 +377,9 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
     );
   }
 
+  // ALTERATIONS.md B3: a 2x2 grid in seating order (same order as the
+  // standings list), sharing `PlayerGridPicker` with Home's "At the table"
+  // grid instead of this dialog's own plain list.
   Widget _playerSelector({
     required LocalizationProvider loc,
     required String label,
@@ -389,27 +393,12 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
       children: [
         Text(label.toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
         const SizedBox(height: 8),
-        Column(
-          children: widget.players.map((player) {
-            final isSelected = selected?.id == player.id;
-            final isDisabled = disabledPlayer?.id == player.id;
-            return Opacity(
-              opacity: isDisabled ? 0.35 : 1.0,
-              child: InkWell(
-                onTap: isDisabled ? null : () => onSelect(player),
-                child: Container(
-                  decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 1))),
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink))),
-                      if (isSelected) Icon(Icons.check, size: 18, color: colors.accent),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
+        PlayerGridPicker(
+          players: widget.players.map((p) => PlayerGridEntry(id: p.id, name: p.name)).toList(),
+          selectedId: selected?.id,
+          disabledId: disabledPlayer?.id,
+          showRecord: false,
+          onSelect: (entry) => onSelect(widget.players.firstWhere((p) => p.id == entry.id)),
         ),
       ],
     );

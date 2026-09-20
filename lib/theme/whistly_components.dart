@@ -268,6 +268,29 @@ class WhistlyLeadBadge extends StatelessWidget {
   }
 }
 
+/// ALTERATIONS.md B1 — the Dealer marker, visually the Lead badge's
+/// opposite: `bg` fill with a 2px `line` border and `ink` text, instead of
+/// an `accent` fill with `onAccent` text. Same size, same 9px/800
+/// uppercase, same padding — the two are meant to sit side by side on a
+/// standings row when one player holds both.
+class WhistlyDealerBadge extends StatelessWidget {
+  final String label;
+  const WhistlyDealerBadge({super.key, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppTheme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: colors.bg,
+        border: Border.all(color: colors.line, width: 2),
+      ),
+      child: Text(label.toUpperCase(), style: WhistlyText.badge(colors.ink)),
+    );
+  }
+}
+
 /// Result badge for a round row — always a 2px `ink` border; "Failed"
 /// fills with `accent`, "Achieved" is transparent (spec §5).
 class WhistlyResultBadge extends StatelessWidget {
