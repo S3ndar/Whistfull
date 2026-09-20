@@ -165,6 +165,10 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_theme_dark': 'Dark',
     'settings_theme_light': 'Light',
     'settings_theme_system': 'System',
+    'settings_slim_bonus': 'All-13 Bonus',
+    'settings_slim_bonus_desc': 'Taking all 13 tricks doubles that round\'s points (not Solo Slim, which is already the all-13 bid).',
+    'settings_on': 'ON',
+    'settings_off': 'OFF',
 
     // Settings — Support (ads / purchases)
     'settings_support': 'Support Whistly',
@@ -403,6 +407,10 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_theme_dark': 'Donker',
     'settings_theme_light': 'Licht',
     'settings_theme_system': 'Systeem',
+    'settings_slim_bonus': 'Bonus voor Alle 13',
+    'settings_slim_bonus_desc': 'Alle 13 slagen verdubbelt de punten van die ronde (niet Solo Slim, dat al het bod voor alle 13 is).',
+    'settings_on': 'AAN',
+    'settings_off': 'UIT',
 
     // Settings — Support (advertenties / aankopen)
     'settings_support': 'Steun Whistly',

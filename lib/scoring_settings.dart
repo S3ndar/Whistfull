@@ -7,12 +7,24 @@ class ScoringSettings extends ChangeNotifier {
 
   // Base points (won/lost from each opponent)
   int askAndJoinBase = 2;
-  int trull = 9;
+  // ALTERATIONS.md A2: was 9 (a 4.5x ratio to askAndJoinBase that neither
+  // published rule set supports). Confirmed with Sander: his group plays
+  // Trull at 2x the Ask & Join base — 4, not a plain team-contract value
+  // and not the old 9. A1's margin-on-failure fix applies to this
+  // regardless of the base value.
+  int trull = 4;
   int aloneBase = 2;
   int misere = 5;
   int abundanceBase = 5; // Base for 9 tricks, others are tiered
   int openMisere = 10;
   int soloSlim = 15;
+
+  // ALTERATIONS.md A3: taking all 13 tricks doubles the round's points —
+  // confirmed by both researched rule sets. Applies to Ask & Join, Trull,
+  // Solo and Abondance; never Solo Slim (already the all-13 bid, and its
+  // value *is* the bonus). A group that plays without this bonus can turn
+  // it off here.
+  bool slimBonusEnabled = true;
 
   Future<void> init() async {
     Box? box;
@@ -35,12 +47,13 @@ class ScoringSettings extends ChangeNotifier {
 
     if (box != null) {
       askAndJoinBase = box.get('askAndJoinBase', defaultValue: 2);
-      trull = box.get('trull', defaultValue: 9);
+      trull = box.get('trull', defaultValue: 4);
       aloneBase = box.get('aloneBase', defaultValue: 2);
       misere = box.get('misere', defaultValue: 5);
       abundanceBase = box.get('abundanceBase', defaultValue: 5);
       openMisere = box.get('openMisere', defaultValue: 10);
       soloSlim = box.get('soloSlim', defaultValue: 15);
+      slimBonusEnabled = box.get('slimBonusEnabled', defaultValue: true);
     }
     notifyListeners();
   }
@@ -55,6 +68,10 @@ class ScoringSettings extends ChangeNotifier {
   /// the settings in force when a game starts, so history can later show
   /// (or re-derive) figures using the settings that were actually live at
   /// the time — instead of whatever the settings happen to be today.
+  ///
+  /// ALTERATIONS.md A4: `slimBonusEnabled` is a bool but this map is
+  /// `Map<String, int>` (no Hive field change needed for that) — stored as
+  /// 0/1 and read back via `!= 0`.
   Map<String, int> toSnapshot() {
     return {
       'askAndJoinBase': askAndJoinBase,
@@ -64,6 +81,7 @@ class ScoringSettings extends ChangeNotifier {
       'abundanceBase': abundanceBase,
       'openMisere': openMisere,
       'soloSlim': soloSlim,
+      'slimBonusEnabled': slimBonusEnabled ? 1 : 0,
     };
   }
 
@@ -81,6 +99,11 @@ class ScoringSettings extends ChangeNotifier {
     s.abundanceBase = snapshot['abundanceBase'] ?? s.abundanceBase;
     s.openMisere = snapshot['openMisere'] ?? s.openMisere;
     s.soloSlim = snapshot['soloSlim'] ?? s.soloSlim;
+    // A snapshot taken before this flag existed has no key at all — treat
+    // that the same as "on" (today's default), not as 0/off, so old games
+    // don't retroactively look like they had the bonus disabled.
+    final rawSlimBonus = snapshot['slimBonusEnabled'];
+    s.slimBonusEnabled = rawSlimBonus == null ? s.slimBonusEnabled : rawSlimBonus != 0;
     return s;
   }
 
@@ -92,6 +115,7 @@ class ScoringSettings extends ChangeNotifier {
     int? abundanceBase,
     int? openMisere,
     int? soloSlim,
+    bool? slimBonusEnabled,
   }) async {
     if (askAndJoinBase != null) this.askAndJoinBase = askAndJoinBase;
     if (trull != null) this.trull = trull;
@@ -100,6 +124,7 @@ class ScoringSettings extends ChangeNotifier {
     if (abundanceBase != null) this.abundanceBase = abundanceBase;
     if (openMisere != null) this.openMisere = openMisere;
     if (soloSlim != null) this.soloSlim = soloSlim;
+    if (slimBonusEnabled != null) this.slimBonusEnabled = slimBonusEnabled;
     notifyListeners();
 
     final box = await Hive.openBox(_boxName);
@@ -110,5 +135,6 @@ class ScoringSettings extends ChangeNotifier {
     if (abundanceBase != null) await box.put('abundanceBase', abundanceBase);
     if (openMisere != null) await box.put('openMisere', openMisere);
     if (soloSlim != null) await box.put('soloSlim', soloSlim);
+    if (slimBonusEnabled != null) await box.put('slimBonusEnabled', slimBonusEnabled);
   }
 }
