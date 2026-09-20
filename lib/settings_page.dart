@@ -115,6 +115,28 @@ class SettingsPage extends StatelessWidget {
             ],
           ),
 
+          Container(
+            padding: const EdgeInsets.fromLTRB(22, 20, 22, 20),
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: colors.line, width: 2))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(loc.translate('settings_slim_bonus').toUpperCase(), style: WhistlyText.eyebrow(colors.muted)),
+                const SizedBox(height: 4),
+                Text(loc.translate('settings_slim_bonus_desc'), style: WhistlyText.body(colors.muted, size: 13)),
+                const SizedBox(height: 10),
+                WhistlyToggleRow<bool>(
+                  options: [
+                    (true, loc.translate('settings_on')),
+                    (false, loc.translate('settings_off')),
+                  ],
+                  selected: settings.slimBonusEnabled,
+                  onChanged: (val) => context.read<ScoringSettings>().updateScore(slimBonusEnabled: val),
+                ),
+              ],
+            ),
+          ),
+
           _SupportSection(),
 
           Padding(

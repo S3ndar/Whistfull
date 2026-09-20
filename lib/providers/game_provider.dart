@@ -147,16 +147,26 @@ class GameProvider extends ChangeNotifier {
         success = tricksWon >= agreedTricks;
         final base = settings.askAndJoinBase; // 2
         final escalatedBase = base + (agreedTricks - 8);
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = escalatedBase + overtricks;
+        // ALTERATIONS.md A1: the margin scales in BOTH directions — a
+        // failed contract used to discard how far short it fell (bidding
+        // 8 and taking 5 cost the same as taking 7). `.abs()` on the
+        // difference restores the missing half of the shape; `success`
+        // (via _applyTeam) still decides the sign.
+        final margin = (tricksWon - agreedTricks).abs();
+        var totalPoints = escalatedBase + margin;
+        // A3: taking all 13 tricks doubles the round, BEFORE the Rondpas
+        // multiplier below — Round.multiplier must keep meaning "Rondpas
+        // multiplier only".
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2;
         _applyTeam(deltas, declarerId, partnerId, totalPoints, success);
         break;
 
       case 'Trull':
         success = tricksWon >= agreedTricks;
-        final base = settings.trull; // 9
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = base + overtricks;
+        final base = settings.trull; // 4 (ALTERATIONS.md A2)
+        final margin = (tricksWon - agreedTricks).abs(); // A1
+        var totalPoints = base + margin;
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2; // A3
         _applyTeam(deltas, declarerId, partnerId, totalPoints, success);
         break;
 
@@ -164,8 +174,9 @@ class GameProvider extends ChangeNotifier {
         success = tricksWon >= agreedTricks;
         final base = settings.aloneBase; // 2
         final escalatedBase = base + (agreedTricks - 5);
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = escalatedBase + overtricks;
+        final margin = (tricksWon - agreedTricks).abs(); // A1
+        var totalPoints = escalatedBase + margin;
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2; // A3
         _applySolo(deltas, declarerId, totalPoints, success);
         break;
 
@@ -173,8 +184,9 @@ class GameProvider extends ChangeNotifier {
         success = tricksWon >= agreedTricks;
         final base = settings.abundanceBase; // 5
         final escalatedBase = base + (agreedTricks - 9);
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = escalatedBase + overtricks;
+        final margin = (tricksWon - agreedTricks).abs(); // A1
+        var totalPoints = escalatedBase + margin;
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2; // A3
         _applySolo(deltas, declarerId, totalPoints, success);
         break;
 

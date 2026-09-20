@@ -144,8 +144,10 @@ void main() {
     });
 
     test('Ask & Join: failure', () {
-      // Declarer: p1, Partner: p2
-      // Target: 8 tricks, Tricks won: 7. base = 2, total = 2.
+      // ALTERATIONS.md A1: a failed contract's margin now scales the score
+      // the same way an overtrick does — bid 8, took 7 (1 short) costs
+      // base(2) + margin(1) = 3, not the pre-fix 2 that discarded the
+      // shortfall entirely.
       final deltas = provider.addRound(
         contractType: 'Ask & Join',
         declarerId: 'p1',
@@ -156,14 +158,16 @@ void main() {
         settings: settings,
       );
 
-      expect(deltas['p1'], -2);
-      expect(deltas['p2'], -2);
-      expect(deltas['p3'], 2);
-      expect(deltas['p4'], 2);
+      expect(deltas['p1'], -3);
+      expect(deltas['p2'], -3);
+      expect(deltas['p3'], 3);
+      expect(deltas['p4'], 3);
     });
 
     test('Trull: success', () {
-      // Declarer: p1, Partner: p2. base = 9, overtricks = 1 (tricks: 10 vs target: 9). total = 10.
+      // ALTERATIONS.md A2: trull base is 4 (confirmed with Sander), not the
+      // old unsupported 9. base = 4, margin = 1 (tricks: 10 vs target: 9).
+      // total = 5.
       final deltas = provider.addRound(
         contractType: 'Trull',
         declarerId: 'p1',
@@ -174,10 +178,10 @@ void main() {
         settings: settings,
       );
 
-      expect(deltas['p1'], 10);
-      expect(deltas['p2'], 10);
-      expect(deltas['p3'], -10);
-      expect(deltas['p4'], -10);
+      expect(deltas['p1'], 5);
+      expect(deltas['p2'], 5);
+      expect(deltas['p3'], -5);
+      expect(deltas['p4'], -5);
     });
 
     test('Solo: success', () {
@@ -199,9 +203,10 @@ void main() {
     });
 
     test('Solo: failure with escalation', () {
-      // Declarer: p1. Target: 7, Tricks won: 6.
-      // Base: aloneBase (2) + (7 - 5) = 4.
-      // Failure: declarer loses 4 * 3 = 12. Defenders gain 4 each.
+      // Declarer: p1. Target: 7, Tricks won: 6 (1 short).
+      // ALTERATIONS.md A1: escalatedBase = aloneBase(2) + (7-5) = 4, plus
+      // the margin (1) the old formula discarded on failure = 5.
+      // Failure: declarer loses 5 * 3 = 15. Defenders gain 5 each.
       final deltas = provider.addRound(
         contractType: 'Solo',
         declarerId: 'p1',
@@ -211,10 +216,10 @@ void main() {
         settings: settings,
       );
 
-      expect(deltas['p1'], -12);
-      expect(deltas['p2'], 4);
-      expect(deltas['p3'], 4);
-      expect(deltas['p4'], 4);
+      expect(deltas['p1'], -15);
+      expect(deltas['p2'], 5);
+      expect(deltas['p3'], 5);
+      expect(deltas['p4'], 5);
     });
 
     test('Abondance: success', () {
@@ -377,6 +382,247 @@ void main() {
     });
   });
 
+  // ALTERATIONS.md A1 (undertrick margin) & A3 (all-13 slim bonus).
+  group('GameProvider ALTERATIONS.md A1/A3 — margin and slim bonus', () {
+    setUp(() async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+    });
+
+    test('1. Ask & Join bid 8, took 5 -> each defender +5, each bidder -5', () {
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 5,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -5);
+      expect(deltas['p2'], -5);
+      expect(deltas['p3'], 5);
+      expect(deltas['p4'], 5);
+    });
+
+    test('2. Ask & Join bid 8, took 7 (1 short) -> +-3', () {
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 7,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -3);
+      expect(deltas['p3'], 3);
+    });
+
+    test('3. Ask & Join bid 9, took 6 -> base 3 + 3 short = +-6 (escalation still applies)', () {
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 6,
+        agreedTricks: 9,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -6);
+      expect(deltas['p3'], 6);
+    });
+
+    test('4. Solo bid 6, took 3 -> per-opponent 3+3=6, soloist -18, each defender +6', () {
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 3,
+        agreedTricks: 6,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -18);
+      expect(deltas['p2'], 6);
+      expect(deltas['p3'], 6);
+      expect(deltas['p4'], 6);
+    });
+
+    test('5. Abondance bid 9, took 7 -> per-opponent 5+2=7, soloist -21', () {
+      final deltas = provider.addRound(
+        contractType: 'Abondance',
+        declarerId: 'p1',
+        tricksWon: 7,
+        agreedTricks: 9,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], -21);
+      expect(deltas['p2'], 7);
+      expect(deltas['p3'], 7);
+      expect(deltas['p4'], 7);
+    });
+
+    test('6. failure and success at the same margin are mirror images', () {
+      final failed = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 6,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+      provider.undoLastRound();
+      final succeeded = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 10,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(failed['p1'], -succeeded['p1']!);
+      expect(failed['p3'], -succeeded['p3']!);
+    });
+
+    test('7. every round still sums to zero', () {
+      for (final round in [
+        () => provider.addRound(
+              contractType: 'Ask & Join',
+              declarerId: 'p1',
+              partnerId: 'p2',
+              tricksWon: 5,
+              agreedTricks: 8,
+              miserieSuccess: false,
+              settings: settings,
+            ),
+        () => provider.addRound(
+              contractType: 'Trull',
+              declarerId: 'p2',
+              partnerId: 'p3',
+              tricksWon: 13,
+              agreedTricks: 8,
+              miserieSuccess: false,
+              settings: settings,
+            ),
+        () => provider.addRound(
+              contractType: 'Solo',
+              declarerId: 'p3',
+              tricksWon: 3,
+              agreedTricks: 6,
+              miserieSuccess: false,
+              settings: settings,
+            ),
+        () => provider.addRound(
+              contractType: 'Abondance',
+              declarerId: 'p4',
+              tricksWon: 13,
+              agreedTricks: 9,
+              miserieSuccess: false,
+              settings: settings,
+            ),
+      ]) {
+        final deltas = round();
+        expect(deltas.values.fold<int>(0, (a, b) => a + b), 0);
+      }
+    });
+
+    test('8. Ask & Join bid 8, took 13 -> double a 2+5=7 -> +-14 per opponent', () {
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 13,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 14);
+      expect(deltas['p2'], 14);
+      expect(deltas['p3'], -14);
+      expect(deltas['p4'], -14);
+    });
+
+    test('9. Solo bid 5, took 13 -> per-opponent (2+8)x2=20, soloist +-60', () {
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 13,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      expect(deltas['p1'], 60);
+      expect(deltas['p2'], -20);
+      expect(deltas['p3'], -20);
+      expect(deltas['p4'], -20);
+    });
+
+    test('10. Solo Slim taking 13 is not doubled', () {
+      final deltas = provider.addRound(
+        contractType: 'Solo Slim',
+        declarerId: 'p1',
+        tricksWon: 13,
+        agreedTricks: 13,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      // settings.soloSlim (15) * 3, undoubled.
+      expect(deltas['p1'], 45);
+      expect(deltas['p2'], -15);
+    });
+
+    test('11. slim + Rondpas x4 compounds to x8 total', () {
+      provider.addPassRound();
+      provider.addPassRound();
+      expect(provider.pointMultiplier, 4);
+
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 13,
+        agreedTricks: 5,
+        miserieSuccess: false,
+        settings: settings,
+      );
+
+      // Undoubled, unmultiplied per-opponent value is 10 (escalatedBase 2 +
+      // margin 8) -> x2 slim x4 Rondpas = x8 -> 80.
+      expect(deltas['p2'], -80);
+      expect(deltas['p1'], 240);
+      // Round.multiplier stores ONLY the Rondpas multiplier, never the
+      // slim bonus folded into it.
+      expect(provider.activeGame!.rounds.last.multiplier, 4);
+    });
+
+    test('12. slimBonusEnabled = false restores the undoubled value', () {
+      final settingsNoBonus = ScoringSettings()..slimBonusEnabled = false;
+      final deltas = provider.addRound(
+        contractType: 'Ask & Join',
+        declarerId: 'p1',
+        partnerId: 'p2',
+        tricksWon: 13,
+        agreedTricks: 8,
+        miserieSuccess: false,
+        settings: settingsNoBonus,
+      );
+
+      expect(deltas['p1'], 7);
+      expect(deltas['p3'], -7);
+    });
+  });
+
   group('GameProvider Undo/Delete & Recompute', () {
     setUp(() async {
       await provider.init();
@@ -466,7 +712,7 @@ void main() {
         agreedTricks: 9,
         miserieSuccess: false,
         settings: settings,
-      ); // round 1 (to be deleted): p2/p3 +10, p1/p4 -10
+      ); // round 1 (to be deleted): p2/p3 +5, p1/p4 -5 (trull base 4 + margin 1)
 
       provider.addRound(
         contractType: 'Solo',
