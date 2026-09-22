@@ -171,6 +171,26 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_on': 'ON',
     'settings_off': 'OFF',
 
+    // Stats panel (ALTERATIONS.md round 2, Part C) & Solo Slim crown (Part D)
+    'crown_solo_slim': 'Solo Slim',
+    'crown_solo_slim_desc':
+        'Played completely alone and took all 13 tricks — the rarest result in the game.',
+    'crown_round': 'Round {}',
+    'crown_in_progress': 'Current game',
+    'crown_times': '{}x',
+    'stats_section_title': 'Stats',
+    'stats_title_charts': 'Charts',
+    'stats_chart_progression': 'Score progression',
+    'stats_chart_trumps': 'Trump suits chosen',
+    'stats_chart_contract_success': 'Success rate by contract',
+    'stats_chart_accuracy': 'Bidding accuracy',
+    'stats_chart_risk': 'Risk factor',
+    'stats_table_average': 'Table average',
+    'stats_no_data': 'Not enough rounds yet',
+    'stats_untracked_trump': '{} rounds without a recorded trump',
+    'stats_miserie_note': 'A Miserie played by two counts as held only if both succeed.',
+    'stats_risk_help': 'How often this player was one of the contracting players.',
+
     // Settings — Support (ads / purchases)
     'settings_support': 'Support Whistly',
     'settings_remove_ads': 'Remove ads',
@@ -413,6 +433,26 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_slim_bonus_desc': 'Alle 13 slagen verdubbelt de punten van die ronde (niet Solo Slim, dat al het bod voor alle 13 is).',
     'settings_on': 'AAN',
     'settings_off': 'UIT',
+
+    // Statistiekenpaneel (ALTERATIONS.md ronde 2, Deel C) & Solo Slim kroon (Deel D)
+    'crown_solo_slim': 'Solo Slim',
+    'crown_solo_slim_desc':
+        'Helemaal alleen gespeeld en alle 13 slagen gehaald — het zeldzaamste resultaat in het spel.',
+    'crown_round': 'Ronde {}',
+    'crown_in_progress': 'Huidig spel',
+    'crown_times': '{}x',
+    'stats_section_title': 'Statistieken',
+    'stats_title_charts': 'Grafieken',
+    'stats_chart_progression': 'Scoreverloop',
+    'stats_chart_trumps': 'Gekozen troefkleuren',
+    'stats_chart_contract_success': 'Slaagkans per contract',
+    'stats_chart_accuracy': 'Biednauwkeurigheid',
+    'stats_chart_risk': 'Risicofactor',
+    'stats_table_average': 'Tafelgemiddelde',
+    'stats_no_data': 'Nog niet genoeg rondes',
+    'stats_untracked_trump': '{} rondes zonder geregistreerde troef',
+    'stats_miserie_note': 'Een Miserie met twee telt alleen als geslaagd wanneer beiden slagen.',
+    'stats_risk_help': 'Hoe vaak deze speler mee in het contract zat.',
 
     // Settings — Support (advertenties / aankopen)
     'settings_support': 'Steun Whistly',
