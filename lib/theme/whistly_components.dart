@@ -301,6 +301,45 @@ class WhistlyLeadBadge extends StatelessWidget {
   }
 }
 
+/// ALTERATIONS.md (round 2) D3 — the Solo Slim crown: the only mark in
+/// the app that is an achievement rather than a state, so it sits before
+/// the Dealer/Lead badges in a standings row (name · crown · Dealer ·
+/// Lead · score — achievement, then state, then rank). Purely
+/// presentational, like every other component in this file — the
+/// lookup (which player has slims, from where) and the tap popover live
+/// in `lib/stats/crown_badge.dart`, which needs `GameProvider` and
+/// navigation this file deliberately has no dependency on.
+///
+/// 16px `Icons.workspace_premium` in `colors.crown`, in a 20px-high tap
+/// target so it lines up with the other two badges' height. [count] > 1
+/// adds a 9px mono count immediately right of the glyph (already
+/// formatted by the caller, e.g. via the `crown_times` translation, so
+/// this file doesn't need to know about pluralisation rules).
+class WhistlyCrownBadge extends StatelessWidget {
+  final String? countLabel;
+  final VoidCallback? onTap;
+  const WhistlyCrownBadge({super.key, this.countLabel, this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = AppTheme.of(context);
+    final content = SizedBox(
+      height: 20,
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.workspace_premium, size: 16, color: colors.crown),
+          if (countLabel != null) ...[
+            const SizedBox(width: 2),
+            Text(countLabel!, style: WhistlyText.mono(colors.crown, size: 9)),
+          ],
+        ],
+      ),
+    );
+    return onTap == null ? content : GestureDetector(onTap: onTap, child: content);
+  }
+}
+
 /// ALTERATIONS.md B1 (round 1) / B1.2 (round 2) — the Dealer marker, the
 /// Lead badge's photographic negative: black edge, red letters, instead
 /// of a red fill with black-on-accent text. B1.2: text is `accent`, not

@@ -15,6 +15,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color onAccent; // text on an accent fill — #0E0E0E in both modes
   final Color suitRed; // hearts + diamonds, both modes
   final Color suitInk; // spades + clubs — black in light, white in dark
+  final Color crown; // Solo Slim achievement mark only (ALTERATIONS.md D2) — mode-dependent, off-palette
 
   const AppSemanticColors({
     required this.bg,
@@ -25,6 +26,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.onAccent,
     required this.suitRed,
     required this.suitInk,
+    required this.crown,
   });
 
   static const AppSemanticColors light = AppSemanticColors(
@@ -36,6 +38,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     onAccent: AppColors.onAccent,
     suitRed: AppColors.suitRed,
     suitInk: AppColors.suitInkLight,
+    crown: AppColors.crownLight,
   );
 
   static const AppSemanticColors dark = AppSemanticColors(
@@ -47,6 +50,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     onAccent: AppColors.onAccent,
     suitRed: AppColors.suitRed,
     suitInk: AppColors.suitInkDark,
+    crown: AppColors.crownDark,
   );
 
   @override
@@ -59,6 +63,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? onAccent,
     Color? suitRed,
     Color? suitInk,
+    Color? crown,
   }) {
     return AppSemanticColors(
       bg: bg ?? this.bg,
@@ -69,6 +74,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       onAccent: onAccent ?? this.onAccent,
       suitRed: suitRed ?? this.suitRed,
       suitInk: suitInk ?? this.suitInk,
+      crown: crown ?? this.crown,
     );
   }
 
@@ -84,6 +90,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       onAccent: Color.lerp(onAccent, other.onAccent, t)!,
       suitRed: Color.lerp(suitRed, other.suitRed, t)!,
       suitInk: Color.lerp(suitInk, other.suitInk, t)!,
+      crown: Color.lerp(crown, other.crown, t)!,
     );
   }
 }

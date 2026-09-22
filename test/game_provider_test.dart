@@ -867,4 +867,31 @@ void main() {
       await Hive.openBox<Game>('games_box');
     });
   });
+
+  group('GameProvider Solo Slim cache (ALTERATIONS.md round 2, D1)', () {
+    test('soloSlimsByPlayer reflects a Solo Slim entered in the still-active game, '
+        'and updates once it is undone', () async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+
+      expect(provider.soloSlimsByPlayer.containsKey('p1'), isFalse);
+
+      provider.addRound(
+        contractType: 'Solo Slim',
+        declarerId: 'p1',
+        tricksWon: 13,
+        agreedTricks: 13,
+        miserieSuccess: true,
+        settings: settings,
+      );
+
+      // The cache must not have been computed once and frozen — it has
+      // to notice the new round, since it's re-derived (not just reused)
+      // every time the underlying game/round list actually changes.
+      expect(provider.soloSlimsByPlayer['p1']?.length, 1);
+
+      provider.undoLastRound();
+      expect(provider.soloSlimsByPlayer.containsKey('p1'), isFalse);
+    });
+  });
 }

@@ -9,6 +9,7 @@ import 'package:whistly/widgets/round_setup_dialog.dart'; // For getContractName
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 import 'package:whistly/stats/stats_panel.dart';
+import 'package:whistly/stats/crown_badge.dart';
 
 class GameHistoryDetailPage extends StatelessWidget {
   final Game game;
@@ -67,6 +68,7 @@ class GameHistoryDetailPage extends StatelessWidget {
                       SizedBox(width: 16, child: Text('${i + 1}', style: WhistlyText.mono(colors.muted, size: 12))),
                       const SizedBox(width: 12),
                       Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis)),
+                      SoloSlimCrown(playerId: player.id),
                       if (player.id == soleLeaderId) ...[
                         WhistlyLeadBadge(label: loc.translate('lead')),
                         const SizedBox(width: 8),

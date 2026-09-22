@@ -5,6 +5,7 @@ import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/player.dart';
 import 'package:whistly/models/round.dart';
 import 'package:whistly/scoring_settings.dart';
+import 'package:whistly/stats/achievements.dart';
 import 'package:whistly/utils/hive_recovery.dart';
 
 class GameProvider extends ChangeNotifier {
@@ -40,6 +41,16 @@ class GameProvider extends ChangeNotifier {
 
   GamePlayerRef? get currentDealer =>
       _activeGame != null ? _activeGame!.players[_dealerIndex] : null;
+
+  // ALTERATIONS.md (round 2) D1 — Solo Slim detection walks every round
+  // of every game, so it must never run inside a build method. Cached
+  // here instead, invalidated at every place that already calls
+  // notifyListeners() because the game list or the active game changed
+  // (recomputeFromRounds, endGame, abandonGame, and the box load in
+  // init) — never inside build().
+  Map<String, List<SoloSlim>>? _slimCache;
+  Map<String, List<SoloSlim>> get soloSlimsByPlayer =>
+      _slimCache ??= soloSlims([...completedGames, ?activeGame]);
 
   /// True if the most recent attempt to persist a game to Hive failed
   /// (disk full, box mid-compaction, etc). The in-memory state the UI
@@ -99,6 +110,7 @@ class GameProvider extends ChangeNotifier {
         }
       }
     }
+    _slimCache = null;
     notifyListeners();
   }
 
@@ -130,6 +142,7 @@ class GameProvider extends ChangeNotifier {
     }
     _activeGame = null;
     _appStateBox!.delete('activeGameId');
+    _slimCache = null;
     notifyListeners();
   }
 
@@ -144,6 +157,7 @@ class GameProvider extends ChangeNotifier {
     }
     _activeGame = null;
     _appStateBox!.delete('activeGameId');
+    _slimCache = null;
     notifyListeners();
   }
 
@@ -351,6 +365,7 @@ class GameProvider extends ChangeNotifier {
     _activeGame!.pointMultiplier = 1 << exponent;
 
     _persist(_activeGame!);
+    _slimCache = null;
     notifyListeners();
   }
 
