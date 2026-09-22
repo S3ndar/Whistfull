@@ -1,13 +1,14 @@
-// ALTERATIONS.md C1 — score progression chart tests.
+// ALTERATIONS.md C1 — score progression chart tests. The old test 16
+// ("absent below 3 rounds, present at 3+") tested `ScoreProgressionSection`,
+// deleted in round 2's C5 — that guard is now `StatsPanel`'s own
+// `stats_no_data` rule, tested in test/stats/stats_panel_test.dart instead.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
 
 import 'package:whistly/models/game.dart';
 import 'package:whistly/models/game_player_ref.dart';
 import 'package:whistly/models/round.dart';
-import 'package:whistly/providers/localization_provider.dart';
-import 'package:whistly/widgets/score_chart.dart';
+import 'package:whistly/stats/score_chart.dart';
 
 void main() {
   final players = [
@@ -107,61 +108,18 @@ void main() {
     }
   });
 
-  testWidgets('16: absent below 3 rounds, present at 3+', (tester) async {
-    Future<void> pump(Game game) async {
-      await tester.pumpWidget(
-        ChangeNotifierProvider(
-          create: (_) => LocalizationProvider(),
-          child: MaterialApp(
-            home: Scaffold(body: ScoreProgressionSection(game: game)),
-          ),
-        ),
-      );
-      await tester.pumpAndSettle();
-    }
-
-    final twoRounds = gameWithRounds([
-      scoreRound({'p1': 6, 'p2': -2, 'p3': -2, 'p4': -2}),
-      scoreRound({'p1': -3, 'p2': 1, 'p3': 1, 'p4': 1}),
-    ]);
-    await pump(twoRounds);
-    expect(find.text('SCORE PROGRESSION'), findsNothing);
-
-    final threeRounds = gameWithRounds([
-      scoreRound({'p1': 6, 'p2': -2, 'p3': -2, 'p4': -2}),
-      scoreRound({'p1': -3, 'p2': 1, 'p3': 1, 'p4': 1}),
-      scoreRound({'p1': 5, 'p2': -5, 'p3': 0, 'p4': 0}),
-    ]);
-    await pump(threeRounds);
-    expect(find.text('SCORE PROGRESSION'), findsOneWidget);
-  });
-
   // Not part of ALTERATIONS.md's numbered test list, but this codebase has
   // a documented history (active_game_page.dart's Row/stretch bug) of
-  // widgets that render nothing with zero analyzer/console error — these
-  // actually trigger CustomPainter.paint() by expanding the chart, for
-  // every edge case the spec calls out, to catch exactly that failure
-  // mode rather than trusting that "it compiles" means "it paints."
-  testWidgets('expanding the chart paints without throwing — spec edge cases', (tester) async {
-    Future<void> expandAndPaint(Game game) async {
+  // widgets that render nothing with zero analyzer/console error — this
+  // actually triggers CustomPainter.paint() for every edge case the spec
+  // calls out, rather than trusting that "it compiles" means "it paints."
+  testWidgets('paints without throwing — spec edge cases', (tester) async {
+    Future<void> pumpAndDrag(Game game) async {
       await tester.pumpWidget(
-        ChangeNotifierProvider(
-          create: (_) => LocalizationProvider(),
-          child: MaterialApp(
-            // Keyed per game: without a key, two calls to expandAndPaint in
-            // one test reuse the same State object at this tree position
-            // (same widget type, same slot), so the second call would
-            // start already-expanded from the first call's tap.
-            home: Scaffold(
-              body: SingleChildScrollView(
-                child: ScoreProgressionSection(key: ValueKey(game.id), game: game),
-              ),
-            ),
-          ),
+        MaterialApp(
+          home: Scaffold(body: SingleChildScrollView(child: ScoreProgressionChart(key: ValueKey(game.id), game: game))),
         ),
       );
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('SCORE PROGRESSION'));
       await tester.pumpAndSettle();
       expect(find.byType(ScoreProgressionChart), findsOneWidget);
       // Drag across the chart to exercise the crosshair-painting path too.
@@ -171,7 +129,7 @@ void main() {
 
     // All-equal scores: flat lines must still render (a shared baseline,
     // not a divide-by-zero on a zero data range).
-    await expandAndPaint(gameWithRounds([
+    await pumpAndDrag(gameWithRounds([
       scoreRound({'p1': 0, 'p2': 0, 'p3': 0, 'p4': 0}),
       scoreRound({'p1': 0, 'p2': 0, 'p3': 0, 'p4': 0}),
       scoreRound({'p1': 0, 'p2': 0, 'p3': 0, 'p4': 0}),
@@ -195,7 +153,7 @@ void main() {
       soloGame.rounds.add(round);
       soloGame.totalScores['p1'] = (soloGame.totalScores['p1'] ?? 0) + delta;
     }
-    await expandAndPaint(soloGame);
+    await pumpAndDrag(soloGame);
   });
 
   testWidgets('a round added to the same mutated Game after a drag still repaints correctly', (tester) async {
@@ -212,18 +170,13 @@ void main() {
 
     Future<void> pumpChart() async {
       await tester.pumpWidget(
-        ChangeNotifierProvider(
-          create: (_) => LocalizationProvider(),
-          child: MaterialApp(
-            home: Scaffold(body: ScoreProgressionSection(key: ValueKey(game.id), game: game)),
-          ),
+        MaterialApp(
+          home: Scaffold(body: ScoreProgressionChart(key: ValueKey(game.id), game: game)),
         ),
       );
     }
 
     await pumpChart();
-    await tester.pumpAndSettle();
-    await tester.tap(find.text('SCORE PROGRESSION'));
     await tester.pumpAndSettle();
     // Drag once to populate the cache via a non-round-adding rebuild path.
     await tester.drag(find.byType(ScoreProgressionChart), const Offset(20, 0));

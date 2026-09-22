@@ -14,7 +14,7 @@ import 'package:whistly/screens/hierarchy_page.dart';
 import 'package:confetti/confetti.dart';
 import 'package:whistly/ads/ads_provider.dart';
 import 'package:whistly/ads/banner_ad_widget.dart';
-import 'package:whistly/widgets/score_chart.dart';
+import 'package:whistly/stats/stats_panel.dart';
 
 class ActiveGamePage extends StatefulWidget {
   const ActiveGamePage({super.key});
@@ -240,8 +240,8 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                 ),
               ),
 
-            // ─── Score progression chart ────────────────────────────────
-            ScoreProgressionSection(game: game),
+            // ─── Stats panel (ALTERATIONS.md round 2, C5) ──────────────
+            StatsPanel(scope: [game]),
 
             // ─── Round history, newest first ────────────────────────────
             Expanded(

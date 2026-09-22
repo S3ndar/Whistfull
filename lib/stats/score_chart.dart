@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:whistly/models/game.dart';
-import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 
@@ -32,46 +30,14 @@ const List<List<double>> _dashPatterns = [
   <double>[8, 3, 2, 3],
 ];
 
-/// The collapsible "Score progression" section: absent below 3 rounds (a
-/// chart with 0-2 points says nothing), otherwise collapsed by default
-/// behind a text action, with `ScoreProgressionChart` beneath once
-/// expanded.
-class ScoreProgressionSection extends StatefulWidget {
-  final Game game;
-  const ScoreProgressionSection({super.key, required this.game});
-
-  @override
-  State<ScoreProgressionSection> createState() => _ScoreProgressionSectionState();
-}
-
-class _ScoreProgressionSectionState extends State<ScoreProgressionSection> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.game.rounds.length < 3) return const SizedBox.shrink();
-    final loc = context.watch<LocalizationProvider>();
-
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 12, 22, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          WhistlyTextAction(
-            label: loc.translate('score_progression'),
-            icon: _expanded ? Icons.expand_less : Icons.expand_more,
-            onPressed: () => setState(() => _expanded = !_expanded),
-          ),
-          if (_expanded) ...[
-            const SizedBox(height: 8),
-            ScoreProgressionChart(game: widget.game),
-            const SizedBox(height: 4),
-          ],
-        ],
-      ),
-    );
-  }
-}
+// ALTERATIONS.md (round 2) C2/C5: `ScoreProgressionSection` — the
+// collapsible wrapper that used to own both the "≥3 rounds" guard and
+// the "Score progression" text-action toggle — was deleted here.
+// `StatsPanel` (lib/stats/stats_panel.dart) now owns the header/selector
+// active_game_page.dart mounts instead, and its `stats_no_data` rule
+// (driven by game_stats.dart's `contractOutcomes`, i.e. non-Pass rounds)
+// is the single guard every chart in the panel shares, replacing this
+// section's own round-count check.
 
 /// The chart itself — a `CustomPainter` line chart, not a package: the
 /// theme forbids radius/shadows/gradients that most chart packages assume.

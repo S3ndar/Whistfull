@@ -8,6 +8,8 @@ import 'package:whistly/screens/game_history_detail_page.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 import 'package:whistly/ads/banner_ad_widget.dart';
+import 'package:whistly/models/game.dart';
+import 'package:whistly/stats/stats_panel.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
@@ -50,10 +52,20 @@ class HistoryPage extends StatelessWidget {
                     )
                   : ListView.separated(
                       padding: EdgeInsets.zero,
-                      itemCount: games.length,
+                      // ALTERATIONS.md (round 2) C5, placement 3: the
+                      // "Stats" section is a leading item of THIS list,
+                      // not a separate fixed Column child above it — the
+                      // panel must scroll with the games, staying inside
+                      // the scrollable area, never between the list and
+                      // the AdaptiveBannerAd below.
+                      itemCount: games.length + (games.length >= 2 ? 1 : 0),
                       separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
                       itemBuilder: (context, index) {
-                        final game = games[index];
+                        final showStats = games.length >= 2;
+                        if (showStats && index == 0) {
+                          return _HistoryStatsSection(games: games);
+                        }
+                        final game = games[showStats ? index - 1 : index];
 
                         // Find winner(s) — highest score, ties included.
                         // Mirrors active_game_page.dart's
@@ -127,6 +139,51 @@ class HistoryPage extends StatelessWidget {
             const AdaptiveBannerAd(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// ALTERATIONS.md (round 2) C5, placement 3 — a collapsed "Stats"
+/// section pinned above the game list, hidden entirely when there are
+/// fewer than 2 completed games (a single game has nothing to compare;
+/// the game's own detail page already shows its stats via placement 2).
+/// Collapsed by default so the list of games stays the first thing on
+/// the tab.
+class _HistoryStatsSection extends StatefulWidget {
+  final List<Game> games;
+  const _HistoryStatsSection({required this.games});
+
+  @override
+  State<_HistoryStatsSection> createState() => _HistoryStatsSectionState();
+}
+
+class _HistoryStatsSectionState extends State<_HistoryStatsSection> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = context.watch<LocalizationProvider>();
+    final colors = AppTheme.of(context);
+
+    return Container(
+      color: colors.bg,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(22, 13, 22, 13),
+            child: WhistlyTextAction(
+              label: loc.translate('stats_section_title'),
+              icon: _expanded ? Icons.expand_less : Icons.expand_more,
+              onPressed: () => setState(() => _expanded = !_expanded),
+            ),
+          ),
+          // StatsPanel carries its own 22px horizontal padding — not
+          // wrapped in the Padding above, or it would double up.
+          if (_expanded) StatsPanel(scope: widget.games, allowProgression: false),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }

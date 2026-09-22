@@ -8,6 +8,7 @@ import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/widgets/round_setup_dialog.dart'; // For getContractName
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
+import 'package:whistly/stats/stats_panel.dart';
 
 class GameHistoryDetailPage extends StatelessWidget {
   final Game game;
@@ -89,6 +90,9 @@ class GameHistoryDetailPage extends StatelessWidget {
               }),
             ),
           ),
+
+          // ALTERATIONS.md (round 2) C5, placement 2.
+          StatsPanel(scope: [game]),
 
           Expanded(
             child: ListView.separated(
