@@ -41,6 +41,32 @@ class GameProvider extends ChangeNotifier {
   GamePlayerRef? get currentDealer =>
       _activeGame != null ? _activeGame!.players[_dealerIndex] : null;
 
+  /// True if the most recent attempt to persist a game to Hive failed
+  /// (disk full, box mid-compaction, etc). The in-memory state the UI
+  /// shows is always up to date regardless — this only says whether that
+  /// state has actually reached disk yet. Cleared back to false on the
+  /// next successful write.
+  bool lastSaveFailed = false;
+
+  /// `Box.put` returns a Future that can reject; every write in this
+  /// class is otherwise fire-and-forget (nothing here is async), so an
+  /// unhandled rejection would otherwise vanish — the round/game looks
+  /// saved in the UI but silently isn't on disk. This just makes sure a
+  /// failure is at least logged and observable via [lastSaveFailed]
+  /// rather than disappearing.
+  void _persist(Game game) {
+    _gamesBox!.put(game.id, game).then((_) {
+      if (lastSaveFailed) {
+        lastSaveFailed = false;
+        notifyListeners();
+      }
+    }).catchError((e) {
+      debugPrint('GameProvider: failed to persist game ${game.id}: $e');
+      lastSaveFailed = true;
+      notifyListeners();
+    });
+  }
+
   Future<void> init() async {
     try {
       _gamesBox = await Hive.openBox<Game>(_boxName);
@@ -90,7 +116,7 @@ class GameProvider extends ChangeNotifier {
       scoringSnapshot: settings.toSnapshot(),
     );
     // Explicitly add to box and mark as active
-    _gamesBox!.put(_activeGame!.id, _activeGame!);
+    _persist(_activeGame!);
     _appStateBox!.put('activeGameId', _activeGame!.id);
     notifyListeners();
   }
@@ -100,7 +126,7 @@ class GameProvider extends ChangeNotifier {
     if (_activeGame != null) {
       _activeGame!.dateEnded = DateTime.now();
       _activeGame!.isComplete = true;
-      _gamesBox!.put(_activeGame!.id, _activeGame!);
+      _persist(_activeGame!);
     }
     _activeGame = null;
     _appStateBox!.delete('activeGameId');
@@ -114,7 +140,7 @@ class GameProvider extends ChangeNotifier {
   void abandonGame() {
     if (_activeGame != null) {
       _activeGame!.dateEnded = DateTime.now();
-      _gamesBox!.put(_activeGame!.id, _activeGame!);
+      _persist(_activeGame!);
     }
     _activeGame = null;
     _appStateBox!.delete('activeGameId');
@@ -147,16 +173,26 @@ class GameProvider extends ChangeNotifier {
         success = tricksWon >= agreedTricks;
         final base = settings.askAndJoinBase; // 2
         final escalatedBase = base + (agreedTricks - 8);
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = escalatedBase + overtricks;
+        // ALTERATIONS.md A1: the margin scales in BOTH directions — a
+        // failed contract used to discard how far short it fell (bidding
+        // 8 and taking 5 cost the same as taking 7). `.abs()` on the
+        // difference restores the missing half of the shape; `success`
+        // (via _applyTeam) still decides the sign.
+        final margin = (tricksWon - agreedTricks).abs();
+        var totalPoints = escalatedBase + margin;
+        // A3: taking all 13 tricks doubles the round, BEFORE the Rondpas
+        // multiplier below — Round.multiplier must keep meaning "Rondpas
+        // multiplier only".
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2;
         _applyTeam(deltas, declarerId, partnerId, totalPoints, success);
         break;
 
       case 'Trull':
         success = tricksWon >= agreedTricks;
-        final base = settings.trull; // 9
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = base + overtricks;
+        final base = settings.trull; // 4 (ALTERATIONS.md A2)
+        final margin = (tricksWon - agreedTricks).abs(); // A1
+        var totalPoints = base + margin;
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2; // A3
         _applyTeam(deltas, declarerId, partnerId, totalPoints, success);
         break;
 
@@ -164,8 +200,9 @@ class GameProvider extends ChangeNotifier {
         success = tricksWon >= agreedTricks;
         final base = settings.aloneBase; // 2
         final escalatedBase = base + (agreedTricks - 5);
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = escalatedBase + overtricks;
+        final margin = (tricksWon - agreedTricks).abs(); // A1
+        var totalPoints = escalatedBase + margin;
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2; // A3
         _applySolo(deltas, declarerId, totalPoints, success);
         break;
 
@@ -173,8 +210,9 @@ class GameProvider extends ChangeNotifier {
         success = tricksWon >= agreedTricks;
         final base = settings.abundanceBase; // 5
         final escalatedBase = base + (agreedTricks - 9);
-        final overtricks = success ? (tricksWon - agreedTricks) : 0;
-        final totalPoints = escalatedBase + overtricks;
+        final margin = (tricksWon - agreedTricks).abs(); // A1
+        var totalPoints = escalatedBase + margin;
+        if (settings.slimBonusEnabled && tricksWon == 13) totalPoints *= 2; // A3
         _applySolo(deltas, declarerId, totalPoints, success);
         break;
 
@@ -312,7 +350,7 @@ class GameProvider extends ChangeNotifier {
     final exponent = trailingPasses > 10 ? 10 : trailingPasses;
     _activeGame!.pointMultiplier = 1 << exponent;
 
-    _gamesBox!.put(_activeGame!.id, _activeGame!);
+    _persist(_activeGame!);
     notifyListeners();
   }
 
