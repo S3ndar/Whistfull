@@ -97,21 +97,7 @@ class BarChart extends StatelessWidget {
           children: [
             Expanded(
               flex: 4,
-              child: Row(
-                children: [
-                  if (datum.glyphColor != null) ...[
-                    Text('●', style: TextStyle(color: datum.glyphColor, fontSize: 10)),
-                    const SizedBox(width: 6),
-                  ],
-                  Expanded(
-                    child: Text(
-                      datum.label,
-                      style: WhistlyText.rowTitle(labelColor).copyWith(fontSize: 13),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+              child: _rowLabel(datum, labelColor),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -200,6 +186,32 @@ class BarChart extends StatelessWidget {
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: rows);
   }
+}
+
+/// C4.1's trump chart prefixes each label with its own suit glyph
+/// (already the label's first character), coloured via [BarDatum.glyphColor]
+/// — a fixed generic dot would lose the "which suit" information the
+/// glyph carries. Every other chart has no glyphColor and renders as a
+/// plain `Text`.
+Widget _rowLabel(BarDatum datum, Color labelColor) {
+  if (datum.glyphColor == null || datum.label.isEmpty) {
+    return Text(
+      datum.label,
+      style: WhistlyText.rowTitle(labelColor).copyWith(fontSize: 13),
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+  final glyph = datum.label.substring(0, 1);
+  final rest = datum.label.substring(1);
+  return RichText(
+    overflow: TextOverflow.ellipsis,
+    text: TextSpan(
+      children: [
+        TextSpan(text: glyph, style: WhistlyText.rowTitle(datum.glyphColor!).copyWith(fontSize: 13)),
+        TextSpan(text: rest, style: WhistlyText.rowTitle(labelColor).copyWith(fontSize: 13)),
+      ],
+    ),
+  );
 }
 
 class _DashedLinePainter extends CustomPainter {
