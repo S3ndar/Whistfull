@@ -9,6 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:whistly/screens/game_history_detail_page.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
+import 'package:whistly/stats/crown_badge.dart';
 
 class PlayerStatsPage extends StatelessWidget {
   final Player player;
@@ -93,7 +94,12 @@ class PlayerStatsPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(latestPlayer.name, style: WhistlyText.sectionHead(colors.ink)),
+                  Row(
+                    children: [
+                      Text(latestPlayer.name, style: WhistlyText.sectionHead(colors.ink)),
+                      SoloSlimCrown(playerId: latestPlayer.id),
+                    ],
+                  ),
                   const SizedBox(height: 4),
                   Text(
                     (latestPlayer.isFavorite ? loc.translate('players_favorite') : 'Player').toUpperCase(),

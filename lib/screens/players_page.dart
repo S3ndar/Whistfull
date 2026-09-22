@@ -6,6 +6,7 @@ import 'package:whistly/screens/player_stats_page.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 import 'package:whistly/ads/banner_ad_widget.dart';
+import 'package:whistly/stats/crown_badge.dart';
 
 class PlayersPage extends StatelessWidget {
   const PlayersPage({super.key});
@@ -115,6 +116,7 @@ class PlayersPage extends StatelessWidget {
                             child: Row(
                               children: [
                                 Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink))),
+                                SoloSlimCrown(playerId: player.id),
                                 IconButton(
                                   icon: Icon(
                                     player.isFavorite ? Icons.star : Icons.star_border,

@@ -15,6 +15,7 @@ import 'package:confetti/confetti.dart';
 import 'package:whistly/ads/ads_provider.dart';
 import 'package:whistly/ads/banner_ad_widget.dart';
 import 'package:whistly/stats/stats_panel.dart';
+import 'package:whistly/stats/crown_badge.dart';
 
 class ActiveGamePage extends StatefulWidget {
   const ActiveGamePage({super.key});
@@ -355,6 +356,12 @@ class _StandingsList extends StatelessWidget {
                 Expanded(
                   child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
                 ),
+                // D3: crown first (achievement), then Dealer/Lead
+                // (state, then rank) — name · crown · Dealer · Lead ·
+                // score. SoloSlimCrown owns its own trailing gap and
+                // renders nothing (no gap either) for a player with no
+                // slim.
+                SoloSlimCrown(playerId: player.id),
                 // B1: Dealer marker first, then Lead — one player can hold
                 // both. The header text naming the dealer stays too; this
                 // is additional, not a replacement.

@@ -172,6 +172,7 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_off': 'OFF',
 
     // Stats panel (ALTERATIONS.md round 2, Part C) & Solo Slim crown (Part D)
+    'close': 'Close',
     'crown_solo_slim': 'Solo Slim',
     'crown_solo_slim_desc':
         'Played completely alone and took all 13 tricks — the rarest result in the game.',
@@ -435,6 +436,7 @@ class LocalizationProvider extends ChangeNotifier {
     'settings_off': 'UIT',
 
     // Statistiekenpaneel (ALTERATIONS.md ronde 2, Deel C) & Solo Slim kroon (Deel D)
+    'close': 'Sluiten',
     'crown_solo_slim': 'Solo Slim',
     'crown_solo_slim_desc':
         'Helemaal alleen gespeeld en alle 13 slagen gehaald — het zeldzaamste resultaat in het spel.',
