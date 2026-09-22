@@ -23,6 +23,7 @@ import 'package:whistly/providers/player_provider.dart';
 import 'package:whistly/providers/theme_provider.dart';
 import 'package:whistly/scoring_settings.dart';
 import 'package:whistly/screens/active_game_page.dart';
+import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 
 void main() {
@@ -190,5 +191,47 @@ void main() {
     for (final digit in ['1', '2', '3', '4']) {
       expect(find.text(digit), findsNothing);
     }
+  });
+
+  // ALTERATIONS.md round 2, B1.1/B1.2 — driven directly against the badge
+  // widgets rather than the full app, since both are about the badges'
+  // own geometry/colour, not their placement on the standings row (which
+  // tests 1-5 above already cover).
+  Widget wrapBadge(Widget child) => MaterialApp(
+        theme: ThemeData(extensions: const [AppSemanticColors.light]),
+        home: Scaffold(body: Center(child: child)),
+      );
+
+  testWidgets('6: the Dealer badge renders accent text on a line-bordered bg fill', (tester) async {
+    await tester.pumpWidget(wrapBadge(const WhistlyDealerBadge(label: 'Dealer')));
+
+    final textWidget = tester.widget<Text>(find.text('DEALER'));
+    expect(textWidget.style!.color, AppSemanticColors.light.accent);
+
+    final container = tester.widget<Container>(find.byType(Container).first);
+    final decoration = container.decoration as BoxDecoration;
+    expect(decoration.color, AppSemanticColors.light.bg);
+    expect(decoration.border!.top.color, AppSemanticColors.light.line);
+    expect(decoration.border!.top.width, 2);
+  });
+
+  testWidgets('7: the Dealer and Lead badges render at identical height', (tester) async {
+    await tester.pumpWidget(wrapBadge(
+      const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          WhistlyDealerBadge(label: 'Dealer'),
+          SizedBox(width: 6),
+          WhistlyLeadBadge(label: 'Lead'),
+        ],
+      ),
+    ));
+
+    final dealerSize = tester.getSize(find.byType(WhistlyDealerBadge));
+    final leadSize = tester.getSize(find.byType(WhistlyLeadBadge));
+    expect(dealerSize.height, leadSize.height);
+    // Widths are expected to differ ("DEALER" vs "LEAD") — B1.1 explicitly
+    // forbids forcing them equal.
+    expect(dealerSize.width, isNot(leadSize.width));
   });
 }

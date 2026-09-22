@@ -253,6 +253,41 @@ class WhistlyTextAction extends StatelessWidget {
 
 /// Lead badge — `accent` fill, `onAccent` text, 9px uppercase, 4/8 padding.
 /// One per screen (spec §5).
+/// ALTERATIONS.md (round 2) B1.1 — shared geometry for the two standings
+/// badges. Both always carry a 2px border so their outer box is
+/// identical; the Lead badge's border is its own fill colour, so it looks
+/// exactly as it did before this change. Inset is 6px + 2px border = the
+/// 8px the Lead badge has always had, so nothing else on the row moves.
+/// Width is deliberately left to the label's own length ("DEALER" vs
+/// "LEAD") — do not force a fixed/min width to equalise them; only the
+/// height is locked.
+class _WhistlyBadge extends StatelessWidget {
+  final String label;
+  final Color fill;
+  final Color border;
+  final Color text;
+  const _WhistlyBadge({
+    required this.label,
+    required this.fill,
+    required this.border,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 20, // locked: the two badges are always the same height
+      alignment: Alignment.center,
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      decoration: BoxDecoration(
+        color: fill,
+        border: Border.all(color: border, width: 2),
+      ),
+      child: Text(label.toUpperCase(), style: WhistlyText.badge(text)),
+    );
+  }
+}
+
 class WhistlyLeadBadge extends StatelessWidget {
   final String label;
   const WhistlyLeadBadge({super.key, required this.label});
@@ -260,19 +295,20 @@ class WhistlyLeadBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      color: colors.accent,
-      child: Text(label.toUpperCase(), style: WhistlyText.badge(colors.onAccent)),
-    );
+    // Border == fill, so it's invisible against itself — this badge reads
+    // exactly as it did before B1.1's shared geometry.
+    return _WhistlyBadge(label: label, fill: colors.accent, border: colors.accent, text: colors.onAccent);
   }
 }
 
-/// ALTERATIONS.md B1 — the Dealer marker, visually the Lead badge's
-/// opposite: `bg` fill with a 2px `line` border and `ink` text, instead of
-/// an `accent` fill with `onAccent` text. Same size, same 9px/800
-/// uppercase, same padding — the two are meant to sit side by side on a
-/// standings row when one player holds both.
+/// ALTERATIONS.md B1 (round 1) / B1.2 (round 2) — the Dealer marker, the
+/// Lead badge's photographic negative: black edge, red letters, instead
+/// of a red fill with black-on-accent text. B1.2: text is `accent`, not
+/// `ink` — this is the badge's whole "negative" concept, and rendering it
+/// in `ink` silently un-inverted it. This adds a second `accent`
+/// occurrence to the standings region, but the theme spec's "one accent
+/// gesture per region" rule counts accent *fills*, not text — see
+/// whistly-theme-spec.md §5.
 class WhistlyDealerBadge extends StatelessWidget {
   final String label;
   const WhistlyDealerBadge({super.key, required this.label});
@@ -280,14 +316,7 @@ class WhistlyDealerBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: colors.bg,
-        border: Border.all(color: colors.line, width: 2),
-      ),
-      child: Text(label.toUpperCase(), style: WhistlyText.badge(colors.ink)),
-    );
+    return _WhistlyBadge(label: label, fill: colors.bg, border: colors.line, text: colors.accent);
   }
 }
 
@@ -492,15 +521,23 @@ class WhistlyLogoLockup extends StatelessWidget {
       children: [
         WhistlyLogoMark(size: markSize),
         const SizedBox(width: 18),
-        Text(
-          'Whistly',
-          style: TextStyle(
-            fontFamily: 'Archivo',
-            fontSize: 42,
-            fontWeight: FontWeight.w800,
-            fontVariations: WhistlyText._w800,
-            letterSpacing: -0.03 * 42,
-            color: colors.ink,
+        // Flexible, not a bare Text: on the narrowest phones (~320px wide)
+        // the mark + 42px wordmark don't both fit at natural size —
+        // without this the Row overflows instead of the wordmark
+        // shrinking/ellipsizing (ALTERATIONS.md round 2, B5's test 5).
+        Flexible(
+          child: Text(
+            'Whistly',
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            style: TextStyle(
+              fontFamily: 'Archivo',
+              fontSize: 42,
+              fontWeight: FontWeight.w800,
+              fontVariations: WhistlyText._w800,
+              letterSpacing: -0.03 * 42,
+              color: colors.ink,
+            ),
           ),
         ),
       ],
