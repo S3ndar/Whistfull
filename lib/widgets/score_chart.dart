@@ -93,11 +93,28 @@ class ScoreProgressionChart extends StatefulWidget {
 class _ScoreProgressionChartState extends State<ScoreProgressionChart> {
   double? _dragDx;
 
+  // `cumulativeSeries` is O(rounds x players) — cheap for one build, but
+  // build() also reruns on every onHorizontalDragUpdate frame (just to
+  // move the crosshair), and `widget.game` is the same mutable Game
+  // instance across those rebuilds (GameProvider mutates it in place), so
+  // identity checks on `widget.game` can't tell "a round was added" apart
+  // from "the drag moved." Caching on `rounds.length` can, and is the
+  // cheapest signal that's actually correct: a real round changes it, a
+  // drag frame never does.
+  List<List<int>>? _cachedSeries;
+  int _cachedRoundCount = -1;
+  String? _cachedGameId;
+
   @override
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
     final game = widget.game;
-    final series = cumulativeSeries(game);
+    if (_cachedSeries == null || _cachedRoundCount != game.rounds.length || _cachedGameId != game.id) {
+      _cachedSeries = cumulativeSeries(game);
+      _cachedRoundCount = game.rounds.length;
+      _cachedGameId = game.id;
+    }
+    final series = _cachedSeries!;
     final players = game.players;
 
     String? accentId = widget.accentPlayerId;
