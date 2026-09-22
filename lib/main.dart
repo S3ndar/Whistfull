@@ -212,7 +212,7 @@ class _MainNavigationWrapperState extends State<MainNavigationWrapper> {
 /// Home — per spec §6: brand block (logo mark, wordmark, tagline eyebrow)
 /// with a 2px bottom rule; "At the table" section (eyebrow left, dealer
 /// name right when a game is active; 2x2 player grid; + Add player) with
-/// a 2px bottom rule; flex spacer; suit strip + primary button; tab bar.
+/// a 2px bottom rule; flex spacer; primary button; tab bar.
 class _HomePlayTab extends StatelessWidget {
   final VoidCallback onNavigateToPlayers;
   const _HomePlayTab({required this.onNavigateToPlayers});
@@ -331,15 +331,21 @@ class _HomePlayTab extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                     ],
-                    Row(
+                    // Wrap, not Row: on the narrowest phones (~320px wide)
+                    // "Quick Start" + "+ Add player" don't both fit on one
+                    // line — Wrap drops the second action to its own line
+                    // there instead of overflowing (ALTERATIONS.md round 2,
+                    // B5's test 5); at any normal width both still render
+                    // side by side exactly as before.
+                    Wrap(
+                      spacing: 24,
+                      runSpacing: 8,
                       children: [
-                        if (!hasEnoughPlayers) ...[
+                        if (!hasEnoughPlayers)
                           WhistlyTextAction(
                             label: loc.translate('home_quick_start'),
                             onPressed: () => context.read<PlayerProvider>().populateDefaults(),
                           ),
-                          const SizedBox(width: 24),
-                        ],
                         WhistlyTextAction(
                           icon: Icons.add,
                           label: loc.translate('home_add_player_action'),
@@ -353,12 +359,13 @@ class _HomePlayTab extends StatelessWidget {
 
             const Spacer(),
 
-            // ─── Suit strip + primary button ───────────────────────────
-            Padding(
-              padding: const EdgeInsets.fromLTRB(22, 0, 22, 0),
-              child: const _SuitStrip(),
-            ),
-            const SizedBox(height: 12),
+            // ─── Primary button ─────────────────────────────────────────
+            // ALTERATIONS.md round 2, B5: the decorative suit strip that
+            // used to sit here carried no information — just four glyphs
+            // showing a deck has four suits — and cost 56px + 12px on the
+            // one screen that had already overflowed once. Real suit
+            // information now lives in the stats panel's trump histogram
+            // (C4.1).
             if (hasActiveGame)
               WhistlyPrimaryButton(
                 label: loc.translate('continue_game'),
@@ -397,42 +404,10 @@ class _HomePlayTab extends StatelessWidget {
   }
 }
 
-/// Suit strip — four equal cells, `line`-colored 2px-gap grid, each `bg`
-/// filled with its suit glyph in suit color (spec §5). Decorative on Home.
-class _SuitStrip extends StatelessWidget {
-  const _SuitStrip();
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = AppTheme.of(context);
-    const suits = [
-      ('♠', false),
-      ('♥', true),
-      ('♦', true),
-      ('♣', false),
-    ];
-    return Container(
-      color: colors.line,
-      child: Row(
-        children: List.generate(suits.length, (i) {
-          final (glyph, isRed) = suits[i];
-          return Expanded(
-            child: Container(
-              margin: EdgeInsets.only(left: i == 0 ? 0 : 2),
-              color: colors.bg,
-              height: 56,
-              alignment: Alignment.center,
-              child: Text(
-                glyph,
-                style: TextStyle(fontSize: 24, color: isRed ? colors.suitRed : colors.suitInk),
-              ),
-            ),
-          );
-        }),
-      ),
-    );
-  }
-}
+// ALTERATIONS.md round 2, B5: `_SuitStrip` — a purely decorative row of
+// four suit glyphs above the primary button — was deleted here, along
+// with the Padding that hosted it. See the Spacer/primary-button comment
+// above for why.
 
 // ALTERATIONS.md B3: the player grid used to live here as a private
 // `_PlayerGrid`/`_PlayerGridEntry` pair. It's now `PlayerGridPicker`/
