@@ -832,4 +832,39 @@ void main() {
       expect(reloaded.players.map((p) => p.id).toList(), players.map((p) => p.id).toList());
     });
   });
+
+  group('GameProvider Hive write safety', () {
+    test('a failed persist is caught, flagged via lastSaveFailed, and does not throw', () async {
+      await provider.init();
+      provider.startGame(players, settings: settings);
+      await Future.delayed(Duration.zero); // let startGame's persist settle
+      expect(provider.lastSaveFailed, isFalse);
+
+      // Simulate a real-world write failure (disk full, box mid-
+      // compaction, etc) by closing the underlying box out from under
+      // the provider — the next write must reject.
+      await Hive.box<Game>('games_box').close();
+
+      // addRound is otherwise synchronous and must not throw even though
+      // its fire-and-forget persist will reject.
+      final deltas = provider.addRound(
+        contractType: 'Solo',
+        declarerId: 'p1',
+        tricksWon: 8,
+        agreedTricks: 5,
+        miserieSuccess: true,
+        settings: settings,
+      );
+      // In-memory state is unaffected by the write failure — only
+      // whether it reached disk is in question.
+      expect(deltas['p1'], isNotNull);
+      expect(provider.activeGame!.rounds.length, 1);
+
+      await Future.delayed(Duration.zero); // let the rejected Future settle
+      expect(provider.lastSaveFailed, isTrue);
+
+      // Reopen the box so tearDown's Hive.close() doesn't itself throw.
+      await Hive.openBox<Game>('games_box');
+    });
+  });
 }

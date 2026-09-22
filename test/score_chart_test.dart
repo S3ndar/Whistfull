@@ -197,4 +197,50 @@ void main() {
     }
     await expandAndPaint(soloGame);
   });
+
+  testWidgets('a round added to the same mutated Game after a drag still repaints correctly', (tester) async {
+    // Regression test for the chart's cache invalidation: the chart caches
+    // its cumulativeSeries() result keyed on (game.id, rounds.length) so a
+    // drag frame doesn't recompute it, but GameProvider mutates the SAME
+    // Game instance in place when a round is added rather than replacing
+    // it — the cache must still notice, not keep serving stale data.
+    final game = gameWithRounds([
+      scoreRound({'p1': 1, 'p2': -1, 'p3': 0, 'p4': 0}),
+      scoreRound({'p1': 1, 'p2': -1, 'p3': 0, 'p4': 0}),
+      scoreRound({'p1': 1, 'p2': -1, 'p3': 0, 'p4': 0}),
+    ]);
+
+    Future<void> pumpChart() async {
+      await tester.pumpWidget(
+        ChangeNotifierProvider(
+          create: (_) => LocalizationProvider(),
+          child: MaterialApp(
+            home: Scaffold(body: ScoreProgressionSection(key: ValueKey(game.id), game: game)),
+          ),
+        ),
+      );
+    }
+
+    await pumpChart();
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('SCORE PROGRESSION'));
+    await tester.pumpAndSettle();
+    // Drag once to populate the cache via a non-round-adding rebuild path.
+    await tester.drag(find.byType(ScoreProgressionChart), const Offset(20, 0));
+    await tester.pumpAndSettle();
+
+    // Mutate the SAME Game instance in place, the way GameProvider does —
+    // a new round appended, not a new Game object.
+    final newRound = scoreRound({'p1': 50, 'p2': -50, 'p3': 0, 'p4': 0});
+    game.rounds.add(newRound);
+    newRound.scoreDeltas.forEach((id, delta) {
+      game.totalScores[id] = (game.totalScores[id] ?? 0) + delta;
+    });
+    expect(cumulativeSeries(game)[0].last, 53);
+
+    await pumpChart();
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(ScoreProgressionChart), findsOneWidget);
+  });
 }
