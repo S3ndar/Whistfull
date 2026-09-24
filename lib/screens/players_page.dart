@@ -115,8 +115,16 @@ class PlayersPage extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
                             child: Row(
                               children: [
-                                Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink))),
-                                SoloSlimCrown(playerId: player.id),
+                                Expanded(
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+                                      ),
+                                      SoloSlimCrown(playerId: player.id),
+                                    ],
+                                  ),
+                                ),
                                 IconButton(
                                   icon: Icon(
                                     player.isFavorite ? Icons.star : Icons.star_border,

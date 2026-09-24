@@ -12,9 +12,15 @@ import 'package:whistly/theme/whistly_components.dart';
 /// ALTERATIONS.md (round 2) D3 — wires `WhistlyCrownBadge` (the pure
 /// glyph, in whistly_components.dart) to `GameProvider.soloSlimsByPlayer`
 /// and the tap popover. Renders nothing for a player with no slim.
-/// Wherever a player's name is listed: active_game_page.dart's
-/// standings, game_history_detail_page.dart's final scores,
-/// players_page.dart's roster, player_stats_page.dart's header.
+///
+/// Meant to sit as a suffix directly after the player's name (inside the
+/// same `Row`/`Flexible` as their name `Text`, not as a separate badge
+/// grouped with Dealer/Lead over by the score) — a leading gap separates
+/// it from the name; there's deliberately no trailing gap, since nothing
+/// else is meant to follow it in that slot. Used wherever a player's
+/// name is listed: active_game_page.dart's standings,
+/// game_history_detail_page.dart's final scores, players_page.dart's
+/// roster, player_stats_page.dart's header.
 class SoloSlimCrown extends StatelessWidget {
   final String playerId;
   const SoloSlimCrown({super.key, required this.playerId});
@@ -26,18 +32,14 @@ class SoloSlimCrown extends StatelessWidget {
     if (slims == null || slims.isEmpty) return const SizedBox.shrink();
     final loc = context.watch<LocalizationProvider>();
 
-    // The trailing gap lives here, not at each call site, since whether
-    // there's a crown at all is only known once soloSlimsByPlayer has
-    // been looked up — a caller can't conditionally add its own gap
-    // without duplicating that lookup.
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        const SizedBox(width: 6),
         WhistlyCrownBadge(
           countLabel: slims.length > 1 ? loc.translate('crown_times').replaceFirst('{}', '${slims.length}') : null,
           onTap: () => _showPopover(context, loc, slims, gameProvider),
         ),
-        const SizedBox(width: 6),
       ],
     );
   }

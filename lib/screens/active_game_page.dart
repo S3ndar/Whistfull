@@ -353,15 +353,21 @@ class _StandingsList extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
             child: Row(
               children: [
+                // D3 (revised): the crown is a suffix on the player's own
+                // name — not a floating badge grouped with Dealer/Lead
+                // next to the score — so it reads as part of "who this
+                // is," not as another state marker.
                 Expanded(
-                  child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+                      ),
+                      SoloSlimCrown(playerId: player.id),
+                    ],
+                  ),
                 ),
-                // D3: crown first (achievement), then Dealer/Lead
-                // (state, then rank) — name · crown · Dealer · Lead ·
-                // score. SoloSlimCrown owns its own trailing gap and
-                // renders nothing (no gap either) for a player with no
-                // slim.
-                SoloSlimCrown(playerId: player.id),
+                const SizedBox(width: 6),
                 // B1: Dealer marker first, then Lead — one player can hold
                 // both. The header text naming the dealer stays too; this
                 // is additional, not a replacement.

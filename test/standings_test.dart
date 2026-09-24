@@ -202,7 +202,7 @@ void main() {
         home: Scaffold(body: Center(child: child)),
       );
 
-  testWidgets('6: the Dealer badge renders accent text on a line-bordered bg fill', (tester) async {
+  testWidgets('6: the Dealer badge renders accent text on an accent-bordered bg fill', (tester) async {
     await tester.pumpWidget(wrapBadge(const WhistlyDealerBadge(label: 'Dealer')));
 
     final textWidget = tester.widget<Text>(find.text('DEALER'));
@@ -211,7 +211,7 @@ void main() {
     final container = tester.widget<Container>(find.byType(Container).first);
     final decoration = container.decoration as BoxDecoration;
     expect(decoration.color, AppSemanticColors.light.bg);
-    expect(decoration.border!.top.color, AppSemanticColors.light.line);
+    expect(decoration.border!.top.color, AppSemanticColors.light.accent);
     expect(decoration.border!.top.width, 2);
   });
 
