@@ -340,14 +340,15 @@ class WhistlyCrownBadge extends StatelessWidget {
   }
 }
 
-/// ALTERATIONS.md B1 (round 1) / B1.2 (round 2) — the Dealer marker, the
-/// Lead badge's photographic negative: black edge, red letters, instead
-/// of a red fill with black-on-accent text. B1.2: text is `accent`, not
-/// `ink` — this is the badge's whole "negative" concept, and rendering it
-/// in `ink` silently un-inverted it. This adds a second `accent`
-/// occurrence to the standings region, but the theme spec's "one accent
-/// gesture per region" rule counts accent *fills*, not text — see
-/// whistly-theme-spec.md §5.
+/// ALTERATIONS.md B1 (round 1) / B1.2 (round 2, then a follow-up) — the
+/// Dealer marker, the Lead badge's photographic negative: `bg` fill with
+/// red edge and red letters, instead of a red fill with black-on-accent
+/// text. Border and text are both `accent` (not `line`/`ink`) — a
+/// `line`-only border read as a plain neutral outline rather than the
+/// Lead badge's inverse, so the edge was changed to match the text.
+/// This adds a second `accent` occurrence to the standings region, but
+/// the theme spec's "one accent gesture per region" rule counts accent
+/// *fills*, not borders/text — see whistly-theme-spec.md §5.
 class WhistlyDealerBadge extends StatelessWidget {
   final String label;
   const WhistlyDealerBadge({super.key, required this.label});
@@ -355,7 +356,7 @@ class WhistlyDealerBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
-    return _WhistlyBadge(label: label, fill: colors.bg, border: colors.line, text: colors.accent);
+    return _WhistlyBadge(label: label, fill: colors.bg, border: colors.accent, text: colors.accent);
   }
 }
 

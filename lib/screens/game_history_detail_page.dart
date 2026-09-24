@@ -67,8 +67,17 @@ class GameHistoryDetailPage extends StatelessWidget {
                     children: [
                       SizedBox(width: 16, child: Text('${i + 1}', style: WhistlyText.mono(colors.muted, size: 12))),
                       const SizedBox(width: 12),
-                      Expanded(child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis)),
-                      SoloSlimCrown(playerId: player.id),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
+                            ),
+                            SoloSlimCrown(playerId: player.id),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 6),
                       if (player.id == soleLeaderId) ...[
                         WhistlyLeadBadge(label: loc.translate('lead')),
                         const SizedBox(width: 8),
@@ -93,11 +102,11 @@ class GameHistoryDetailPage extends StatelessWidget {
             ),
           ),
 
-          // ALTERATIONS.md (round 2) C5, placement 2.
-          StatsPanel(scope: [game]),
-
-          Expanded(
-            child: ListView.separated(
+          // ALTERATIONS.md (round 2) C5, placement 2; covers the round
+          // list below whenever a chart is selected instead of "Rounds".
+          StatsPanel(
+            scope: [game],
+            roundsView: ListView.separated(
               padding: EdgeInsets.zero,
               itemCount: game.rounds.length,
               separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),

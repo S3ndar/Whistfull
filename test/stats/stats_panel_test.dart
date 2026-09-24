@@ -49,6 +49,14 @@ void main() {
         child: MaterialApp(home: Scaffold(body: SingleChildScrollView(child: child))),
       );
 
+  // roundsView makes StatsPanel return an Expanded as its own build
+  // output (see stats_panel.dart), so it needs a Column ancestor to sit
+  // in, not a SingleChildScrollView.
+  Widget wrapWithRounds(Widget child) => ChangeNotifierProvider(
+        create: (_) => LocalizationProvider(),
+        child: MaterialApp(home: Scaffold(body: Column(children: [child]))),
+      );
+
   final threeRoundGame = buildGame('g1', [
     soloRound(success: true),
     soloRound(success: false, declarerId: 'p2'),
@@ -113,5 +121,77 @@ void main() {
     expect(find.text('Not enough rounds yet'), findsOneWidget);
     // No selector when there's nothing to select between.
     expect(find.text('Score progression'), findsNothing);
+  });
+
+  testWidgets('18: with roundsView, Rounds is selected by default and the round list shows', (tester) async {
+    await tester.pumpWidget(wrapWithRounds(StatsPanel(
+      scope: [threeRoundGame],
+      roundsView: const Text('THE ROUND LIST'),
+    )));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Rounds'), findsOneWidget);
+    expect(find.text('THE ROUND LIST'), findsOneWidget);
+    // The renamed header — no more "Charts".
+    expect(find.text('VIEW'), findsOneWidget);
+    expect(find.text('CHARTS'), findsNothing);
+  });
+
+  testWidgets('19: selecting a chart covers the round list; selecting Rounds again restores it', (tester) async {
+    await tester.pumpWidget(wrapWithRounds(StatsPanel(
+      scope: [threeRoundGame],
+      roundsView: const Text('THE ROUND LIST'),
+    )));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Rounds'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Score progression'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('THE ROUND LIST'), findsNothing);
+    expect(find.text('Score progression'), findsOneWidget);
+
+    await tester.tap(find.text('Score progression'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Rounds'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('THE ROUND LIST'), findsOneWidget);
+  });
+
+  testWidgets('20: with roundsView, Rounds is always available even with fewer than 3 eligible rounds', (tester) async {
+    final twoRoundGame = buildGame('g3', [
+      soloRound(success: true),
+      soloRound(success: false, declarerId: 'p2'),
+    ]);
+    await tester.pumpWidget(wrapWithRounds(StatsPanel(
+      scope: [twoRoundGame],
+      roundsView: const Text('THE ROUND LIST'),
+    )));
+    await tester.pumpAndSettle();
+
+    expect(find.text('THE ROUND LIST'), findsOneWidget);
+    expect(find.text('Rounds'), findsOneWidget);
+
+    // Charts are still offered in the selector — picking one just shows
+    // stats_no_data instead of the chart, same as the roundsView == null
+    // case in test 17.
+    await tester.tap(find.text('Rounds'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Score progression'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('THE ROUND LIST'), findsNothing);
+    expect(find.text('Not enough rounds yet'), findsOneWidget);
+  });
+
+  testWidgets('21: without roundsView, behavior and header label are unchanged', (tester) async {
+    await tester.pumpWidget(wrap(StatsPanel(scope: [threeRoundGame])));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Score progression'), findsOneWidget);
+    expect(find.text('Rounds'), findsNothing);
+    expect(find.text('VIEW'), findsOneWidget);
   });
 }
