@@ -241,12 +241,12 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                 ),
               ),
 
-            // ─── Stats panel (ALTERATIONS.md round 2, C5) ──────────────
-            StatsPanel(scope: [game]),
-
-            // ─── Round history, newest first ────────────────────────────
-            Expanded(
-              child: game.rounds.isEmpty
+            // ─── Stats panel (ALTERATIONS.md round 2, C5); covers the
+            // round list below whenever a chart is selected instead of
+            // "Rounds" — see roundsView: on StatsPanel. ──────────────
+            StatsPanel(
+              scope: [game],
+              roundsView: game.rounds.isEmpty
                   ? Center(
                       child: Text(
                         loc.translate('active_game_no_rounds'),

@@ -102,11 +102,11 @@ class GameHistoryDetailPage extends StatelessWidget {
             ),
           ),
 
-          // ALTERATIONS.md (round 2) C5, placement 2.
-          StatsPanel(scope: [game]),
-
-          Expanded(
-            child: ListView.separated(
+          // ALTERATIONS.md (round 2) C5, placement 2; covers the round
+          // list below whenever a chart is selected instead of "Rounds".
+          StatsPanel(
+            scope: [game],
+            roundsView: ListView.separated(
               padding: EdgeInsets.zero,
               itemCount: game.rounds.length,
               separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
