@@ -139,36 +139,39 @@ flutter:
 
 # Config for flutter_launcher_icons (dev dependency). Regenerate with:
 #   dart run flutter_launcher_icons
-# `app_icon.png`/`app_icon_foreground.png` reproduce WhistlyLogoMark (the
-# 2x2 suit-card mark shown on the Home screen — lib/theme/whistly_components.dart)
-# as static exports, since a launcher icon can't be a live Flutter widget.
-# The foreground is the same mark at 70% scale on a transparent canvas, so
-# it sits inside Android's adaptive-icon safe zone under every mask shape;
-# its own ink fill matches `adaptive_icon_background` exactly so the seam
-# between the two layers is invisible. Regenerate both from
-# WhistlyLogoMark's own source if that widget's design ever changes —
-# they were rendered by hand to match it, not derived automatically.
+# ALTERATIONS.md (round 2) G — the three files below are the finished
+# artwork (do not redraw/rescale/recentre them — see G2's own note on
+# why the outer frame is gone and why 66%/78% are the scales that
+# survive Android's circular mask without clipping the suits):
+#   app_icon_adaptive_fg.png    — Android adaptive foreground, transparent,
+#                                 mark at 66%, the centre cross bleeding to
+#                                 the canvas edge.
+#   app_icon_ios.png            — iOS + legacy Android, opaque cream
+#                                 #F5F1EA, no alpha channel, mark at 78%.
+#   app_icon_monochrome.png     — Android 13+ themed icon, single-colour
+#                                 silhouette.
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/app_icon.png"
+  image_path: "assets/app_icon_ios.png"
   min_sdk_android: 23
   remove_alpha_ios: true
-  adaptive_icon_background: "#0E0E0E"
-  adaptive_icon_foreground: "assets/app_icon_foreground.png"
+  adaptive_icon_background: "#F5F1EA"
+  adaptive_icon_foreground: "assets/app_icon_adaptive_fg.png"
+  adaptive_icon_monochrome: "assets/app_icon_monochrome.png"
 
 # Config for flutter_native_splash (dev dependency). Regenerate with:
 #   dart run flutter_native_splash:create
-# Colours/images match the current theme (app_theme.dart) and the real
-# WhistlyLogoMark, same as the app_icon.png/app_icon_foreground.png pair
-# used by flutter_launcher_icons above — not the old navy/JPEG logo.
+# `color_dark`/`image_dark` are the app's own ink #0E0E0E and the
+# adaptive-foreground artwork — matching dark mode rather than
+# inventing an eighth splash-only colour.
 flutter_native_splash:
   color: "#F5F1EA"
-  image: "assets/app_icon.png"
+  image: "assets/app_icon_ios.png"
   color_dark: "#0E0E0E"
-  image_dark: "assets/app_icon.png"
+  image_dark: "assets/app_icon_adaptive_fg.png"
   android_12:
     color: "#F5F1EA"
     color_dark: "#0E0E0E"
-    image: "assets/app_icon_foreground.png"
-    image_dark: "assets/app_icon_foreground.png"
+    image: "assets/app_icon_adaptive_fg.png"
+    image_dark: "assets/app_icon_adaptive_fg.png"
