@@ -30,6 +30,16 @@ class AppColors {
 
   // ─── Fixed, mode-independent ─────────────────────────────────────────
   static const Color onAccent = Color(0xFF0E0E0E); // text on accent fill, both modes
+  // ALTERATIONS.md (round 2) B1.3 — the Lead badge only, never onAccent
+  // generally (the primary button, active tab, x2 badge and FAILED
+  // result badge all stay black-on-red). White on accent measures
+  // 3.66:1 — below WCAG AA's 4.5:1 for the badge's 9px text (the black
+  // it replaces was 5.28:1) — a deliberate, accepted choice: the badge
+  // is decorative emphasis, and the same information (who's leading) is
+  // already carried by row position and the score itself. If this ratio
+  // ever needs to pass, deepen the fill to suitRed #D5001C (5.46:1 for
+  // white) rather than inventing a new colour.
+  static const Color onAccentLead = Color(0xFFFFFFFF); // Lead badge text only
   static const Color transparent = Colors.transparent;
   static const List<Color> confetti = [
     Colors.green,

@@ -296,8 +296,11 @@ class WhistlyLeadBadge extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppTheme.of(context);
     // Border == fill, so it's invisible against itself — this badge reads
-    // exactly as it did before B1.1's shared geometry.
-    return _WhistlyBadge(label: label, fill: colors.accent, border: colors.accent, text: colors.onAccent);
+    // exactly as it did before B1.1's shared geometry. Text is
+    // onAccentLead (white), not onAccent — ALTERATIONS.md B1.3, scoped
+    // to this badge only; onAccent itself stays black-on-red everywhere
+    // else (primary button, active tab, x2 badge, FAILED result badge).
+    return _WhistlyBadge(label: label, fill: colors.accent, border: colors.accent, text: colors.onAccentLead);
   }
 }
 
