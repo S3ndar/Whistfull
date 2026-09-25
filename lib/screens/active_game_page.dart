@@ -10,6 +10,7 @@ import 'package:whistly/providers/game_provider.dart';
 import 'package:whistly/providers/player_provider.dart';
 import 'package:whistly/providers/localization_provider.dart';
 import 'package:whistly/widgets/round_setup_dialog.dart';
+import 'package:whistly/widgets/player_columns.dart';
 import 'package:whistly/screens/hierarchy_page.dart';
 import 'package:confetti/confetti.dart';
 import 'package:whistly/ads/ads_provider.dart';
@@ -316,10 +317,10 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
   }
 }
 
-/// Standings row: rank (mono, 16px wide) · name (flex) · optional Lead
-/// badge · score (mono 30px, right-aligned, min 56px). Score is `ink`
-/// when >= 0, `accent` when negative (spec §5). Ranked, 1px `line`
-/// between rows.
+/// ALTERATIONS.md (round 2) E2 — the header strip: one column per
+/// player through `PlayerColumns`, in `game.players` (seating) order,
+/// staying outside the scrolling round list below so it's always on
+/// screen. Replaces the old vertical standings `Column`.
 class _StandingsList extends StatelessWidget {
   final Game game;
   final LocalizationProvider loc;
@@ -343,65 +344,92 @@ class _StandingsList extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        child: PlayerColumns(
+          cells: game.players.map((player) {
+            final score = game.totalScores[player.id] ?? 0;
+            final isDealer = dealerId != null && player.id == dealerId;
+            final isLeader = player.id == soleLeaderId;
+            return _HeaderCell(
+              player: player,
+              score: score,
+              isDealer: isDealer,
+              isLeader: isLeader,
+              loc: loc,
+              colors: colors,
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+/// One `PlayerColumns` cell: first name (13px/800, ellipsis, one line,
+/// with the D3 crown suffix) · Dealer/Lead badges in a 4px-gap `Wrap`
+/// (a player holding both must wrap rather than overflow a ~78dp
+/// column) · the running total at `screenNumeral` size 22 (30 overflows
+/// the column at three digits plus a sign).
+class _HeaderCell extends StatelessWidget {
+  final GamePlayerRef player;
+  final int score;
+  final bool isDealer;
+  final bool isLeader;
+  final LocalizationProvider loc;
+  final AppSemanticColors colors;
+
+  const _HeaderCell({
+    required this.player,
+    required this.score,
+    required this.isDealer,
+    required this.isLeader,
+    required this.loc,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
       child: Column(
-        children: List.generate(game.players.length, (i) {
-          final player = game.players[i];
-          final score = game.totalScores[player.id] ?? 0;
-          final isDealer = dealerId != null && player.id == dealerId;
-          return Container(
-            decoration: BoxDecoration(
-              border: i == 0 ? null : Border(top: BorderSide(color: colors.line, width: 1)),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-            child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  player.name.split(' ').first,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: WhistlyText.rowTitle(colors.ink).copyWith(fontSize: 13),
+                ),
+              ),
+              SoloSlimCrown(playerId: player.id),
+            ],
+          ),
+          if (isDealer || isLeader) ...[
+            const SizedBox(height: 4),
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 4,
+              runSpacing: 4,
               children: [
-                // D3 (revised): the crown is a suffix on the player's own
-                // name — not a floating badge grouped with Dealer/Lead
-                // next to the score — so it reads as part of "who this
-                // is," not as another state marker.
-                Expanded(
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
-                      ),
-                      SoloSlimCrown(playerId: player.id),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 6),
-                // B1: Dealer marker first, then Lead — one player can hold
-                // both. The header text naming the dealer stays too; this
-                // is additional, not a replacement.
-                if (isDealer) ...[
-                  WhistlyDealerBadge(label: loc.translate('dealer')),
-                  const SizedBox(width: 6),
-                ],
-                if (player.id == soleLeaderId) ...[
-                  WhistlyLeadBadge(label: loc.translate('lead')),
-                  const SizedBox(width: 8),
-                ],
-                ConstrainedBox(
-                  // Spec's "56px" is a minimum, not a cap (§6) — a fixed
-                  // `width: 56` here let a 3-digit total (e.g. "+13") wrap
-                  // onto two lines instead of overflowing, since the
-                  // 30px-mono glyphs for 3 characters don't fit 56px and
-                  // `Text` wraps by default. `minWidth` keeps every row's
-                  // number right-aligned to the same column for the common
-                  // case, `softWrap: false` lets a wider number grow past
-                  // it on one line instead of wrapping.
-                  constraints: const BoxConstraints(minWidth: 56),
-                  child: Text(
-                    score >= 0 ? '+$score' : '$score',
-                    textAlign: TextAlign.right,
-                    softWrap: false,
-                    style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
-                  ),
-                ),
+                if (isDealer) WhistlyDealerBadge(label: loc.translate('dealer')),
+                if (isLeader) WhistlyLeadBadge(label: loc.translate('lead')),
               ],
             ),
-          );
-        }),
+          ],
+          const SizedBox(height: 6),
+          Text(
+            score >= 0 ? '+$score' : '$score',
+            textAlign: TextAlign.center,
+            style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent, size: 22),
+          ),
+        ],
       ),
     );
   }
@@ -452,9 +480,12 @@ class _SuitStripWithCounts extends StatelessWidget {
   }
 }
 
-/// Round row: index (mono 12px muted) · suit glyph (24px, suit color) ·
-/// bid (15/800) over partners · deltas (mono 11px muted) · result badge
-/// (spec §5).
+/// ALTERATIONS.md (round 2) E3 — the round row as two stacked bands,
+/// separated by nothing (the divider between round rows is the
+/// existing 1px one from the surrounding `ListView.separated`): a meta
+/// band (what was bid) then a delta band through `PlayerColumns` (what
+/// it cost) — that order reads "here is what was bid" then "here is
+/// what it cost," the order a player asks the questions in.
 class _RoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
@@ -471,24 +502,44 @@ class _RoundRow extends StatelessWidget {
     final loc = context.watch<LocalizationProvider>();
     final colors = AppTheme.of(context);
 
+    // No horizontal padding here — StatsPanel already insets its whole
+    // roundsView (this row's only caller) by 22px, so an extra 22px
+    // here would double it and pull this row's columns out of
+    // alignment with the header strip's (which has exactly one 22px
+    // inset of its own).
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 6),
+          child: _buildMetaBand(loc, colors),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: PlayerColumns(cells: _deltaCells(colors)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetaBand(LocalizationProvider loc, AppSemanticColors colors) {
+    // The Rondpas row keeps its own, simpler meta band — there's no
+    // contract, no trump, no result to show, just who dealt.
     if (round.contractType == 'Pass') {
       final dealer = players.firstWhere((p) => p.id == round.dealerId, orElse: () => players.first);
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-        child: Row(
-          children: [
-            SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(loc.translate('bid_pass'), style: WhistlyText.rowTitle(colors.muted)),
+      return Row(
+        children: [
+          SizedBox(width: 20, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 11))),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '${loc.translate('bid_pass')} · ${loc.translate('dealer')}: ${dealer.name}',
+              style: WhistlyText.mono(colors.muted, size: 11),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            Text(
-              '${loc.translate('dealer')}: ${dealer.name}',
-              style: WhistlyText.mono(colors.muted),
-            ),
-            if (onDelete != null) _deleteButton(colors),
-          ],
-        ),
+          ),
+          if (onDelete != null) _deleteButton(colors),
+        ],
       );
     }
 
@@ -517,47 +568,56 @@ class _RoundRow extends StatelessWidget {
             ? colors.suitInk
             : colors.muted;
 
-    final partnerLine = partner != null ? '${declarer.name} & ${partner.name}' : declarer.name;
-    final deltasLine = players.map((p) {
-      final d = round.scoreDeltas[p.id] ?? 0;
-      return '${p.name.split(' ').first} ${d >= 0 ? '+$d' : '$d'}';
-    }).join('  ');
+    final contractingLine = partner != null ? '${declarer.name} & ${partner.name}' : declarer.name;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
-          const SizedBox(width: 12),
-          SizedBox(
-            width: 24,
-            child: trumpGlyph.isEmpty ? null : Text(trumpGlyph, style: TextStyle(fontSize: 24, color: trumpColor)),
+    return Row(
+      children: [
+        SizedBox(width: 20, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 11))),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 18,
+          child: trumpGlyph.isEmpty ? null : Text(trumpGlyph, style: TextStyle(fontSize: 14, color: trumpColor)),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            getContractName(loc, round.contractType),
+            style: WhistlyText.rowTitle(colors.ink).copyWith(fontSize: 13),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  getContractName(loc, round.contractType),
-                  style: WhistlyText.rowTitle(colors.ink),
-                ),
-                const SizedBox(height: 2),
-                Text('$partnerLine · $deltasLine', style: WhistlyText.mono(colors.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          WhistlyResultBadge(
-            achieved: overallSuccess,
-            achievedLabel: loc.translate('setup_succeeded'),
-            failedLabel: loc.translate('setup_failed'),
-          ),
-          if (onDelete != null) _deleteButton(colors),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(contractingLine, style: WhistlyText.mono(colors.muted, size: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+        const SizedBox(width: 8),
+        WhistlyResultBadge(
+          achieved: overallSuccess,
+          achievedLabel: loc.translate('setup_succeeded'),
+          failedLabel: loc.translate('setup_failed'),
+        ),
+        if (onDelete != null) _deleteButton(colors),
+      ],
     );
+  }
+
+  // A Rondpas round has no declarer, so every player's delta is exactly
+  // 0 — the same "0 renders as a dot" rule that applies to any zero
+  // delta on a real contract row gives it four dots for free, rather
+  // than needing a separate early-return that skips the columns
+  // entirely (a row with no columns would break the grid — E3).
+  List<Widget> _deltaCells(AppSemanticColors colors) {
+    return players.map((p) {
+      final delta = round.scoreDeltas[p.id] ?? 0;
+      final text = delta == 0 ? '·' : (delta > 0 ? '+$delta' : '$delta');
+      final color = delta == 0 ? colors.muted : (delta > 0 ? colors.ink : colors.accent);
+      return Text(
+        text,
+        textAlign: TextAlign.center,
+        style: WhistlyText.mono(color, size: 13, weight: FontWeight.w800),
+      );
+    }).toList();
   }
 
   Widget _deleteButton(AppSemanticColors colors) => Padding(
