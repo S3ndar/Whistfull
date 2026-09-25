@@ -231,17 +231,21 @@ class _StatsPanelState extends State<StatsPanel> {
         );
 
       case _ChartKind.contractSuccess:
+        // ALTERATIONS.md (round 2) C4.2 — deliberately no footnote here.
+        // The two-player-Miserie caveat still holds in the data (see the
+        // doc comment on contractSuccess() in game_stats.dart), Sander
+        // asked for the explanation to stay out of the UI.
+        return BarChart(data: contractSuccessChart(widget.scope, loc), axisMax: 1.0);
+
+      case _ChartKind.accuracy:
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            BarChart(data: contractSuccessChart(widget.scope, loc), axisMax: 1.0),
+            BarChart(data: biddingAccuracyChart(widget.scope), axisMax: 1.0),
             const SizedBox(height: 8),
-            Text(loc.translate('stats_miserie_note'), style: WhistlyText.mono(colors.muted, size: 11)),
+            Text(loc.translate('stats_accuracy_help'), style: WhistlyText.mono(colors.muted, size: 11)),
           ],
         );
-
-      case _ChartKind.accuracy:
-        return BarChart(data: biddingAccuracyChart(widget.scope), axisMax: 1.0);
 
       case _ChartKind.risk:
         final result = riskFactorChart(widget.scope);

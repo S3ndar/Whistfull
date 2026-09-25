@@ -190,8 +190,8 @@ class LocalizationProvider extends ChangeNotifier {
     'stats_table_average': 'Table average',
     'stats_no_data': 'Not enough rounds yet',
     'stats_untracked_trump': '{} rounds without a recorded trump',
-    'stats_miserie_note': 'A Miserie played by two counts as held only if both succeed.',
-    'stats_risk_help': 'How often this player was one of the contracting players.',
+    'stats_risk_help': 'How often a player sat in the contract (as bidder or partner), out of the rounds they played. Rondpas rounds are not counted. The dashed line is the table average: above it you bid more than your share of the seats, below it you mostly defend.',
+    'stats_accuracy_help': 'Of the contracts a player sat in, how many came off. It measures judgement, not points: a cautious bidder can score less and still rank highest here.',
 
     // Settings — Support (ads / purchases)
     'settings_support': 'Support Whistly',
@@ -455,8 +455,8 @@ class LocalizationProvider extends ChangeNotifier {
     'stats_table_average': 'Tafelgemiddelde',
     'stats_no_data': 'Nog niet genoeg rondes',
     'stats_untracked_trump': '{} rondes zonder geregistreerde troef',
-    'stats_miserie_note': 'Een Miserie met twee telt alleen als geslaagd wanneer beiden slagen.',
-    'stats_risk_help': 'Hoe vaak deze speler mee in het contract zat.',
+    'stats_risk_help': 'Hoe vaak een speler mee in het contract zat (als bieder of partner), op de rondes die hij speelde. Rondpas telt niet mee. De stippellijn is het tafelgemiddelde: erboven bied je meer dan je deel van de plaatsen, eronder verdedig je vooral.',
+    'stats_accuracy_help': 'Van de contracten waarin een speler zat, hoeveel er lukten. Dit meet inschatting, niet punten: een voorzichtige bieder kan minder scoren en hier toch bovenaan staan.',
 
     // Settings — Support (advertenties / aankopen)
     'settings_support': 'Steun Whistly',

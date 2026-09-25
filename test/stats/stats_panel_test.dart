@@ -194,4 +194,26 @@ void main() {
     expect(find.text('Rounds'), findsNothing);
     expect(find.text('VIEW'), findsOneWidget);
   });
+
+  testWidgets('22: contract success has no footnote; bidding accuracy has its help text (C4.2/C4.3)', (tester) async {
+    await tester.pumpWidget(wrap(StatsPanel(scope: [threeRoundGame])));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Score progression'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Success rate by contract'));
+    await tester.pumpAndSettle();
+
+    // C4.2 — deliberately no footnote on this chart.
+    expect(find.textContaining('Miserie played by two'), findsNothing);
+
+    await tester.tap(find.text('Success rate by contract'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Bidding accuracy'));
+    await tester.pumpAndSettle();
+
+    // C4.3 — always-visible help text under the accuracy chart, same
+    // treatment as the risk chart already has.
+    expect(find.textContaining('It measures judgement, not points'), findsOneWidget);
+  });
 }
