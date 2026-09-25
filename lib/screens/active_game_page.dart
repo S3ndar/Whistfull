@@ -290,7 +290,9 @@ class _ActiveGamePageState extends State<ActiveGamePage> {
                       await showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
+                        useSafeArea: true,
                         backgroundColor: Colors.transparent,
+                        constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.92),
                         builder: (_) => RoundSetupDialog(players: game.players),
                       );
                     },

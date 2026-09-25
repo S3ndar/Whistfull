@@ -133,60 +133,83 @@ class _RoundSetupDialogState extends State<RoundSetupDialog> {
   Widget build(BuildContext context) {
     final loc = context.watch<LocalizationProvider>();
     final colors = AppTheme.of(context);
-    return Container(
-      decoration: BoxDecoration(
-        color: colors.bg,
-        border: Border(top: BorderSide(color: colors.line, width: 2)),
-      ),
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 22,
-        right: 22,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 20,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Header — flush left, per spec (no centered headings).
-          Row(
-            children: [
-              if (_phase != 'contract')
-                IconButton(
-                  icon: Icon(Icons.arrow_back, color: colors.ink),
-                  onPressed: _prevStep,
-                ),
-              Expanded(
-                child: Text(_stepTitle(loc), style: WhistlyText.sectionHead(colors.ink)),
-              ),
-            ],
-          ),
-          // Step indicator — radius 0, per spec §3. Dot count/position
-          // track `_phases`, which already omits whatever isn't relevant
-          // to the selected contract — nothing to specially hide here.
-          Row(
-            children: () {
-              final phases = _phases;
-              final current = phases.indexOf(_phase);
-              return List.generate(phases.length, (i) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 4, top: 12, bottom: 12),
-                  child: Container(
-                    width: i == current ? 20 : 8,
-                    height: 4,
-                    color: i == current ? colors.accent : colors.line,
+    // ALTERATIONS.md (round 2) F — a fixed height on every step, not just
+    // the tall ones, so the sheet doesn't jump in height as the wizard
+    // advances; the caller (active_game_page.dart) already caps the sheet
+    // itself at the same 92% via showModalBottomSheet's constraints, but
+    // that cap alone lets short steps size down to their own content, so
+    // it's repeated here as a concrete SizedBox to actually fill it.
+    return SizedBox(
+      height: MediaQuery.sizeOf(context).height * 0.92,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colors.bg,
+          border: Border(top: BorderSide(color: colors.line, width: 2)),
+        ),
+        padding: EdgeInsets.only(
+          top: 16,
+          left: 22,
+          right: 22,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Header — flush left, per spec (no centered headings).
+            Row(
+              children: [
+                if (_phase != 'contract')
+                  IconButton(
+                    icon: Icon(Icons.arrow_back, color: colors.ink),
+                    onPressed: _prevStep,
                   ),
-                );
-              });
-            }(),
-          ),
-          const SizedBox(height: 4),
-          // Step content
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: _buildStep(loc),
-          ),
-        ],
+                Expanded(
+                  child: Text(_stepTitle(loc), style: WhistlyText.sectionHead(colors.ink)),
+                ),
+              ],
+            ),
+            // Step indicator — radius 0, per spec §3. Dot count/position
+            // track `_phases`, which already omits whatever isn't relevant
+            // to the selected contract — nothing to specially hide here.
+            Row(
+              children: () {
+                final phases = _phases;
+                final current = phases.indexOf(_phase);
+                return List.generate(phases.length, (i) {
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 4, top: 12, bottom: 12),
+                    child: Container(
+                      width: i == current ? 20 : 8,
+                      height: 4,
+                      color: i == current ? colors.accent : colors.line,
+                    ),
+                  );
+                });
+              }(),
+            ),
+            const SizedBox(height: 4),
+            // Step content — Expanded so short steps (e.g. trump picker)
+            // sit at the top of the fixed-height sheet rather than
+            // floating centred in leftover space; scrollable so a tall
+            // step (e.g. the result step's score breakdown) never
+            // overflows instead of scrolling.
+            Expanded(
+              child: SingleChildScrollView(
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  // `?currentChild` (null-aware spread) is avoided here —
+                  // see game_provider.dart's soloSlimsByPlayer for why.
+                  layoutBuilder: (currentChild, previousChildren) => Stack(
+                    alignment: Alignment.topCenter,
+                    // ignore: use_null_aware_elements
+                    children: [...previousChildren, if (currentChild != null) currentChild],
+                  ),
+                  child: _buildStep(loc),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
