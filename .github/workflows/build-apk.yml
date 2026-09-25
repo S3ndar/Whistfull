@@ -59,22 +59,42 @@ jobs:
           from googleapiclient.discovery import build
           from googleapiclient.http import MediaFileUpload
 
+          # `drive.file` (the minimal scope) only sees files the app
+          # itself created or that were opened via a picker under that
+          # scope — a folder merely shared with the service account
+          # through the ordinary Share dialog doesn't qualify, and the
+          # API then returns a bare 404 rather than a permission error.
+          # `drive` (full scope) does respect folders shared by ACL.
           creds = service_account.Credentials.from_service_account_info(
               json.loads(os.environ["GDRIVE_SA_KEY"]),
-              scopes=["https://www.googleapis.com/auth/drive.file"],
+              scopes=["https://www.googleapis.com/auth/drive"],
           )
           drive = build("drive", "v3", credentials=creds)
+
+          folder_id = os.environ["GDRIVE_FOLDER_ID"]
+          # Confirms the folder is visible to this service account (and
+          # is in fact a folder) before attempting the upload, so a bad
+          # folder ID or missing share fails with a clear message
+          # instead of the upload's own generic 404.
+          folder = drive.files().get(
+              fileId=folder_id, fields="id,name,mimeType", supportsAllDrives=True
+          ).execute()
+          if folder.get("mimeType") != "application/vnd.google-apps.folder":
+              raise SystemExit(f"GDRIVE_FOLDER_ID ({folder_id}) is not a folder: {folder}")
+          print(f"Target Drive folder confirmed: \"{folder['name']}\" ({folder_id})")
 
           build_type = "${{ inputs.build_type }}"
           run_number = "${{ github.run_number }}"
           timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H%M")
           name = f"whistly-{build_type}-{timestamp}-run{run_number}.apk"
 
-          metadata = {"name": name, "parents": [os.environ["GDRIVE_FOLDER_ID"]]}
+          metadata = {"name": name, "parents": [folder_id]}
           media = MediaFileUpload(
               f"build/app/outputs/flutter-apk/app-{build_type}.apk",
               mimetype="application/vnd.android.package-archive",
           )
-          uploaded = drive.files().create(body=metadata, media_body=media, fields="id,webViewLink").execute()
+          uploaded = drive.files().create(
+              body=metadata, media_body=media, fields="id,webViewLink", supportsAllDrives=True
+          ).execute()
           print(f"Uploaded to Drive: {uploaded['webViewLink']}")
           PY
