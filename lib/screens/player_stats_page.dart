@@ -177,10 +177,15 @@ class PlayerStatsPage extends StatelessWidget {
                         onTap: () {
                           Navigator.push(context, MaterialPageRoute(builder: (context) => GameHistoryDetailPage(game: game)));
                         },
+                        // `color` lives inside the BoxDecoration: Container
+                        // asserts when given both `color:` and `decoration:`,
+                        // which crashed this page for any player with a game.
                         child: Container(
-                          color: colors.bg,
                           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-                          decoration: BoxDecoration(border: Border(top: BorderSide(color: colors.line, width: 1))),
+                          decoration: BoxDecoration(
+                            color: colors.bg,
+                            border: Border(top: BorderSide(color: colors.line, width: 1)),
+                          ),
                           child: Row(
                             children: [
                               Expanded(
