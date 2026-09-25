@@ -134,6 +134,19 @@ flutter test
 flutter run
 flutter build appbundle --release
 ```
+Simulation tests (`test/simulation/`, see the header of each `*_test.dart`):
+```
+flutter test test/simulation/simulated_games_test.dart --dart-define=SIM_GAMES=500 --dart-define=SIM_SEEDS=10
+flutter test test/simulation/ui_simulation_test.dart --dart-define=SIM_UI_GAMES=6 --dart-define=SIM_UI_SEEDS=5
+flutter test test/simulation/ui_simulation_test.dart --dart-define=SIM_SEED=2003   # replay one seed
+```
+A seeded generator writes random scripts (players, favourites, games, rounds, undo/delete,
+complete/abandon). `ExpectedWorld` tracks what every page should show, scored by an
+independent `ScoringOracle`. `ProviderDriver` runs thousands of games against the
+providers; `UiDriver` taps through the real screens and `page_validators.dart` checks what
+is rendered. When scoring rules or a screen's layout change on purpose, update the
+oracle / the matching view in `expected_state.dart` too.
+
 `verify.ps1` in the repo root runs pub get -> build_runner -> analyze -> test in one
 pass and writes everything to `verify_output.txt`.
 
