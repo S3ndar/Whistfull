@@ -234,4 +234,19 @@ void main() {
     // forbids forcing them equal.
     expect(dealerSize.width, isNot(leadSize.width));
   });
+
+  testWidgets('8: the Lead badge renders white text on an accent fill (B1.3)', (tester) async {
+    await tester.pumpWidget(wrapBadge(const WhistlyLeadBadge(label: 'Lead')));
+
+    final textWidget = tester.widget<Text>(find.text('LEAD'));
+    expect(textWidget.style!.color, AppSemanticColors.light.onAccentLead);
+    expect(textWidget.style!.color, const Color(0xFFFFFFFF));
+    // Never onAccent — that stays black, and is a different token used
+    // by the primary button, active tab, x2 badge and FAILED badge.
+    expect(textWidget.style!.color, isNot(AppSemanticColors.light.onAccent));
+
+    final container = tester.widget<Container>(find.byType(Container).first);
+    final decoration = container.decoration as BoxDecoration;
+    expect(decoration.color, AppSemanticColors.light.accent);
+  });
 }

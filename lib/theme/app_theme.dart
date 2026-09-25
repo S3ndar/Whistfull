@@ -16,6 +16,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
   final Color suitRed; // hearts + diamonds, both modes
   final Color suitInk; // spades + clubs — black in light, white in dark
   final Color crown; // Solo Slim achievement mark only (ALTERATIONS.md D2) — mode-dependent, off-palette
+  final Color onAccentLead; // Lead badge text only (ALTERATIONS.md B1.3) — white, both modes
 
   const AppSemanticColors({
     required this.bg,
@@ -27,6 +28,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     required this.suitRed,
     required this.suitInk,
     required this.crown,
+    required this.onAccentLead,
   });
 
   static const AppSemanticColors light = AppSemanticColors(
@@ -39,6 +41,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     suitRed: AppColors.suitRed,
     suitInk: AppColors.suitInkLight,
     crown: AppColors.crownLight,
+    onAccentLead: AppColors.onAccentLead,
   );
 
   static const AppSemanticColors dark = AppSemanticColors(
@@ -51,6 +54,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     suitRed: AppColors.suitRed,
     suitInk: AppColors.suitInkDark,
     crown: AppColors.crownDark,
+    onAccentLead: AppColors.onAccentLead,
   );
 
   @override
@@ -64,6 +68,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
     Color? suitRed,
     Color? suitInk,
     Color? crown,
+    Color? onAccentLead,
   }) {
     return AppSemanticColors(
       bg: bg ?? this.bg,
@@ -75,6 +80,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       suitRed: suitRed ?? this.suitRed,
       suitInk: suitInk ?? this.suitInk,
       crown: crown ?? this.crown,
+      onAccentLead: onAccentLead ?? this.onAccentLead,
     );
   }
 
@@ -91,6 +97,7 @@ class AppSemanticColors extends ThemeExtension<AppSemanticColors> {
       suitRed: Color.lerp(suitRed, other.suitRed, t)!,
       suitInk: Color.lerp(suitInk, other.suitInk, t)!,
       crown: Color.lerp(crown, other.crown, t)!,
+      onAccentLead: Color.lerp(onAccentLead, other.onAccentLead, t)!,
     );
   }
 }
