@@ -34,3 +34,44 @@ jobs:
         with:
           name: whistly-${{ inputs.build_type }}-apk
           path: build/app/outputs/flutter-apk/app-${{ inputs.build_type }}.apk
+      # Uploads straight to Drive from this runner, which has normal
+      # internet access — unlike a Claude Code cloud session, which
+      # can't reach Drive's/Actions' artifact storage hosts and so
+      # can't relay this file itself. Skipped entirely (not failed)
+      # when the two secrets below aren't set yet, so this workflow
+      # keeps working before that one-time setup is done.
+      - name: Upload APK to Google Drive
+        if: ${{ secrets.GDRIVE_SA_KEY != '' && secrets.GDRIVE_FOLDER_ID != '' }}
+        env:
+          GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+        run: |
+          pip install --quiet google-api-python-client google-auth
+          python3 - <<'PY'
+          import datetime
+          import json
+          import os
+
+          from google.oauth2 import service_account
+          from googleapiclient.discovery import build
+          from googleapiclient.http import MediaFileUpload
+
+          creds = service_account.Credentials.from_service_account_info(
+              json.loads(os.environ["GDRIVE_SA_KEY"]),
+              scopes=["https://www.googleapis.com/auth/drive.file"],
+          )
+          drive = build("drive", "v3", credentials=creds)
+
+          build_type = "${{ inputs.build_type }}"
+          run_number = "${{ github.run_number }}"
+          timestamp = datetime.datetime.utcnow().strftime("%Y-%m-%d_%H%M")
+          name = f"whistly-{build_type}-{timestamp}-run{run_number}.apk"
+
+          metadata = {"name": name, "parents": [os.environ["GDRIVE_FOLDER_ID"]]}
+          media = MediaFileUpload(
+              f"build/app/outputs/flutter-apk/app-{build_type}.apk",
+              mimetype="application/vnd.android.package-archive",
+          )
+          uploaded = drive.files().create(body=metadata, media_body=media, fields="id,webViewLink").execute()
+          print(f"Uploaded to Drive: {uploaded['webViewLink']}")
+          PY
