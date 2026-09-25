@@ -10,6 +10,7 @@ import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
 import 'package:whistly/stats/stats_panel.dart';
 import 'package:whistly/stats/crown_badge.dart';
+import 'package:whistly/widgets/player_columns.dart';
 
 class GameHistoryDetailPage extends StatelessWidget {
   final Game game;
@@ -54,51 +55,28 @@ class GameHistoryDetailPage extends StatelessWidget {
               style: WhistlyText.eyebrow(colors.muted),
             ),
           ),
+          // ALTERATIONS.md (round 2) E4 — through the same PlayerColumns
+          // as the round list below, but in RANKED order: a finished
+          // game legitimately ranks by score (unlike the live view's
+          // fixed seating order), and this block's own column order
+          // doesn't need to match the round list's — they're two
+          // separate tables, not one continuous grid.
           Container(
             decoration: BoxDecoration(border: Border(bottom: BorderSide(color: colors.line, width: 2))),
-            child: Column(
-              children: List.generate(ranked.length, (i) {
-                final player = ranked[i];
-                final score = game.totalScores[player.id] ?? 0;
-                return Container(
-                  decoration: BoxDecoration(border: i == 0 ? null : Border(top: BorderSide(color: colors.line, width: 1))),
-                  padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-                  child: Row(
-                    children: [
-                      SizedBox(width: 16, child: Text('${i + 1}', style: WhistlyText.mono(colors.muted, size: 12))),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(player.name, style: WhistlyText.rowTitle(colors.ink), overflow: TextOverflow.ellipsis),
-                            ),
-                            SoloSlimCrown(playerId: player.id),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 6),
-                      if (player.id == soleLeaderId) ...[
-                        WhistlyLeadBadge(label: loc.translate('lead')),
-                        const SizedBox(width: 8),
-                      ],
-                      ConstrainedBox(
-                        // See the matching column in active_game_page.dart's
-                        // _StandingsList: 56px is a minimum, not a cap — a
-                        // fixed `width: 56` let a 3-digit total wrap onto
-                        // two lines instead of staying on one.
-                        constraints: const BoxConstraints(minWidth: 56),
-                        child: Text(
-                          score >= 0 ? '+$score' : '$score',
-                          textAlign: TextAlign.right,
-                          softWrap: false,
-                          style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent),
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22),
+              child: PlayerColumns(
+                cells: ranked.map((player) {
+                  final score = game.totalScores[player.id] ?? 0;
+                  return _HistoryHeaderCell(
+                    player: player,
+                    score: score,
+                    isLeader: player.id == soleLeaderId,
+                    loc: loc,
+                    colors: colors,
+                  );
+                }).toList(),
+              ),
             ),
           ),
 
@@ -112,6 +90,9 @@ class GameHistoryDetailPage extends StatelessWidget {
               separatorBuilder: (context, index) => Divider(height: 1, color: colors.line),
               itemBuilder: (context, index) {
                 final round = game.rounds[index];
+                // E4 — the round list's columns follow game.players
+                // (seating order), not `ranked`, so each delta stays
+                // under the name it belongs to round by round.
                 return _HistoricalRoundRow(round: round, roundNumber: index + 1, players: players);
               },
             ),
@@ -122,6 +103,66 @@ class GameHistoryDetailPage extends StatelessWidget {
   }
 }
 
+/// E4's `PlayerColumns` cell for the final-scores block — no Dealer
+/// badge (a finished game has no current dealer), otherwise the same
+/// content and sizing as active_game_page.dart's `_HeaderCell`.
+class _HistoryHeaderCell extends StatelessWidget {
+  final GamePlayerRef player;
+  final int score;
+  final bool isLeader;
+  final LocalizationProvider loc;
+  final AppSemanticColors colors;
+
+  const _HistoryHeaderCell({
+    required this.player,
+    required this.score,
+    required this.isLeader,
+    required this.loc,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  player.name.split(' ').first,
+                  textAlign: TextAlign.center,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: WhistlyText.rowTitle(colors.ink).copyWith(fontSize: 13),
+                ),
+              ),
+              SoloSlimCrown(playerId: player.id),
+            ],
+          ),
+          if (isLeader) ...[
+            const SizedBox(height: 4),
+            WhistlyLeadBadge(label: loc.translate('lead')),
+          ],
+          const SizedBox(height: 6),
+          Text(
+            score >= 0 ? '+$score' : '$score',
+            textAlign: TextAlign.center,
+            style: WhistlyText.screenNumeral(score >= 0 ? colors.ink : colors.accent, size: 22),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// E4 — the same meta band / delta band split as
+/// active_game_page.dart's `_RoundRow`, through the same
+/// `PlayerColumns`, in `game.players` (seating) order.
 class _HistoricalRoundRow extends StatelessWidget {
   final Round round;
   final int roundNumber;
@@ -134,18 +175,39 @@ class _HistoricalRoundRow extends StatelessWidget {
     final loc = context.watch<LocalizationProvider>();
     final colors = AppTheme.of(context);
 
+    // No horizontal padding here — StatsPanel already insets its whole
+    // roundsView (this row's only caller) by 22px; see the matching
+    // comment on active_game_page.dart's _RoundRow.
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 10, 0, 6),
+          child: _buildMetaBand(loc, colors),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: PlayerColumns(cells: _deltaCells(colors)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetaBand(LocalizationProvider loc, AppSemanticColors colors) {
     if (round.contractType == 'Pass') {
       final dealer = players.firstWhere((p) => p.id == round.dealerId, orElse: () => players.first);
-      return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-        child: Row(
-          children: [
-            SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
-            const SizedBox(width: 12),
-            Expanded(child: Text(loc.translate('bid_pass'), style: WhistlyText.rowTitle(colors.muted))),
-            Text('${loc.translate('dealer')}: ${dealer.name}', style: WhistlyText.mono(colors.muted)),
-          ],
-        ),
+      return Row(
+        children: [
+          SizedBox(width: 20, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 11))),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              '${loc.translate('bid_pass')} · ${loc.translate('dealer')}: ${dealer.name}',
+              style: WhistlyText.mono(colors.muted, size: 11),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
       );
     }
 
@@ -174,42 +236,49 @@ class _HistoricalRoundRow extends StatelessWidget {
             ? colors.suitInk
             : colors.muted;
 
-    final partnerLine = partner != null ? '${declarer.name} & ${partner.name}' : declarer.name;
-    final deltasLine = players.map((p) {
-      final d = round.scoreDeltas[p.id] ?? 0;
-      return '${p.name.split(' ').first} ${d >= 0 ? '+$d' : '$d'}';
-    }).join('  ');
+    final contractingLine = partner != null ? '${declarer.name} & ${partner.name}' : declarer.name;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(width: 24, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 12))),
-          const SizedBox(width: 12),
-          SizedBox(
-            width: 24,
-            child: trumpGlyph.isEmpty ? null : Text(trumpGlyph, style: TextStyle(fontSize: 24, color: trumpColor)),
+    return Row(
+      children: [
+        SizedBox(width: 20, child: Text('$roundNumber', style: WhistlyText.mono(colors.muted, size: 11))),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 18,
+          child: trumpGlyph.isEmpty ? null : Text(trumpGlyph, style: TextStyle(fontSize: 14, color: trumpColor)),
+        ),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(
+            getContractName(loc, round.contractType),
+            style: WhistlyText.rowTitle(colors.ink).copyWith(fontSize: 13),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(getContractName(loc, round.contractType), style: WhistlyText.rowTitle(colors.ink)),
-                const SizedBox(height: 2),
-                Text('$partnerLine · $deltasLine', style: WhistlyText.mono(colors.muted), maxLines: 1, overflow: TextOverflow.ellipsis),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          WhistlyResultBadge(
-            achieved: overallSuccess,
-            achievedLabel: loc.translate('setup_succeeded'),
-            failedLabel: loc.translate('setup_failed'),
-          ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(contractingLine, style: WhistlyText.mono(colors.muted, size: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ),
+        const SizedBox(width: 8),
+        WhistlyResultBadge(
+          achieved: overallSuccess,
+          achievedLabel: loc.translate('setup_succeeded'),
+          failedLabel: loc.translate('setup_failed'),
+        ),
+      ],
     );
+  }
+
+  List<Widget> _deltaCells(AppSemanticColors colors) {
+    return players.map((p) {
+      final delta = round.scoreDeltas[p.id] ?? 0;
+      final text = delta == 0 ? '·' : (delta > 0 ? '+$delta' : '$delta');
+      final color = delta == 0 ? colors.muted : (delta > 0 ? colors.ink : colors.accent);
+      return Text(
+        text,
+        textAlign: TextAlign.center,
+        style: WhistlyText.mono(color, size: 13, weight: FontWeight.w800),
+      );
+    }).toList();
   }
 }

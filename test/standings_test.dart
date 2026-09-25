@@ -25,6 +25,7 @@ import 'package:whistly/scoring_settings.dart';
 import 'package:whistly/screens/active_game_page.dart';
 import 'package:whistly/theme/app_theme.dart';
 import 'package:whistly/theme/whistly_components.dart';
+import 'package:whistly/widgets/player_columns.dart';
 
 void main() {
   late Directory tempDir;
@@ -83,17 +84,23 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  // Rows are found as the Text widgets carrying each player's name inside
-  // the standings list, ordered top-to-bottom by vertical position.
+  // ALTERATIONS.md (round 2) E2 — the standings list is now the header
+  // strip, one `PlayerColumns` cell per player left-to-right, rather
+  // than a vertical list of rows. Names are found scoped to that first
+  // `PlayerColumns` (the header) specifically, ordered left-to-right by
+  // horizontal position — a round row's own meta band can also render
+  // a lone player's name (e.g. a Solo's declarer with no partner), so
+  // an unscoped find.byType(Text) search would double-count.
   List<String> renderedNameOrder(WidgetTester tester) {
-    final finder = find.byType(Text);
+    final header = find.byType(PlayerColumns).first;
+    final finder = find.descendant(of: header, matching: find.byType(Text));
     final entries = <MapEntry<double, String>>[];
     for (final element in finder.evaluate()) {
       final widget = element.widget as Text;
       final text = widget.data;
       if (text != null && players.any((p) => p.name == text)) {
-        final y = tester.getTopLeft(find.byWidget(widget)).dy;
-        entries.add(MapEntry(y, text));
+        final x = tester.getTopLeft(find.byWidget(widget)).dx;
+        entries.add(MapEntry(x, text));
       }
     }
     entries.sort((a, b) => a.key.compareTo(b.key));
