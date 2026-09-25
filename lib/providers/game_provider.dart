@@ -49,8 +49,15 @@ class GameProvider extends ChangeNotifier {
   // (recomputeFromRounds, endGame, abandonGame, and the box load in
   // init) — never inside build().
   Map<String, List<SoloSlim>>? _slimCache;
+  // `?activeGame` (null-aware spread) parses fine for flutter
+  // analyze/test (the SDK's own front end), but the `analyzer` package
+  // build_runner/hive_generator depend on (pinned older than the Dart
+  // SDK) can't parse null-aware spread elements yet and fails the
+  // whole codegen step with a syntax error — the `if` form below is
+  // the same result, understood by every analyzer version.
   Map<String, List<SoloSlim>> get soloSlimsByPlayer =>
-      _slimCache ??= soloSlims([...completedGames, ?activeGame]);
+      // ignore: use_null_aware_elements
+      _slimCache ??= soloSlims([...completedGames, if (activeGame != null) activeGame!]);
 
   /// True if the most recent attempt to persist a game to Hive failed
   /// (disk full, box mid-compaction, etc). The in-memory state the UI
