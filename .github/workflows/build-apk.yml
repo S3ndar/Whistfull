@@ -41,11 +41,14 @@ jobs:
       # when the two secrets below aren't set yet, so this workflow
       # keeps working before that one-time setup is done.
       - name: Upload APK to Google Drive
-        if: ${{ secrets.GDRIVE_SA_KEY != '' && secrets.GDRIVE_FOLDER_ID != '' }}
         env:
           GDRIVE_SA_KEY: ${{ secrets.GDRIVE_SA_KEY }}
           GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
         run: |
+          if [ -z "$GDRIVE_SA_KEY" ] || [ -z "$GDRIVE_FOLDER_ID" ]; then
+            echo "GDRIVE_SA_KEY/GDRIVE_FOLDER_ID not set — skipping Drive upload."
+            exit 0
+          fi
           pip install --quiet google-api-python-client google-auth
           python3 - <<'PY'
           import datetime
