@@ -97,6 +97,16 @@ const List<String> _trumpSuits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
 
 /// C1.3 / C4.2 — per contract type, how often the contract held.
 /// `'Pass'` never appears as a key.
+///
+/// Caveat, deliberately kept out of the UI (ALTERATIONS.md C4.2 — Sander
+/// asked for the explanation to be left out there): for a Miserie/Open
+/// Miserie played by two, `held` (== `round.success`) is
+/// `miserieSuccess && partnerMiserieSuccess` — the contract as a whole
+/// counts as held only if BOTH players made it, even though one of them
+/// individually succeeding is a per-player fact that `biddingAccuracy`
+/// (below) does track. So this chart can show a two-player Miserie as
+/// "failed" in a round where one of the two players actually made
+/// their half.
 Map<String, ({int made, int total})> contractSuccess(Iterable<Game> games) {
   final made = <String, int>{};
   final total = <String, int>{};
